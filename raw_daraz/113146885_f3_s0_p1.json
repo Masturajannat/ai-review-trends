@@ -1,0 +1,66 @@
+{
+ "success": true,
+ "model": {
+  "items": [],
+  "paging": {
+   "totalItems": 0,
+   "totalPages": 0,
+   "currentPage": 1
+  },
+  "item": {
+   "sellerId": 1016676,
+   "sellerName": null,
+   "itemId": 113146885,
+   "itemStatus": 1,
+   "skuId": null,
+   "configSku": "113146885_BD",
+   "skuInfo": "কালার_ফ্যামিলি:Black",
+   "itemPic": "https://static-01.daraz.com.bd/p/3e695985b1bd12964e54364fd7204eef.jpg",
+   "itemTitle": "ফ্যাশন মিনি ব্যাকপ্যাকস সিকুইন গার্লস স্কুল ব্যাগ চামড়া ভ্রমণের ব্যাকপ্যাক স্পোর্টস ডেপ্যাক হ্যান্ডব্যাগ (25*28*11cm)",
+   "itemUrl": "https://www.daraz.com.bd/products/252811cm-i113146885-s1030280932.html",
+   "categoryId": 10001942,
+   "categoryName": "ব্যাকপ্যাক",
+   "rootCategoryId": 1902,
+   "rootCategoryName": "ব্যাগ এবং ভ্রমণ",
+   "subSellerId": null,
+   "subSellerName": null,
+   "subShopUrl": null,
+   "productPrice": "৳ 1,466"
+  },
+  "ratings": {
+   "average": 4.5,
+   "rateCount": 16,
+   "reviewCount": 10,
+   "imagesCount": 0,
+   "videosCount": 0,
+   "withImageCount": 1,
+   "withVideoCount": 0,
+   "localReviewsCount": 10,
+   "withMediaCount": 1,
+   "rate12Stars": 2,
+   "hiddenCount": 0,
+   "scores": [
+    12,
+    2,
+    0,
+    2,
+    0
+   ],
+   "mediaNum": 0,
+   "labelCounts": [],
+   "impressionTags": null
+  },
+  "mediaList": null,
+  "showInfo": {
+   "showAuthTipsUrl": "",
+   "showAuthTips": true
+  },
+  "pageVersion": null
+ },
+ "msgCode": null,
+ "httpStatusCode": 200,
+ "msgInfo": null,
+ "mappingCode": null,
+ "headers": {},
+ "bizExtMap": null
+}

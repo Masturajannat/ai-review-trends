@@ -1,0 +1,13 @@
+length,text_source,reviews,flagged,flag_rate_pct,ci95_low_pct,ci95_high_pct
+1-4 words,ALL,156,0,0.0,0.0,2.4
+1-4 words,original_english,88,0,0.0,0.0,4.2
+1-4 words,translated,68,0,0.0,0.0,5.3
+5-9 words,ALL,174,12,6.9,4.0,11.7
+5-9 words,original_english,35,2,5.7,1.6,18.6
+5-9 words,translated,139,10,7.2,4.0,12.7
+10-29 words,ALL,272,42,15.4,11.6,20.2
+10-29 words,original_english,12,0,0.0,0.0,24.3
+10-29 words,translated,260,42,16.2,12.2,21.1
+30+ words,ALL,203,27,13.3,9.3,18.7
+30+ words,original_english,4,0,0.0,0.0,49.0
+30+ words,translated,199,27,13.6,9.5,19.0

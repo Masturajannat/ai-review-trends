@@ -1,0 +1,10 @@
+period,text_source,reviews,flagged,flag_rate_pct,ci95_low_pct,ci95_high_pct
+pre_2022,ALL,995,83,8.3,6.8,10.2
+pre_2022,original_english,240,2,0.8,0.2,3.0
+pre_2022,translated,755,81,10.7,8.7,13.1
+2022,ALL,304,27,8.9,6.2,12.6
+2022,original_english,92,3,3.3,1.1,9.2
+2022,translated,212,24,11.3,7.7,16.3
+post_2022,ALL,1600,134,8.4,7.1,9.8
+post_2022,original_english,361,4,1.1,0.4,2.8
+post_2022,translated,1239,130,10.5,8.9,12.3

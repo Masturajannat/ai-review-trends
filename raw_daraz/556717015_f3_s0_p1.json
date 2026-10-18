@@ -1,0 +1,66 @@
+{
+ "success": true,
+ "model": {
+  "items": [],
+  "paging": {
+   "totalItems": 0,
+   "totalPages": 0,
+   "currentPage": 1
+  },
+  "item": {
+   "sellerId": 700876672668,
+   "sellerName": null,
+   "itemId": 556717015,
+   "itemStatus": 1,
+   "skuId": null,
+   "configSku": "556717015_BD",
+   "skuInfo": null,
+   "itemPic": "https://static-01.daraz.com.bd/p/cbf95f140a349d50b2ef7e7d27e413b1.jpg",
+   "itemTitle": "Cosrx অ্যাডভান্সড শামুক 96 mucin পাওয়ার এসেন্স 100ml",
+   "itemUrl": "https://www.daraz.com.bd/products/cosrx-96-mucin-100ml-i556717015-s2588874171.html",
+   "categoryId": 7286,
+   "categoryName": "সিরাম এবং এসেন্স",
+   "rootCategoryId": 1438,
+   "rootCategoryName": "স্বাস্থ্য এবং সৌন্দর্য",
+   "subSellerId": null,
+   "subSellerName": null,
+   "subShopUrl": null,
+   "productPrice": "৳ 672"
+  },
+  "ratings": {
+   "average": 3.3,
+   "rateCount": 7,
+   "reviewCount": 7,
+   "imagesCount": 0,
+   "videosCount": 0,
+   "withImageCount": 4,
+   "withVideoCount": 0,
+   "localReviewsCount": 7,
+   "withMediaCount": 4,
+   "rate12Stars": 3,
+   "hiddenCount": 0,
+   "scores": [
+    4,
+    0,
+    0,
+    0,
+    3
+   ],
+   "mediaNum": 0,
+   "labelCounts": [],
+   "impressionTags": null
+  },
+  "mediaList": null,
+  "showInfo": {
+   "showAuthTipsUrl": "",
+   "showAuthTips": true
+  },
+  "pageVersion": null
+ },
+ "msgCode": null,
+ "httpStatusCode": 200,
+ "msgInfo": null,
+ "mappingCode": null,
+ "headers": {},
+ "bizExtMap": null
+}

@@ -1,0 +1,5 @@
+length,n_human,n_ai,recall,specificity,recall_ci_low,recall_ci_high,spec_ci_low,spec_ci_high
+under 10 words,28,28,0.393,0.929,0.236,0.576,0.774,0.98
+10-19 words,43,43,0.186,0.953,0.097,0.326,0.845,0.987
+20-39 words,32,32,0.312,0.844,0.18,0.486,0.682,0.931
+40+ words,45,45,0.111,0.933,0.048,0.235,0.821,0.977

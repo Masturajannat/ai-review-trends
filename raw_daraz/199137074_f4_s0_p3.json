@@ -1,0 +1,44 @@
+{
+ "success": true,
+ "model": {
+  "items": [],
+  "paging": {
+   "totalItems": 0,
+   "totalPages": 0,
+   "currentPage": 3
+  },
+  "item": null,
+  "ratings": {
+   "average": 4.7,
+   "rateCount": 493,
+   "reviewCount": 493,
+   "imagesCount": 126,
+   "videosCount": 5,
+   "withImageCount": 143,
+   "withVideoCount": 5,
+   "localReviewsCount": 493,
+   "withMediaCount": 145,
+   "rate12Stars": 22,
+   "hiddenCount": 141,
+   "scores": [
+    432,
+    23,
+    15,
+    3,
+    19
+   ],
+   "mediaNum": 38,
+   "labelCounts": [],
+   "impressionTags": null
+  },
+  "mediaList": null,
+  "showInfo": null,
+  "pageVersion": null
+ },
+ "msgCode": null,
+ "httpStatusCode": 200,
+ "msgInfo": null,
+ "mappingCode": null,
+ "headers": {},
+ "bizExtMap": null
+}

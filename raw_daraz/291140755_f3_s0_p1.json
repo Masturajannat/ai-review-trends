@@ -1,0 +1,66 @@
+{
+ "success": true,
+ "model": {
+  "items": [],
+  "paging": {
+   "totalItems": 0,
+   "totalPages": 0,
+   "currentPage": 1
+  },
+  "item": {
+   "sellerId": 700519518134,
+   "sellerName": null,
+   "itemId": 291140755,
+   "itemStatus": 1,
+   "skuId": null,
+   "configSku": "291140755_BD",
+   "skuInfo": "কালার_ফ্যামিলি:Realme 33W Charger",
+   "itemPic": "https://static-01.daraz.com.bd/p/9dc9ed5681285bcbf967607e62e0adf8.jpg",
+   "itemTitle": "Realme 33W কুইক ডার্ট চার্জার 3.0 Qualcomm Adepter USB Type-C কেবল",
+   "itemUrl": "https://www.daraz.com.bd/products/realme-33w-30-qualcomm-adepter-usb-type-c-i291140755-s2567228509.html",
+   "categoryId": 10002875,
+   "categoryName": "ওয়াল চার্জার্স",
+   "rootCategoryId": 2,
+   "rootCategoryName": "মোবাইল এবং ট্যাবলেট",
+   "subSellerId": null,
+   "subSellerName": null,
+   "subShopUrl": null,
+   "productPrice": "৳ 490"
+  },
+  "ratings": {
+   "average": 4.2,
+   "rateCount": 6,
+   "reviewCount": 6,
+   "imagesCount": 10,
+   "videosCount": 0,
+   "withImageCount": 3,
+   "withVideoCount": 0,
+   "localReviewsCount": 6,
+   "withMediaCount": 3,
+   "rate12Stars": 1,
+   "hiddenCount": 1,
+   "scores": [
+    4,
+    1,
+    0,
+    0,
+    1
+   ],
+   "mediaNum": 0,
+   "labelCounts": [],
+   "impressionTags": null
+  },
+  "mediaList": null,
+  "showInfo": {
+   "showAuthTipsUrl": "",
+   "showAuthTips": true
+  },
+  "pageVersion": null
+ },
+ "msgCode": null,
+ "httpStatusCode": 200,
+ "msgInfo": null,
+ "mappingCode": null,
+ "headers": {},
+ "bizExtMap": null
+}
