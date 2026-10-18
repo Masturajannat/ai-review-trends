@@ -1,0 +1,4 @@
+group,threshold,n_human,n_ai,TP,FP,TN,FN,accuracy,accuracy_ci_low,accuracy_ci_high,precision,precision_ci_low,precision_ci_high,recall,recall_ci_low,recall_ci_high,specificity,specificity_ci_low,specificity_ci_high,f1,f1_ci_low,f1_ci_high,roc_auc,roc_auc_ci_low,roc_auc_ci_high,pr_auc
+All reviews,0.5,148,148,34,12,136,114,0.574,0.517,0.629,0.739,0.597,0.844,0.23,0.169,0.304,0.919,0.864,0.953,0.351,0.267,0.431,0.714,0.673,0.759,0.696
+Bengali/Banglish (translated),0.5,113,113,21,10,103,92,0.549,0.484,0.612,0.677,0.501,0.814,0.186,0.125,0.267,0.912,0.845,0.951,0.292,0.194,0.377,0.706,0.655,0.758,0.671
+Original English,0.5,35,35,13,2,33,22,0.657,0.54,0.758,0.867,0.621,0.963,0.371,0.232,0.537,0.943,0.814,0.984,0.52,0.348,0.679,0.741,0.657,0.829,0.782

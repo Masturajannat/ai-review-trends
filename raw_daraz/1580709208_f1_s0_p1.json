@@ -1,0 +1,66 @@
+{
+ "success": true,
+ "model": {
+  "items": [],
+  "paging": {
+   "totalItems": 0,
+   "totalPages": 0,
+   "currentPage": 1
+  },
+  "item": {
+   "sellerId": 701033936051,
+   "sellerName": null,
+   "itemId": 1580709208,
+   "itemStatus": 1,
+   "skuId": 0,
+   "configSku": "1580709208_BD",
+   "skuInfo": "সুগন্ধ_পরিবার:সতেজ, Color Family:বহুবর্ণ",
+   "itemPic": "https://static-01.daraz.com.bd/p/89d71cf1e2611899259504c112482359.jpg",
+   "itemTitle": "সাধারণ থেকে শুষ্ক ত্বকের জন্য সেরাভ হাইড্রেটিং ক্লিনজার - ২৩৬ মিলি [গ্র্যাব কসমিক হাউস]",
+   "itemUrl": "https://www.daraz.com.bd/products/i1580709208-s12669688036.html",
+   "categoryId": 7280,
+   "categoryName": "ফেসিয়াল ক্লিনজার",
+   "rootCategoryId": 1438,
+   "rootCategoryName": "স্বাস্থ্য এবং সৌন্দর্য",
+   "subSellerId": null,
+   "subSellerName": null,
+   "subShopUrl": null,
+   "productPrice": "৳ 599"
+  },
+  "ratings": {
+   "average": 5.0,
+   "rateCount": 4,
+   "reviewCount": 4,
+   "imagesCount": 0,
+   "videosCount": 0,
+   "withImageCount": 0,
+   "withVideoCount": 0,
+   "localReviewsCount": 4,
+   "withMediaCount": 0,
+   "rate12Stars": 0,
+   "hiddenCount": 1,
+   "scores": [
+    4,
+    0,
+    0,
+    0,
+    0
+   ],
+   "mediaNum": 0,
+   "labelCounts": [],
+   "impressionTags": null
+  },
+  "mediaList": null,
+  "showInfo": {
+   "showAuthTipsUrl": "",
+   "showAuthTips": true
+  },
+  "pageVersion": null
+ },
+ "msgCode": null,
+ "httpStatusCode": 200,
+ "msgInfo": null,
+ "mappingCode": null,
+ "headers": {},
+ "bizExtMap": null
+}

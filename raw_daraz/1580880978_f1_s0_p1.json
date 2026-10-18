@@ -1,0 +1,66 @@
+{
+ "success": true,
+ "model": {
+  "items": [],
+  "paging": {
+   "totalItems": 0,
+   "totalPages": 0,
+   "currentPage": 1
+  },
+  "item": {
+   "sellerId": 701034000114,
+   "sellerName": null,
+   "itemId": 1580880978,
+   "itemStatus": 1,
+   "skuId": null,
+   "configSku": "1580880978_BD",
+   "skuInfo": "Color Family:উল্লেখ নেই",
+   "itemPic": "https://static-01.daraz.com.bd/p/cdbe48c5ce93513a4cc3758aa37ec7a7.jpg",
+   "itemTitle": "বিউটি অফ জোসন ৫০মিলি রিলিফ সান অ্যাকোয়া-ফ্রেশ : রাইস + বি৫ এসপিএফ৫০+ পিএ++++ |   কোরিয়া নতুন (গ্ল্যামারাস গ্যালারি)",
+   "itemUrl": "https://www.daraz.com.bd/products/i1580880978-s12669918048.html",
+   "categoryId": 5245,
+   "categoryName": "সানস্ক্রিন এবং সান এর পরে",
+   "rootCategoryId": 1438,
+   "rootCategoryName": "স্বাস্থ্য এবং সৌন্দর্য",
+   "subSellerId": null,
+   "subSellerName": null,
+   "subShopUrl": null,
+   "productPrice": "৳ 389"
+  },
+  "ratings": {
+   "average": 5.0,
+   "rateCount": 10,
+   "reviewCount": 10,
+   "imagesCount": 0,
+   "videosCount": 0,
+   "withImageCount": 4,
+   "withVideoCount": 0,
+   "localReviewsCount": 10,
+   "withMediaCount": 5,
+   "rate12Stars": 0,
+   "hiddenCount": 2,
+   "scores": [
+    9,
+    0,
+    0,
+    0,
+    0
+   ],
+   "mediaNum": 0,
+   "labelCounts": [],
+   "impressionTags": null
+  },
+  "mediaList": null,
+  "showInfo": {
+   "showAuthTipsUrl": "",
+   "showAuthTips": true
+  },
+  "pageVersion": null
+ },
+ "msgCode": null,
+ "httpStatusCode": 200,
+ "msgInfo": null,
+ "mappingCode": null,
+ "headers": {},
+ "bizExtMap": null
+}

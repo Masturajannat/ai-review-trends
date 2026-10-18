@@ -1,0 +1,9 @@
+text_source,period,n_reviews,baseline_est,baseline_ci_low,baseline_ci_high,baseline_unstable_draws,observed_flag_rate,false_positive_rate,recall,labeled_est_raw,labeled_est_clipped,labeled_ci_low,labeled_ci_high,labeled_unstable_draws
+translated,pre_2022,459.0,0.0,0.0,0.0,0.358,0.1503,0.0885,0.1858,0.6352,0.6352,0.0547,1.0,0.049
+translated,2022,122.0,0.614,0.0,1.0,0.352,0.1721,0.0885,0.1858,0.8592,0.8592,0.0362,1.0,0.051
+translated,post_2022,799.0,0.0,0.0,0.7828,0.365,0.1427,0.0885,0.1858,0.5566,0.5566,0.0,1.0,0.045
+translated,post_2022 minus pre_2022 (version A),,,,,,,,,-0.0786,,-0.717,0.3891,
+original_english,pre_2022,51.0,0.0,0.0,0.0,0.0,0.0392,0.0571,0.3714,-0.057,0.0,0.0,0.2059,0.001
+original_english,2022,25.0,0.1228,0.0,0.5605,0.0,0.08,0.0571,0.3714,0.0727,0.0727,0.0,0.5833,0.0
+original_english,post_2022,73.0,0.0469,0.0,0.2711,0.0,0.0548,0.0571,0.3714,-0.0075,0.0,0.0,0.2618,0.0
+original_english,post_2022 minus pre_2022 (version A),,,,,,,,,0.0496,,-0.2114,0.3651,

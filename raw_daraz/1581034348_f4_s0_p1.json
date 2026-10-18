@@ -1,0 +1,66 @@
+{
+ "success": true,
+ "model": {
+  "items": [],
+  "paging": {
+   "totalItems": 0,
+   "totalPages": 0,
+   "currentPage": 1
+  },
+  "item": {
+   "sellerId": 700882560339,
+   "sellerName": null,
+   "itemId": 1581034348,
+   "itemStatus": 1,
+   "skuId": 0,
+   "configSku": "1581034348_BD",
+   "skuInfo": "Color:Black",
+   "itemPic": "https://bd-live-21.slatic.net/kf/S269851d371da4bde9e45dd0b48eaf9f3E.jpg",
+   "itemTitle": "KEBIDUMEI ব্লুটুথ ৫.৪ গেমিং হেডসেটস টিডব্লিউএস ওয়্যারলেস ইয়ারবাডস ক্লিপ-অন টিএফ কার্ড সাপোর্ট এবং কে সং মনিটর মোড সহ গেমিংয়ের জন্য ব্যবহারযোগ্য",
+   "itemUrl": "https://www.daraz.com.bd/products/kebidumei-i1581034348-s12670431575.html",
+   "categoryId": 155,
+   "categoryName": "ইন-ইয়ার হেডফোনগুলি",
+   "rootCategoryId": 147,
+   "rootCategoryName": "টিভি, অডিও / ভিডিও, গেমিং এবং পরিধানযোগ্য",
+   "subSellerId": null,
+   "subSellerName": null,
+   "subShopUrl": null,
+   "productPrice": "৳ 640"
+  },
+  "ratings": {
+   "average": 4.1,
+   "rateCount": 16,
+   "reviewCount": 16,
+   "imagesCount": 0,
+   "videosCount": 0,
+   "withImageCount": 3,
+   "withVideoCount": 0,
+   "localReviewsCount": 16,
+   "withMediaCount": 3,
+   "rate12Stars": 3,
+   "hiddenCount": 3,
+   "scores": [
+    3,
+    0,
+    1,
+    0,
+    3
+   ],
+   "mediaNum": 0,
+   "labelCounts": [],
+   "impressionTags": null
+  },
+  "mediaList": null,
+  "showInfo": {
+   "showAuthTipsUrl": "",
+   "showAuthTips": true
+  },
+  "pageVersion": null
+ },
+ "msgCode": null,
+ "httpStatusCode": 200,
+ "msgInfo": null,
+ "mappingCode": null,
+ "headers": {},
+ "bizExtMap": null
+}

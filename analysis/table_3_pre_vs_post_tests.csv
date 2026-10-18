@@ -1,0 +1,7 @@
+subset,pre_n,pre_flag_pct,post_n,post_flag_pct,diff_post_minus_pre_pts,p_value
+all reviews,995,8.3,1600,8.4,0.0,0.976
+30+ words,203,13.3,252,10.7,-2.6,0.396
+10+ words,485,14.6,828,14.0,-0.6,0.753
+translated only,755,10.7,1239,10.5,-0.2,0.868
+original English only,240,0.8,361,1.1,0.3,0.74
+"translated, 10+ words",469,15.1,802,14.2,-0.9,0.652

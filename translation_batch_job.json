@@ -1,0 +1,12 @@
+{
+  "input_csv": "C:\\Users\\Mastu\\Downloads\\EcommerceReviewQualityAnalysis\\EcommerceReviewQualityAnalysis\\data\\combined_reviews.csv",
+  "output_csv": "C:\\Users\\Mastu\\Downloads\\EcommerceReviewQualityAnalysis\\EcommerceReviewQualityAnalysis\\data\\combined_reviews_translated.csv",
+  "batch_input": "C:\\Users\\Mastu\\Downloads\\EcommerceReviewQualityAnalysis\\EcommerceReviewQualityAnalysis\\data\\translation_batch_input.jsonl",
+  "model": "gpt-4o-mini",
+  "row_count": 20,
+  "request_count": 20,
+  "batch_id": null,
+  "input_file_id": null,
+  "output_file_id": null,
+  "error_file_id": null
+}
