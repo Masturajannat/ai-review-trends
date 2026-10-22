@@ -1,0 +1,12 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# secrets
+.env
+
+# local scratch / caches
+mixture_estimation/data/test1_*.csv
+mixture_estimation/data/ai_translation_cache.json
