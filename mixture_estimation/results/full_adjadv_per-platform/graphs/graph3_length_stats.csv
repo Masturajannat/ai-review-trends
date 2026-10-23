@@ -1,0 +1,10 @@
+platform,period,n,q1,median,q3
+Daraz,pre_2022 (held out),258,7.0,12.0,23.75
+Daraz,2022,84,5.0,11.0,23.25
+Daraz,post_2022,1163,5.0,11.0,23.0
+Rokomari,pre_2022 (held out),296,5.0,14.0,55.0
+Rokomari,2022,87,3.0,6.0,14.5
+Rokomari,post_2022,142,5.0,9.5,21.0
+Shajgoj,pre_2022 (held out),251,6.0,13.0,24.0
+Shajgoj,2022,81,7.0,12.0,25.0
+Shajgoj,post_2022,162,6.0,11.0,21.75
