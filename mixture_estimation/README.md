@@ -24,6 +24,17 @@ python mixture_estimation\scripts\04_translate_ai.py
 python mixture_estimation\scripts\05_validate.py
 ```
 
+**Full run** (one AI review for every pre-2022 review, ~800; the 200 pilot AI reviews are reused):
+
+```powershell
+python mixture_estimation\scripts\03_generate_ai.py --full      # writes data/ai_reference.csv, data/ai_validation.csv
+python mixture_estimation\scripts\04_translate_ai.py --full
+python mixture_estimation\scripts\05_validate.py --full         # results in results/full/
+```
+
+Gemini's free tier has a daily limit: when it is reached, `03_generate_ai.py` stops with a message.
+Run the same command again the next day; it continues where it stopped.
+
 ## Generator: Gemini instead of OpenAI
 
 The OpenAI account had no API credits, so the AI reviews were generated with **Gemini (`gemini-3.5-flash-lite`,
@@ -45,6 +56,6 @@ saves after every review so a run can be stopped and resumed; never saves failed
 | Estimated (mean of 200 mixes) | 7.5% | 10.3% | 13.0% | 16.0% | 19.2% | 22.0% |
 
 The estimate tracks the truth but is pulled toward the middle (10% → 13%; the paper reaches about ±2 points).
-Main reason: Q is learned from only 100 AI reviews (316 sentences). **Next step:** generate one AI review for
-every human review in `human_reference` and `human_validation` (~800), translate, and rerun step 5.
+Main reason: Q is learned from only 100 AI reviews (316 sentences). **Next step:** the full run above
+(one AI review for every human review in `human_reference` and `human_validation`).
 Real-data numbers in `results/real_data_estimates.csv` are preliminary until the validation passes.

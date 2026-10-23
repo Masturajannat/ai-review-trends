@@ -1,18 +1,24 @@
 """
-Make one AI review for every human review in the pilot files.
+Make one AI review for every human review.
+
+  default : the 100 + 100 pilot reviews  (pilot_human_*.csv -> pilot_ai_*.csv)
+  --full  : ALL pre-2022 reviews          (human_*.csv -> ai_*.csv, about 800)
+            The 200 pilot AI reviews are copied in first, so they are not made again.
 
 RUN (PowerShell, from the ai-review-trends folder)
   Gemini (free tier, the default):
     $env:GEMINI_API_KEY="your-key"
     python mixture_estimation\\scripts\\03_generate_ai.py --provider gemini --limit 4   # quick test
     python mixture_estimation\\scripts\\03_generate_ai.py --provider gemini             # full pilot
+    python mixture_estimation\\scripts\\03_generate_ai.py --full                        # all ~800 reviews
   OpenAI (needs credits):
     $env:OPENAI_API_KEY="your-key"
     python mixture_estimation\\scripts\\03_generate_ai.py --provider openai
 
 Safe to stop (Ctrl+C) and run again: every finished review is saved at once, and a new run
 only does the reviews that are still missing. Failed requests are never saved as blank rows.
-If the API runs out of quota the script stops and tells you; run it again later.
+If the API runs out of quota (or Gemini's free daily limit is reached) the script stops and tells
+you; run the same command again later (Gemini's daily limit resets the next day).
 """
 import argparse
 import os
@@ -75,6 +81,10 @@ class OutOfQuota(Exception):
     pass
 
 
+class RateLimited(Exception):
+    pass
+
+
 def call_openai(prompt, model):
     key = os.getenv("OPENAI_API_KEY")
     r = requests.post("https://api.openai.com/v1/chat/completions",
@@ -95,6 +105,8 @@ def call_gemini(prompt, model):
                       json={"contents": [{"role": "user", "parts": [{"text": prompt}]}]})
     if r.status_code in (400, 401, 403) and "API_KEY" in r.text.upper():
         raise OutOfQuota("Gemini rejected the key. Check GEMINI_API_KEY")
+    if r.status_code == 429:
+        raise RateLimited(f"429 Too Many Requests: {r.text[:120]}")
     if r.status_code == 404:
         sys.exit(f"Gemini model '{model}' not found. Try --model gemini-3.8-flash")
     r.raise_for_status()
@@ -104,7 +116,10 @@ def call_gemini(prompt, model):
 
 
 def ask(call, prompt, model, tries=5):
-    """Try a few times (waiting longer each time). Returns "" if every try failed."""
+    """Try a few times (waiting longer each time). Returns "" if every try failed.
+    If EVERY try is refused with 429 (too many requests), the free daily limit is probably used up:
+    stop instead of skipping review after review."""
+    limited = 0
     for attempt in range(tries):
         try:
             text = call(prompt, model)
@@ -113,9 +128,15 @@ def ask(call, prompt, model, tries=5):
             print("  empty answer, retrying")
         except OutOfQuota:
             raise
-        except Exception as e:  # busy, rate limited, network ...
+        except RateLimited as e:
+            limited += 1
+            print(f"  rate limited {attempt + 1}/{tries}, waiting")
+        except Exception as e:  # busy, network ...
             print(f"  retry {attempt + 1}/{tries}: {str(e)[:150]}")
-        time.sleep(10 * (attempt + 1))
+        time.sleep(15 * (attempt + 1))
+    if limited == tries:
+        raise OutOfQuota("the API kept answering 429 (limit reached, probably the free daily limit). "
+                         "Run the same command again later or tomorrow")
     return ""
 
 
@@ -136,6 +157,8 @@ def main():
     ap.add_argument("--provider", choices=["openai", "gemini"], default="gemini")
     ap.add_argument("--model", default=None, help="default: gpt-4o-mini / gemini-3.5-flash-lite")
     ap.add_argument("--limit", type=int, default=None, help="test mode: only this many reviews per half")
+    ap.add_argument("--full", action="store_true",
+                    help="all pre-2022 reviews (human_*.csv -> ai_*.csv) instead of the 100+100 pilot")
     args = ap.parse_args()
 
     key_name = "OPENAI_API_KEY" if args.provider == "openai" else "GEMINI_API_KEY"
@@ -146,8 +169,16 @@ def main():
     print(f"Provider: {args.provider}   model: {model}")
 
     for half in ["reference", "validation"]:
-        human = pd.read_csv(DATA / f"pilot_human_{half}.csv", dtype={"review_id": str})
-        out_file = DATA / f"pilot_ai_{half}.csv"
+        prefix_in, prefix_out = ("human", "ai") if args.full else ("pilot_human", "pilot_ai")
+        human = pd.read_csv(DATA / f"{prefix_in}_{half}.csv", dtype={"review_id": str})
+        out_file = DATA / f"{prefix_out}_{half}.csv"
+        pilot_file = DATA / f"pilot_ai_{half}.csv"
+        if args.full and not out_file.exists() and pilot_file.exists():
+            # reuse the pilot AI reviews (same human reviews), so they are not generated again
+            pilot = pd.read_csv(pilot_file, dtype={"review_id": str})
+            pilot = pilot[pilot.review_id.isin(human.review_id)]
+            pilot.to_csv(out_file, index=False, encoding="utf-8")
+            print(f"Copied {len(pilot)} pilot AI reviews into {out_file.name}")
         done = pd.read_csv(out_file, dtype={"review_id": str}) if out_file.exists() else pd.DataFrame()
         done_ids = set(done.review_id) if len(done) else set()
         todo = [(i, r) for i, r in enumerate(human.itertuples()) if r.review_id not in done_ids]
@@ -155,6 +186,7 @@ def main():
             todo = todo[:args.limit]
         print(f"\n{half}: {len(done_ids)} already done, {len(todo)} to make")
 
+        fails_in_row = 0
         for k, (i, r) in enumerate(todo, 1):
             kind, prompt = make_prompt(i, r)
             lang = language_of(r)
@@ -170,7 +202,12 @@ def main():
                 sys.exit(f"\nSTOPPED: {e}. Everything finished so far is saved in {out_file.name}.")
             if not text:
                 print(f"  [{k}/{len(todo)}] {r.review_id}: failed, skipped (run again later to retry)")
+                fails_in_row += 1
+                if fails_in_row >= 5:
+                    sys.exit("\nSTOPPED: 5 reviews in a row failed. The API is probably down or limited. "
+                             f"Everything finished so far is saved in {out_file.name}; run again later.")
                 continue
+            fails_in_row = 0
             row = pd.DataFrame([{
                 "review_id": r.review_id,          # id of the human review it was made from
                 "platform": r.platform,

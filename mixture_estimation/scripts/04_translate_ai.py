@@ -7,11 +7,13 @@ estimator could pick up "translation style" instead of "AI style".
 Original-English AI reviews are kept as they are, exactly like the real data.
 
 RUN (from the ai-review-trends folder, no API key needed)
-  python mixture_estimation\\scripts\\04_translate_ai.py
+  python mixture_estimation\\scripts\\04_translate_ai.py            # pilot files  (pilot_ai_*.csv)
+  python mixture_estimation\\scripts\\04_translate_ai.py --full     # full files   (ai_*.csv)
 
 Safe to stop and run again: finished translations are cached in data/ai_translation_cache.json,
-and the pilot_ai_*.csv files are updated in place (only the translated_review_en column).
+and the AI review files are updated in place (only the translated_review_en column).
 """
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -28,9 +30,15 @@ import translate_reviews_to_english as tr   # importing does not run it
 
 
 def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--full", action="store_true", help="translate ai_*.csv instead of pilot_ai_*.csv")
+    args = ap.parse_args()
+    prefix = "ai" if args.full else "pilot_ai"
     cache = json.loads(CACHE.read_text(encoding="utf-8")) if CACHE.exists() else {}
     for half in ["reference", "validation"]:
-        path = DATA / f"pilot_ai_{half}.csv"
+        path = DATA / f"{prefix}_{half}.csv"
+        if not path.exists():
+            sys.exit(f"{path.name} not found. Run 03_generate_ai.py{' --full' if args.full else ''} first.")
         df = pd.read_csv(path, dtype={"review_id": str, "translated_review_en": str})
         df["translated_review_en"] = df["translated_review_en"].fillna("")
         # English rows: copy as they are (this is what the real data did)

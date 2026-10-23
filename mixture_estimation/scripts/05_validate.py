@@ -9,8 +9,10 @@ real 2022 / post-2022 reviews.
 Data (all from earlier steps, in ../data):
   human_reference.csv   pre-2022 human reviews -> learn the HUMAN word distribution P
   pilot_ai_reference.csv  AI reviews (made from pilot_human_reference) -> learn the AI distribution Q
+                          (with --full: ai_reference.csv, one AI review per human_reference review)
   human_validation.csv  held-out pre-2022 human reviews -> the "human" part of each test mix
   pilot_ai_validation.csv held-out AI reviews -> the "AI" part of each test mix
+                          (with --full: ai_validation.csv)
   source_reviews_clean.csv all real reviews -> real-data estimates per period and platform
 A test mix never contains the human review an AI review in the same mix was made from.
 
@@ -23,7 +25,8 @@ to is the share of AI sentences in the mix (the share of AI reviews is reported 
 RUN (from the ai-review-trends folder; pandas, numpy, matplotlib only; about a minute)
   python mixture_estimation\\scripts\\05_validate.py
   python mixture_estimation\\scripts\\05_validate.py --reps 100      # quicker
-Outputs go to mixture_estimation/results/.
+  python mixture_estimation\\scripts\\05_validate.py --full          # with the full AI set (~800)
+Outputs go to mixture_estimation/results/ (pilot) or mixture_estimation/results/full/ (--full).
 """
 import argparse
 import html
@@ -115,16 +118,26 @@ def main():
     ap.add_argument("--mix-size", type=int, default=250, help="reviews in each test mix")
     ap.add_argument("--min-docs", type=int, default=3)
     ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--full", action="store_true", help="use ai_*.csv (all reviews) instead of the pilot")
     args = ap.parse_args()
-    OUT.mkdir(exist_ok=True)
+    out = OUT / "full" if args.full else OUT
+    out.mkdir(parents=True, exist_ok=True)
+    prefix = "ai" if args.full else "pilot_ai"
     read = lambda f: pd.read_csv(DATA / f, dtype={"review_id": str})
 
     h_ref, h_val = read("human_reference.csv"), read("human_validation.csv")
-    ai_ref, ai_val = read("pilot_ai_reference.csv"), read("pilot_ai_validation.csv")
-    src_val = set(read("pilot_human_validation.csv").review_id)
-    h_pool = h_val[~h_val.review_id.isin(src_val)]          # human test reviews: never an AI source
+    ai_ref, ai_val = read(f"{prefix}_reference.csv"), read(f"{prefix}_validation.csv")
+    for name, d in [("reference", ai_ref), ("validation", ai_val)]:
+        missing = (d.translated_review_en.fillna("").str.strip() == "").sum()
+        if missing:
+            print(f"WARNING: {missing} AI {name} reviews have no English text yet - run 04_translate_ai.py"
+                  f"{' --full' if args.full else ''} first. They are left out.")
+    ai_ref = ai_ref[ai_ref.translated_review_en.fillna("").str.strip() != ""]
+    ai_val = ai_val[ai_val.translated_review_en.fillna("").str.strip() != ""]
+    h_pool = h_val
     print(f"P from {len(h_ref)} human reviews, Q from {len(ai_ref)} AI reviews")
     print(f"Test pool: {len(h_pool)} held-out human reviews + {len(ai_val)} held-out AI reviews")
+    print("(in each mix, the human reviews the chosen AI reviews were made from are left out)")
 
     est = Estimator(h_ref.translated_review_en, ai_ref.translated_review_en, args.min_docs)
     print(f"Vocabulary: {len(est.vocab)} words  (sentences: human {est.n_human_sent}, AI {est.n_ai_sent})")
@@ -133,6 +146,7 @@ def main():
     def per_review(texts):
         return [est.loglik(sentences(t)) for t in texts]
     H, A = per_review(h_pool.translated_review_en), per_review(ai_val.translated_review_en)
+    h_ids, a_ids = h_pool.review_id.to_numpy(), ai_val.review_id.to_numpy()
 
     # ---------------- 1. sanity: pure human and pure AI
     cat = lambda xs: (np.concatenate([x[0] for x in xs]), np.concatenate([x[1] for x in xs]))
@@ -145,11 +159,13 @@ def main():
     for target in [0.0, 0.05, 0.10, 0.15, 0.20, 0.25]:
         n_ai = int(round(target * args.mix_size))
         n_h = args.mix_size - n_ai
-        if n_ai > len(A) or n_h > len(H):
+        if n_ai > len(A) or n_h > len(H) - n_ai:
             print(f"  skip {target:.0%}: not enough reviews"); continue
         for r in range(args.reps):
-            hi = rng.choice(len(H), n_h, replace=False)
             ai = rng.choice(len(A), n_ai, replace=False)
+            # a human review never sits in the same mix as the AI review made from it
+            allowed = np.flatnonzero(~np.isin(h_ids, a_ids[ai]))
+            hi = rng.choice(allowed, n_h, replace=False)
             parts = [H[i] for i in hi] + [A[i] for i in ai]
             lp, lq = cat(parts)
             ai_sent = sum(len(A[i][0]) for i in ai)
@@ -161,8 +177,8 @@ def main():
         true_sentence_share=("true_sentence_share", "mean"), mean_estimate=("estimate", "mean"),
         p5=("estimate", lambda x: x.quantile(.05)), p95=("estimate", lambda x: x.quantile(.95)),
         mean_error=("error", "mean"), mean_abs_error=("error", lambda x: x.abs().mean())).reset_index()
-    s.to_csv(OUT / "validation_summary.csv", index=False)
-    v.to_csv(OUT / "validation_runs.csv", index=False)
+    s.to_csv(out / "validation_summary.csv", index=False)
+    v.to_csv(out / "validation_runs.csv", index=False)
     print("\nVALIDATION (estimates are shares of sentences; 'true' = real share of AI sentences in the mix)")
     print((s.set_index("target_review_share") * 100).round(1).to_string())
 
@@ -180,7 +196,7 @@ def main():
             res.append(dict(platform=platform or "All", period=name, reviews=len(g), sentences=n_sent,
                             ai_share=a, ci_low=lo, ci_high=hi))
     res = pd.DataFrame(res)
-    res.to_csv(OUT / "real_data_estimates.csv", index=False)
+    res.to_csv(out / "real_data_estimates.csv", index=False)
     show = res.copy()
     for c in ["ai_share", "ci_low", "ci_high"]:
         show[c] = (show[c] * 100).round(1)
@@ -199,11 +215,12 @@ def main():
                 fmt="o", color="#1f6fb4", capsize=4, label="estimate (mean, 5-95% of mixes)")
     ax.set_xlabel("True AI share in the mix (% of sentences)")
     ax.set_ylabel("Estimated AI share (%)")
-    ax.set_title(f"Validation on held-out pre-2022 reviews ({args.reps} mixes each)", fontsize=10)
+    ax.set_title(f"Validation on held-out pre-2022 reviews ({'full' if args.full else 'pilot'}, "
+                 f"Q from {len(ai_ref)} AI reviews, {args.reps} mixes each)", fontsize=9)
     ax.legend(frameon=False, fontsize=9)
     fig.tight_layout()
-    fig.savefig(OUT / "validation_chart.png", dpi=160)
-    print(f"\nSaved results to {OUT}")
+    fig.savefig(out / "validation_chart.png", dpi=160)
+    print(f"\nSaved results to {out}")
 
 
 if __name__ == "__main__":
