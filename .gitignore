@@ -8,5 +8,5 @@ venv/
 .env
 
 # local scratch / caches
-mixture_estimation/data/test1_*.csv
-mixture_estimation/data/ai_translation_cache.json
+archive/week5_mixture_translated/data/test1_*.csv
+archive/week5_mixture_translated/data/ai_translation_cache.json
