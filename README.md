@@ -35,9 +35,12 @@ to machine-translated reviews. They are kept in `archive/` with a summary of why
 | `raw_daraz/` | Raw Daraz API responses |
 | `combine_reviews_all.py` → `combined_reviews.csv` | All 2,899 scraped reviews in one file, original text |
 | `trend_analysis/` | Current pipeline: dataset preparation and trend analysis (see its README) |
+| `INSTRUCTIONS.md` | Setup, Git workflow, running the pipeline, adding new reviews |
 | `archive/` | Earlier translation-based approaches (see its README) |
 
 ## Running the pipeline
+
+See `INSTRUCTIONS.md` for setup and the full workflow.
 
 ```powershell
 python combine_reviews_all.py                              # merge the scraped files
