@@ -19,7 +19,8 @@ CSE299 Junior Design, Department of ECE, North South University, Fall 2026.
 The current analysis (`trend_analysis/`) works on the original review text, without translation,
 and analyses each platform separately. Following Liang et al. (2024), it identifies words that
 AI-generated reviews use far more often than pre-2022 human reviews and tracks how often these
-words appear over time, with the 2022 reviews before ChatGPT's release as a control period.
+words appear before and after ChatGPT's release, with reviews from January to November 2022 used
+as a placebo check.
 
 Earlier approaches applied an AI-text detector (Week 4) and a distributional estimator (Week 5)
 to machine-translated reviews. They are kept in `archive/` with a summary of why they were replaced.

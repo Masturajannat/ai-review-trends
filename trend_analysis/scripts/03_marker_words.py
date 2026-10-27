@@ -91,7 +91,7 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     controls, checks = [], []
     for lang in LANGUAGES:
-        h_disc = reviews[(reviews.language == lang) & (reviews.period == "pre_2022") & (reviews.half == "discovery")]
+        h_disc = reviews[(reviews.language == lang) & (reviews.period_detail == "pre_2022") & (reviews.half == "discovery")]
         a_disc = ai[(ai.language == lang) & (ai.half == "discovery")]
         cand = log_odds(word_sets(a_disc.text_clean, lang), word_sets(h_disc.text_clean, lang))
         cand["in_markers"] = cand.word.isin(markers[markers.language == lang].word)
@@ -114,7 +114,7 @@ def main():
                                                     "n_products", "top_product_share"]])
 
         # held-out check: do the curated markers separate AI from human text they were not chosen on?
-        h_out = reviews[(reviews.language == lang) & (reviews.period == "pre_2022") & (reviews.half == "heldout")]
+        h_out = reviews[(reviews.language == lang) & (reviews.period_detail == "pre_2022") & (reviews.half == "heldout")]
         a_out = ai[(ai.language == lang) & (ai.half == "heldout")]
         for group in ["evaluative", "formal", "control"]:
             words = ctrl.word if group == "control" else markers[(markers.language == lang) & (markers.group == group)].word

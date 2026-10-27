@@ -6,21 +6,24 @@ Inputs : trend_analysis/data/reviews_all.csv, trend_analysis/markers.csv,
 Outputs: trend_analysis/results/
   trend_series.csv        which platform-language series are analysed, with review counts
   trend_periods.csv       per series and period: share of reviews with a marker, markers per 100 words
-  trend_changes.csv       change vs the pre-2022 baseline (and post vs 2022 control) with bootstrap 95% CI,
-                          for all reviews, reviews > 10 and > 25 words, and same-product reviews
+  trend_changes.csv       post-ChatGPT minus pre-ChatGPT with bootstrap 95% CI, for all reviews and for the
+                          robustness subsets, plus the placebo comparison (Jan-Nov 2022 minus pre-2022)
   trend_halfyear.csv      share of reviews with a marker by half-year
   word_shift.csv          each marker word: share of reviews containing it, pre-2022 vs post-ChatGPT
   fig_trend_halfyear.png, fig_period_comparison.png, fig_word_shift.png
 
 Design
-  * Baseline = pre-2022 reviews of the HELD-OUT half only. The discovery half was used to choose the
-    marker words, so including it would bias the baseline downwards.
-  * 2022_control = 1 Jan - 29 Nov 2022, before ChatGPT. If the method is sound, it should match the
-    baseline; post_chatgpt is compared with both.
+  * Two periods, split at ChatGPT's release on 30 Nov 2022: pre_chatgpt and post_chatgpt.
+  * Baseline = pre-ChatGPT reviews, excluding the discovery half of the pre-2022 reviews. That half was
+    used to choose the marker words, so including it would bias the baseline downwards.
+  * Robustness subsets: reviews over 10 and over 25 words; products that also have pre-ChatGPT reviews;
+    baseline restricted to pre-2022 (without Jan-Nov 2022).
+  * Placebo check: Jan-Nov 2022 minus pre-2022. Both periods are before ChatGPT, so no change is expected;
+    a clear difference would indicate drift unrelated to AI.
   * Measures per review: contains at least one evaluative marker (yes/no) and evaluative markers per
     100 words (adjusts for review length). The same is computed for formal markers and control words.
     Control words should not change; if they do, the change is not specific to AI-style language.
-  * A series is analysed if it has at least MIN_REVIEWS reviews in both the baseline and post-ChatGPT.
+  * A series is analysed if it has at least MIN_REVIEWS reviews in both periods.
   * 95% intervals: bootstrap over reviews (BOOT rounds).
 
 Run from the repository root:  python trend_analysis/scripts/04_trends.py
@@ -39,8 +42,9 @@ ROOT = HERE.parents[1]
 TA = ROOT / "trend_analysis"
 OUT = TA / "results"
 REF_SPLIT = ROOT / "archive" / "week5_mixture_translated" / "data" / "human_reference.csv"
-PERIODS = ["pre_2022", "2022_control", "post_chatgpt"]
-PERIOD_LABEL = {"pre_2022": "Pre-2022", "2022_control": "2022 control", "post_chatgpt": "Post-ChatGPT"}
+PERIODS = ["pre_chatgpt", "post_chatgpt"]
+PERIOD_LABEL = {"pre_chatgpt": "Pre-ChatGPT", "post_chatgpt": "Post-ChatGPT",
+                "pre_2022": "Pre-2022", "jan_nov_2022": "Jan-Nov 2022"}
 MIN_REVIEWS = 30
 MIN_HALFYEAR = 10
 BOOT = 2000
@@ -54,7 +58,7 @@ def load():
     df = df[df.keep & df.language.isin(["bangla", "banglish", "english"])].copy()
     ref_ids = set(pd.read_csv(REF_SPLIT, dtype={"review_id": str}).review_id)
     # drop the discovery half of pre-2022 (used to choose the markers)
-    df = df[~((df.period == "pre_2022") & df.review_id.isin(ref_ids))].copy()
+    df = df[~((df.period_detail == "pre_2022") & df.review_id.isin(ref_ids))].copy()
     df["date"] = pd.to_datetime(df.date)
     markers = pd.read_csv(TA / "markers.csv")
     controls = pd.read_csv(OUT / "control_words.csv")
@@ -100,53 +104,58 @@ def main():
     df = add_measures(df, markers, controls)
 
     # ---------------- series
-    cnt = df.groupby(["platform", "language", "period"]).size().unstack(fill_value=0).reindex(
-        columns=PERIODS, fill_value=0)
-    cnt["analysed"] = (cnt.pre_2022 >= MIN_REVIEWS) & (cnt.post_chatgpt >= MIN_REVIEWS)
+    cnt = df.groupby(["platform", "language", "period_detail"]).size().unstack(fill_value=0).reindex(
+        columns=["pre_2022", "jan_nov_2022", "post_chatgpt"], fill_value=0)
+    cnt.insert(2, "pre_chatgpt", cnt.pre_2022 + cnt.jan_nov_2022)
+    cnt["analysed"] = (cnt.pre_chatgpt >= MIN_REVIEWS) & (cnt.post_chatgpt >= MIN_REVIEWS)
     cnt.to_csv(OUT / "trend_series.csv")
     series = [s for s, ok in cnt.analysed.items() if ok]
-    print("Reviews per series (pre-2022 = held-out half only):")
+    print("Reviews per series (pre-2022 = held-out half only; pre-ChatGPT = pre-2022 + Jan-Nov 2022):")
     print(cnt.to_string())
 
     # ---------------- period levels and changes
     measures = ["has_eval", "eval_per100", "has_formal", "has_control", "control_per100"]
     levels, changes = [], []
-    pre_products = {}
+    main_cmp = ("post_chatgpt - pre_chatgpt", "period", "post_chatgpt", "pre_chatgpt")
     for (p, lang) in series:
         s = df[(df.platform == p) & (df.language == lang)]
-        pre_products[(p, lang)] = set(s[s.period == "pre_2022"].product_id)
-        subsets = {"all": s, "words>10": s[s.keep_10], "words>25": s[s.keep_25],
-                   "same products": s[s.product_id.isin(pre_products[(p, lang)])]}
-        for sub_name, g in subsets.items():
-            for m in measures:
-                if g[m].isna().all():
-                    continue
-                boots, est = {}, {}
-                for per in PERIODS:
-                    x = g[g.period == per][m].dropna()
-                    est[per] = x.mean() if len(x) else np.nan
-                    boots[per] = boot_mean(x, rng) if len(x) >= 5 else None
-                    if sub_name == "all":
-                        lo, hi = (np.percentile(boots[per], [2.5, 97.5]) if boots[per] is not None
-                                  else (np.nan, np.nan))
-                        levels.append(dict(platform=p, language=lang, measure=m, period=per, reviews=len(x),
-                                           value=est[per], ci_low=lo, ci_high=hi))
-                for a, b in [("post_chatgpt", "pre_2022"), ("2022_control", "pre_2022"),
-                             ("post_chatgpt", "2022_control")]:
-                    if boots[a] is None or boots[b] is None:
+        pre_products = set(s[s.period == "pre_chatgpt"].product_id)
+        # (subset name, reviews, comparisons as (label, column, value a, value b))
+        subsets = [
+            ("all", s, [main_cmp]),
+            ("words>10", s[s.keep_10], [main_cmp]),
+            ("words>25", s[s.keep_25], [main_cmp]),
+            ("same products", s[s.product_id.isin(pre_products)], [main_cmp]),
+            ("baseline pre-2022 only", s[s.period_detail != "jan_nov_2022"], [main_cmp]),
+            ("placebo", s, [("jan_nov_2022 - pre_2022", "period_detail", "jan_nov_2022", "pre_2022")]),
+        ]
+        for m in measures:
+            if s[m].isna().all():
+                continue
+            for per_col, per in [("period", "pre_chatgpt"), ("period", "post_chatgpt"),
+                                 ("period_detail", "pre_2022"), ("period_detail", "jan_nov_2022")]:
+                x = s[s[per_col] == per][m].dropna()
+                b = boot_mean(x, rng) if len(x) >= 5 else None
+                lo, hi = np.percentile(b, [2.5, 97.5]) if b is not None else (np.nan, np.nan)
+                levels.append(dict(platform=p, language=lang, measure=m, period=per, reviews=len(x),
+                                   value=x.mean() if len(x) else np.nan, ci_low=lo, ci_high=hi))
+            for sub_name, g, comparisons in subsets:
+                for label, col, a, b_ in comparisons:
+                    xa, xb = g[g[col] == a][m].dropna(), g[g[col] == b_][m].dropna()
+                    if len(xa) < 5 or len(xb) < 5:
                         continue
-                    d = boots[a] - boots[b]
+                    d = boot_mean(xa, rng) - boot_mean(xb, rng)
                     lo, hi = np.percentile(d, [2.5, 97.5])
-                    changes.append(dict(platform=p, language=lang, subset=sub_name, measure=m,
-                                        comparison=f"{a} - {b}", n_a=int((g.period == a).sum()),
-                                        n_b=int((g.period == b).sum()), change=est[a] - est[b],
-                                        ci_low=lo, ci_high=hi,
+                    changes.append(dict(platform=p, language=lang, subset=sub_name, measure=m, comparison=label,
+                                        n_a=len(xa), n_b=len(xb), change=xa.mean() - xb.mean(), ci_low=lo,
+                                        ci_high=hi,
                                         clear=("increase" if lo > 0 else "decrease" if hi < 0 else "no clear change")))
     levels, changes = pd.DataFrame(levels), pd.DataFrame(changes)
     levels.to_csv(OUT / "trend_periods.csv", index=False)
     changes.to_csv(OUT / "trend_changes.csv", index=False)
 
-    main_tab = changes[(changes.subset == "all") & changes.measure.isin(["has_eval", "has_control"])].copy()
+    main_tab = changes[changes.subset.isin(["all", "placebo"]) &
+                       changes.measure.isin(["has_eval", "has_control"])].copy()
     for c in ["change", "ci_low", "ci_high"]:
         main_tab[c] = (main_tab[c] * 100).round(1)
     print("\nChange in % of reviews containing a marker (has_eval) or a control word (has_control):")
@@ -173,7 +182,7 @@ def main():
     ws = []
     for (p, lang) in series:
         s = df[(df.platform == p) & (df.language == lang)]
-        pre, post = s[s.period == "pre_2022"], s[s.period == "post_chatgpt"]
+        pre, post = s[s.period == "pre_chatgpt"], s[s.period == "post_chatgpt"]
         pre_t = [set(tu.tokens(t, lang)) for t in pre.text_clean]
         post_t = [set(tu.tokens(t, lang)) for t in post.text_clean]
         for r in markers[markers.language == lang].itertuples():
@@ -230,20 +239,19 @@ def plot(series, hy, levels, ws):
         g = levels[(levels.platform == p) & (levels.language == lang) & (levels.measure == "has_eval")]
         g = g.set_index("period").reindex(PERIODS)
         y = g.value * 100
-        ax.bar(range(3), y, color=COLORS[p], alpha=.85, width=.55)
-        ax.errorbar(range(3), y, yerr=[y - g.ci_low * 100, g.ci_high * 100 - y], fmt="none", ecolor="#222",
+        ax.bar(range(len(PERIODS)), y, color=COLORS[p], alpha=.85, width=.5)
+        ax.errorbar(range(len(PERIODS)), y, yerr=[y - g.ci_low * 100, g.ci_high * 100 - y], fmt="none", ecolor="#222",
                     capsize=4, lw=1.2)
         for i, (v, k) in enumerate(zip(y, g.reviews)):
             ax.text(i, 2, f"n={int(k)}", ha="center", fontsize=7.5, color="white")
-            ax.text(i + .3, v + 1.5, f"{v:.0f}%", fontsize=8)
-        ax.axhline(y.iloc[0], color="#888", ls="--", lw=1)
-        ax.set_xticks(range(3))
+            ax.text(i + .28, v + 1.5, f"{v:.0f}%", fontsize=8)
+        ax.set_xticks(range(len(PERIODS)))
         ax.set_xticklabels([PERIOD_LABEL[x] for x in PERIODS], fontsize=8)
         ax.set_title(title(p, lang), loc="left")
     for ax in axs.flat[n:]:
         ax.axis("off")
     axs[0, 0].set_ylabel("% of reviews with an AI-marker word")
-    fig.suptitle("AI-marker words by period (95% bootstrap intervals; dashed line: pre-2022 level)",
+    fig.suptitle("AI-marker words before and after ChatGPT's release (30 Nov 2022), 95% bootstrap intervals",
                  x=0.01, ha="left", fontsize=10)
     fig.tight_layout()
     fig.savefig(OUT / "fig_period_comparison.png", dpi=170)
@@ -256,7 +264,7 @@ def plot(series, hy, levels, ws):
         g = g.sort_values("post_share").tail(10)
         yy = np.arange(len(g))
         ax.hlines(yy, g.pre_share * 100, g.post_share * 100, color="#bbb", lw=2)
-        ax.plot(g.pre_share * 100, yy, "o", color="#999", label="Pre-2022")
+        ax.plot(g.pre_share * 100, yy, "o", color="#999", label="Pre-ChatGPT")
         ax.plot(g.post_share * 100, yy, "o", color=COLORS[p], label="Post-ChatGPT")
         labels = g.meaning if lang == "bangla" else g.word
         ax.set_yticks(yy)

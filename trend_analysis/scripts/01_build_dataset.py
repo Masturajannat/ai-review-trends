@@ -15,8 +15,9 @@ Steps
      mixed (both scripts in one review).
   4. Parse the review date. Daraz shows reviews younger than about a month as "x weeks ago"; these are
      converted using the scrape date and marked date_is_approx.
-  5. Assign periods: pre_2022 | 2022_control (1 Jan - 29 Nov 2022, before ChatGPT's release on
-     30 Nov 2022) | post_chatgpt (30 Nov 2022 onwards), plus calendar half-years.
+  5. Assign periods relative to ChatGPT's release on 30 Nov 2022: period = pre_chatgpt | post_chatgpt.
+     period_detail splits pre_chatgpt further into pre_2022 and jan_nov_2022 (used for a placebo check).
+     Calendar half-years in half_year.
   6. Exclude, in this order (first matching reason is recorded):
        duplicate_review_id, no_text, exact_repeat (same cleaned text on the same platform; the earliest
        is kept), stock_request (restock / availability questions of 15 words or fewer),
@@ -71,13 +72,13 @@ def parse_date(raw, platform):
     return pd.NaT, False
 
 
-def period_of(date):
+def period_detail_of(date):
     if pd.isna(date):
         return "unknown"
     if date < pd.Timestamp("2022-01-01"):
         return "pre_2022"
     if date < CHATGPT_RELEASE:
-        return "2022_control"
+        return "jan_nov_2022"
     return "post_chatgpt"
 
 
@@ -99,7 +100,8 @@ def main():
     df["year"] = df.date.dt.year.astype("Int64")
     df["half_year"] = df.date.dt.year.astype("Int64").astype(str) + "-H" + \
         ((df.date.dt.month > 6).astype(int) + 1).astype(str)
-    df["period"] = df.date.map(period_of)
+    df["period_detail"] = df.date.map(period_detail_of)
+    df["period"] = df.period_detail.replace({"pre_2022": "pre_chatgpt", "jan_nov_2022": "pre_chatgpt"})
 
     # 6: exclusions (first matching reason wins)
     df = df.sort_values(["platform", "date"], kind="stable").reset_index(drop=True)
@@ -117,7 +119,7 @@ def main():
     df["keep_25"] = df.keep & (df.n_words > 25)
 
     cols = ["review_id", "platform", "product_id", "product_name", "rating", "review_date_raw", "date",
-            "date_is_approx", "year", "half_year", "period", "language", "n_words", "keep", "keep_10",
+            "date_is_approx", "year", "half_year", "period", "period_detail", "language", "n_words", "keep", "keep_10",
             "keep_25", "exclude_reason", "text_original", "text_clean"]
     df = df[cols]
     df["date"] = df.date.dt.strftime("%Y-%m-%d")
@@ -129,10 +131,11 @@ def main():
         g.to_csv(DATA / f"reviews_{p.lower()}.csv", index=False, encoding="utf-8-sig")
 
     # summaries
-    order = ["pre_2022", "2022_control", "post_chatgpt"]
-    counts = (kept.groupby(["platform", "language", "period"]).size().unstack(fill_value=0)
+    order = ["pre_2022", "jan_nov_2022", "post_chatgpt"]
+    counts = (kept.groupby(["platform", "language", "period_detail"]).size().unstack(fill_value=0)
               .reindex(columns=order, fill_value=0))
-    counts["total"] = counts.sum(axis=1)
+    counts.insert(2, "pre_chatgpt", counts.pre_2022 + counts.jan_nov_2022)
+    counts["total"] = counts.pre_chatgpt + counts.post_chatgpt
     counts.to_csv(RESULTS / "dataset_counts.csv")
     hy = kept.groupby(["platform", "language", "half_year"]).size().unstack(fill_value=0)
     hy.to_csv(RESULTS / "dataset_counts_halfyear.csv")
