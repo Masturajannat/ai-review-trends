@@ -83,3 +83,20 @@ def language_of(text):
     if n_bl >= 2 or (n_bl == 1 and n_en <= 2):
         return "banglish"
     return "english"
+
+
+BENGALI_WORD = re.compile(r"[ঀ-৿]+")
+LATIN_WORD = re.compile(r"[a-z]+(?:'[a-z]+)?")
+
+
+def tokens(text, language):
+    """Word tokens used for marker counting. Bengali-script words for bangla; lower-case Latin words
+    for banglish and english (letters repeated three or more times are shortened: 'valooo' -> 'valo').
+    One-letter tokens are dropped."""
+    t = str(text)
+    if language == "bangla":
+        return [w for w in BENGALI_WORD.findall(t) if len(w) > 1]
+    words_ = LATIN_WORD.findall(t.lower())
+    if language == "banglish":
+        words_ = [re.sub(r"(.)\1{2,}", r"\1", w) for w in words_]
+    return [w for w in words_ if len(w) > 1]

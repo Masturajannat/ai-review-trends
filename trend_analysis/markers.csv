@@ -1,0 +1,39 @@
+language,word,group,meaning,z_discovery
+bangla,চমৎকার,evaluative,excellent,4.2
+bangla,দারুণ,evaluative,great,4.0
+bangla,বেশ,evaluative,quite,3.6
+bangla,সত্যিই,evaluative,truly,3.2
+bangla,অত্যন্ত,evaluative,extremely,3.0
+bangla,একদম,evaluative,absolutely,2.9
+bangla,অদ্ভুত,evaluative,wonderful/strange,2.3
+bangla,সন্তুষ্ট,evaluative,satisfied,2.3
+bangla,ভীষণ,evaluative,immensely,2.2
+bangla,সন্তোষজনক,evaluative,satisfactory,2.1
+bangla,অন্যরকম,evaluative,unique,2.0
+bangla,গভীর,evaluative,deep,1.9
+bangla,জীবন্ত,evaluative,vivid,1.9
+bangla,মাস্টারপিস,evaluative,masterpiece,1.9
+bangla,সম্পূর্ণ,evaluative,complete,1.8
+bangla,নিখুঁত,evaluative,flawless,1.8
+bangla,এককথায়,evaluative,in a word,1.8
+bangla,গভীরভাবে,evaluative,deeply,1.7
+bangla,অসাধারণ,evaluative,extraordinary,1.6
+bangla,অমূল্য,evaluative,invaluable,1.5
+bangla,এটি,formal,this (formal; colloquial এটা),3.6
+bangla,এবং,formal,and (formal; colloquial আর),3.3
+bangla,প্রতিটি,formal,each (formal),2.9
+bangla,একটি,formal,a/one (formal; colloquial একটা),2.8
+banglish,ekdom,evaluative,absolutely,2.5
+banglish,darun,evaluative,great,2.2
+banglish,khub,evaluative,very,2.1
+banglish,highly,evaluative,highly,2.0
+banglish,recommended,evaluative,recommended,1.8
+banglish,khuboi,evaluative,very much,1.2
+banglish,shobcheye,evaluative,most/best,1.0
+banglish,ebong,formal,and (formal; colloquial ar),1.5
+english,truly,evaluative,truly,2.8
+english,highly,evaluative,highly,2.2
+english,amazing,evaluative,amazing,2.2
+english,absolute,evaluative,absolute,2.2
+english,masterpiece,evaluative,masterpiece,1.7
+english,recommended,evaluative,recommended,1.5

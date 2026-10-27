@@ -1,0 +1,10 @@
+platform,language,pre_2022,2022_control,post_chatgpt,analysed
+Daraz,bangla,40,29,372,True
+Daraz,banglish,26,13,183,False
+Daraz,english,30,12,211,True
+Rokomari,bangla,74,22,55,True
+Rokomari,banglish,5,2,5,False
+Rokomari,english,25,15,31,False
+Shajgoj,bangla,12,8,32,False
+Shajgoj,banglish,37,20,59,True
+Shajgoj,english,43,29,28,False

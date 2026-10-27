@@ -42,9 +42,11 @@ to machine-translated reviews. They are kept in `archive/` with a summary of why
 python combine_reviews_all.py                              # merge the scraped files
 python trend_analysis\scripts\01_build_dataset.py          # clean, tag language, assign periods
 python trend_analysis\scripts\02_build_ai_reference.py     # AI reference reviews, original language
+python trend_analysis\scripts\03_marker_words.py          # AI-associated marker words per language
+python trend_analysis\scripts\04_trends.py                # marker-word trends per platform
 ```
 
-Requires Python 3.10+ with `pandas`.
+Requires Python 3.10+ with `pandas`, `numpy` and `matplotlib`.
 
 ## Reference
 
