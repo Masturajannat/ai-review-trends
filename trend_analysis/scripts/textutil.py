@@ -1,7 +1,9 @@
 """Shared text helpers for the original-language pipeline: cleaning, word counts, language tags."""
+import csv
 import html
 import re
 import unicodedata
+from pathlib import Path
 
 BENGALI = re.compile(r"[ঀ-৿]")
 LATIN = re.compile(r"[A-Za-z]")
@@ -38,6 +40,33 @@ sundor shundor darun dorun mast joss osadharon oshadharon chomotkar valobasha po
 bujhlam bujhte dekhlam dekhte dekhen dekhe chai chaile chacchi parben parbo pari parlam parsi
 bole boli bollo bolte bolben thik thakle thake thakbe dorkar lagbe hoilo hoiche gese geche gelo jay jabe
 """.split())
+
+
+# Banglish spelling variants (trend_analysis/banglish_variants.csv): variant -> canonical form.
+# canonical = standard Avro Phonetic spelling of the Bangla word (register families: standard written form)
+VARIANTS_FILE = Path(__file__).resolve().parent.parent / "banglish_variants.csv"
+
+
+def _load_variants():
+    table, families = {}, {}
+    if VARIANTS_FILE.exists():
+        with open(VARIANTS_FILE, encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                forms = row["variants"].split()
+                families[row["canonical"]] = dict(type=row["type"], meaning=row["meaning"], variants=forms)
+                for v in forms:
+                    table[v] = row["canonical"]
+    return table, families
+
+
+VARIANT_TO_CANONICAL, FAMILIES = _load_variants()
+# every spelling of a Bangla (non-loanword) family counts as a Banglish word for language tagging
+BANGLISH_WORDS |= {w for c, f in FAMILIES.items() if f["type"] != "loanword" for w in [c] + f["variants"]}
+
+
+def normalize_banglish(words_):
+    """Map Banglish spelling variants to their canonical form (vlo, valo -> bhalo; onk -> onek)."""
+    return [VARIANT_TO_CANONICAL.get(w, w) for w in words_]
 
 
 def clean_text(text):
@@ -89,14 +118,17 @@ BENGALI_WORD = re.compile(r"[ঀ-৿]+")
 LATIN_WORD = re.compile(r"[a-z]+(?:'[a-z]+)?")
 
 
-def tokens(text, language):
+def tokens(text, language, normalize=False):
     """Word tokens used for marker counting. Bengali-script words for bangla; lower-case Latin words
     for banglish and english (letters repeated three or more times are shortened: 'valooo' -> 'valo').
-    One-letter tokens are dropped."""
+    One-letter tokens are dropped. normalize=True maps Banglish spelling variants to canonical forms."""
     t = str(text)
     if language == "bangla":
         return [w for w in BENGALI_WORD.findall(t) if len(w) > 1]
     words_ = LATIN_WORD.findall(t.lower())
     if language == "banglish":
         words_ = [re.sub(r"(.)\1{2,}", r"\1", w) for w in words_]
-    return [w for w in words_ if len(w) > 1]
+    words_ = [w for w in words_ if len(w) > 1]
+    if normalize and language == "banglish":
+        words_ = normalize_banglish(words_)
+    return words_

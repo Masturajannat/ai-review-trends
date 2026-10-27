@@ -20,7 +20,7 @@ Reads `combined_reviews.csv` (all scraped reviews) and produces the analysis dat
 |---|---|
 | Cleaning | Emojis, text emoticons (`:)`, `<3`, `xD`) and other symbols removed; HTML entities decoded |
 | Word count | Whitespace tokens of the cleaned text that contain at least one letter |
-| Language | `bangla`: at least 80% of letters in Bengali script. `mixed`: 20–80%. Latin-script text is `banglish` if it contains two or more common Banglish words (or one, with at most two common English words), otherwise `english` |
+| Language | `bangla`: at least 80% of letters in Bengali script. `mixed`: 20–80%. Latin-script text is `banglish` if it contains two or more common Banglish words (or one, with at most two common English words), otherwise `english`. The Banglish word list includes every spelling variant in `banglish_variants.csv` |
 | Date | Parsed from the review date. Daraz shows reviews newer than about a month as "x weeks ago"; these are converted using the scrape date (16 Oct 2026) and marked `date_is_approx` |
 | Period | `period`: `pre_chatgpt` (before 30 Nov 2022) or `post_chatgpt` (30 Nov 2022 onwards). `period_detail` splits the pre-ChatGPT period into `pre_2022` and `jan_nov_2022`, used for a placebo check. Calendar half-years in `half_year` |
 | Exclusion | In order: duplicate review ID; no text; exact repeat of a review on the same platform (earliest kept); restock or availability request of 15 words or fewer; **5 words or fewer** |
@@ -35,12 +35,12 @@ Of 2,899 scraped reviews, 1,740 are kept (774 too short, 279 exact repeats, 99 s
 | Platform | Language | Pre-ChatGPT | of which pre-2022 | of which Jan–Nov 2022 | Post-ChatGPT |
 |---|---|---|---|---|---|
 | Daraz | Bangla | 106 | 77 | 29 | 372 |
-| Daraz | Banglish | 59 | 46 | 13 | 183 |
-| Daraz | English | 76 | 64 | 12 | 211 |
+| Daraz | Banglish | 60 | 47 | 13 | 183 |
+| Daraz | English | 75 | 63 | 12 | 211 |
 | Rokomari | Bangla | 172 | 150 | 22 | 55 |
 | Rokomari | English | 58 | 43 | 15 | 31 |
-| Shajgoj | Banglish | 95 | 75 | 20 | 59 |
-| Shajgoj | English | 118 | 89 | 29 | 28 |
+| Shajgoj | Banglish | 95 | 75 | 20 | 62 |
+| Shajgoj | English | 118 | 89 | 29 | 25 |
 | Shajgoj | Bangla | 29 | 21 | 8 | 32 |
 
 Smaller groups (Rokomari Banglish, mixed-script reviews) are in `results/dataset_counts.csv`.
@@ -57,8 +57,8 @@ the incorrect language labels; additional English AI reviews are needed before t
 
 ### `textutil.py`
 
-Shared cleaning, word-counting and language-tagging functions, used by both scripts so that real
-and AI-generated reviews are processed identically.
+Shared cleaning, word-counting, language-tagging and Banglish spelling-normalisation functions, used
+by all scripts so that real and AI-generated reviews are processed identically.
 
 ## Phase 2: marker-word trend
 
@@ -127,7 +127,7 @@ Six series meet the size requirement. Share of reviews containing an evaluative 
 | Daraz – English | 14.3% (n = 42) | 14.7% (n = 211) | +0.4 [−11.5, +11.4] |
 | Rokomari – Bangla | 36.5% (n = 96) | 30.9% (n = 55) | −5.5 [−21.1, +10.3] |
 | Rokomari – English | 15.0% (n = 40) | 19.4% (n = 31) | +4.4 [−13.5, +21.5] |
-| Shajgoj – Banglish | 19.3% (n = 57) | 11.9% (n = 59) | −7.4 [−21.2, +4.9] |
+| Shajgoj – Banglish | 19.3% (n = 57) | 11.3% (n = 62) | −8.0 [−21.5, +4.3] |
 
 No series shows a clear increase in AI-associated words after ChatGPT's release. Markers per
 100 words, reviews over 10 words, same-product reviews and a pre-2022-only baseline lead to the
@@ -150,7 +150,98 @@ same conclusion (all `no clear change` in `results/trend_changes.csv`).
   ruled out.
 - Marker words were derived from Gemini output; reviews written with ChatGPT may favour other words.
 - The English marker list is based on 44 AI reviews.
-- Banglish spelling varies widely; only repeated letters are normalised.
+- Banglish spelling varies widely; this analysis counts spellings as written. The Banglish-specific
+  analysis below normalises spelling and supersedes the Banglish rows of this table.
+
+## Phase 3: Banglish and language mix
+
+```powershell
+python trend_analysis\scripts\05_banglish.py
+python trend_analysis\scripts\06_language_mix.py
+```
+
+### Spelling variants (`banglish_variants.csv`)
+
+Banglish has no fixed spelling: "good" appears as *valo* (231 times), *vlo* (57), *bhalo* (20),
+*balo* and *vhalo*. The table maps 150 variant spellings onto 51 families and assigns each a canonical
+form, the standard Avro Phonetic spelling of the Bangla word. Families are of three types:
+
+| Type | Example | Families |
+|---|---|---|
+| `spelling` | vlo, valo, balo → *bhalo*; onk, onak → *onek*; akdom → *ekdom*; amr → *amar* | 34 |
+| `register` | colloquial hoise, hoice → standard *hoyeche*; paisi → *peyechi*; gese → *geche* | 7 |
+| `loanword` | misspelled English words: coyalety → *quality*; prefect → *perfect*; orginal → *original* | 10 |
+
+Candidate groups were generated from consonant skeletons (bh/v, sh/s, ch/s/c merged; vowels
+removed) and checked by hand. `textutil.tokens(..., normalize=True)` applies the table.
+
+### Standard-form share (`05_banglish.py`, part A)
+
+For each Banglish review, the share of variant-family words written in their canonical form.
+AI-generated Banglish uses standard spellings far more consistently than reviewers do:
+
+| Group | Reviews | Standard-form share |
+|---|---|---|
+| AI (Gemini) | 314 | 81.4% |
+| Human pre-2022, held-out half | 61 | 48.5% |
+| Human pre-2022, all | 116 | 52.8% |
+
+Before and after ChatGPT (95% bootstrap interval):
+
+| Platform | Pre-ChatGPT | Post-ChatGPT | Change (points) | Placebo (Jan–Nov 2022 − pre-2022) |
+|---|---|---|---|---|
+| Daraz | 43.3% (n = 57) | 46.0% (n = 166) | +2.7 [−7.1, +12.8] | −8.3 [−27.0, +10.1] |
+| Shajgoj | 58.3% (n = 83) | 53.7% (n = 54) | −4.6 [−17.4, +7.9] | −4.0 [−21.3, +12.1] |
+
+Spelling has not moved towards the AI pattern on either platform.
+
+### Cross-fitted marker words (`05_banglish.py`, part B)
+
+Marker words are counted after spelling normalisation, so *akdom* and *ekdom* count as the same
+word. To use every pre-ChatGPT review, the analysis is cross-fitted: markers are chosen on one half
+of the pre-2022 reviews and the baseline is measured on the other half, then the halves are swapped
+and the two estimates averaged. Markers are selected automatically from a fixed list of evaluative
+words (`EVALUATIVE` in the script, defined before the analysis) as those with log-odds z ≥ 1.
+
+| Fold | Markers selected | Held-out AI | Held-out human |
+|---|---|---|---|
+| A | darun, ekdom, highly, khub, khuboi, recommended, shobcheye | 72.8% | 23.5% |
+| B | awesome, darun, ekdom, highly, khub, khubi, perfect, recommended, sundor | 75.6% | 26.2% |
+
+Both halves select largely the same words.
+
+| Platform | Pre-ChatGPT | Post-ChatGPT | Change (points) |
+|---|---|---|---|
+| Daraz | 26.1% (n = 60) | 13.7% (n = 183) | −12.4 [−25.6, −0.4] |
+| Shajgoj | 21.7% (n = 95) | 15.3% (n = 62) | −6.4 [−18.2, +5.5] |
+
+Banglish reviews did not become more AI-like after ChatGPT; on Daraz, marker words became less
+frequent.
+
+### Language mix (`06_language_mix.py`)
+
+AI assistants write standard Bengali script or English by default. A shift away from Banglish after
+ChatGPT would therefore be one possible trace of AI use, although keyboard habits and the reviewer
+population also affect it. Change in the share of reviews in each language, post- minus
+pre-ChatGPT, for products reviewed in both periods:
+
+| Platform | Bengali script | Banglish | English |
+|---|---|---|---|
+| Daraz (240 → 232 reviews) | +20.9 [+12.4, +29.7] | −2.2 [−9.8, +5.4] | −18.8 [−25.9, −11.9] |
+| Rokomari (241 → 89) | −11.4 [−22.5, +0.1] | +1.9 [−2.9, +7.6] | +7.4 [−3.8, +18.3] |
+| Shajgoj (218 → 124) | +13.9 [+5.1, +23.1] | +13.3 [+2.4, +24.5] | −29.4 [−39.0, −20.0] |
+
+The Banglish share did not fall on any platform; on Shajgoj it rose. English declined on Daraz
+and Shajgoj, while Bengali script grew. This pattern does not match a shift towards
+AI-produced text, which would favour polished English or Bengali script over Banglish; it is more
+consistent with a broader move towards Bengali-language reviewing.
+
+### Limitations
+
+- The pre-ChatGPT Banglish groups are small (57–95 reviews).
+- The AI reference is Gemini's Banglish, which overuses some words (*khub* in 49% of AI reviews
+  against 10% of human ones). Banglish written with ChatGPT may differ.
+- The variant table covers frequent words; rarer variants remain unnormalised.
 
 ## Files
 
@@ -170,6 +261,12 @@ same conclusion (all `no clear change` in `results/trend_changes.csv`).
 | `results/fig_period_comparison.png` | Marker share before and after ChatGPT for each series |
 | `results/fig_trend_halfyear.png` | Marker and control-word share by half-year |
 | `results/fig_word_shift.png` | Each evaluative marker before and after ChatGPT |
+| `banglish_variants.csv` | Banglish spelling-variant families with canonical forms |
+| `results/banglish_standard_check.csv`, `banglish_standard_periods.csv`, `banglish_standard_changes.csv` | Standard-form share: AI vs human check; by platform and period; changes |
+| `results/banglish_markers_crossfit.csv` | Cross-fitted Banglish markers per fold and changes by platform |
+| `results/fig_banglish.png` | Standard-form share by year and period; cross-fitted markers |
+| `results/language_mix_by_year.csv`, `language_mix_changes.csv` | Language shares by platform and year; changes |
+| `results/fig_language_mix.png` | Language of reviews by year and platform |
 
 ## Next phases
 

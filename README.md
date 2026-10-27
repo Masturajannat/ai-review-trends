@@ -45,6 +45,8 @@ python trend_analysis\scripts\01_build_dataset.py          # clean, tag language
 python trend_analysis\scripts\02_build_ai_reference.py     # AI reference reviews, original language
 python trend_analysis\scripts\03_marker_words.py          # AI-associated marker words per language
 python trend_analysis\scripts\04_trends.py                # marker-word trends per platform
+python trend_analysis\scripts\05_banglish.py              # Banglish spelling and marker analysis
+python trend_analysis\scripts\06_language_mix.py          # language of reviews over time
 ```
 
 Requires Python 3.10+ with `pandas`, `numpy` and `matplotlib`.
