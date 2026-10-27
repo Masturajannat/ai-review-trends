@@ -97,6 +97,7 @@ output of the previous one, so run them in order after any change to the data.
 | 5 | `python trend_analysis\scripts\04_trends.py` | Marker-word trends per platform and language, charts |
 | 6 | `python trend_analysis\scripts\05_banglish.py` | Banglish standard-spelling share and cross-fitted markers |
 | 7 | `python trend_analysis\scripts\06_language_mix.py` | Language of reviews over time |
+| 8 | `python trend_analysis\scripts\07_ai_share.py` | Estimated AI share, validated on known mixtures |
 
 Step 1 is needed only after the scraped files change. All results are written to
 `trend_analysis/results/`; each script prints a summary when it finishes.
@@ -113,6 +114,7 @@ Step 1 is needed only after the scraped files change. All results are written to
 | `results/fig_word_shift.png` | Each marker word before and after ChatGPT |
 | `results/fig_banglish.png` | Banglish standard-spelling share and markers |
 | `results/fig_language_mix.png` | Language of reviews by year |
+| `results/fig_ai_share.png` | Validation of the AI-share estimate and estimates per series |
 
 ## 4. Adding new reviews
 
@@ -126,7 +128,7 @@ Step 1 is needed only after the scraped files change. All results are written to
 4. **Daraz only:** recent Daraz reviews are dated "x weeks ago". Set `DARAZ_SCRAPE_DATE` in
    `trend_analysis/scripts/01_build_dataset.py` to the date of the new scrape, otherwise these dates
    are converted wrongly.
-5. **Rerun steps 1–7** of section 3.
+5. **Rerun steps 1–8** of section 3.
 6. **Check** `results/dataset_counts.csv` and the summary printed by `01_build_dataset.py`:
    the number of kept reviews should rise, and no date warnings should appear.
 
@@ -141,7 +143,7 @@ message, and choose words without looking at post-ChatGPT results.
 | `trend_analysis/banglish_variants.csv` | Banglish spelling variants and their standard (Avro Phonetic) form | One canonical form per word; a spelling may appear in only one family |
 | `EVALUATIVE` list in `05_banglish.py` | Banglish evaluative words from which markers are chosen automatically | Evaluative words only, in canonical spelling |
 
-After editing, rerun steps 2–7.
+After editing, rerun steps 2–8.
 
 ## 6. Troubleshooting
 

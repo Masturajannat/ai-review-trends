@@ -243,6 +243,80 @@ consistent with a broader move towards Bengali-language reviewing.
   against 10% of human ones). Banglish written with ChatGPT may differ.
 - The variant table covers frequent words; rarer variants remain unnormalised.
 
+## Phase 4: estimated AI share
+
+```powershell
+python trend_analysis\scripts\07_ai_share.py
+```
+
+### Method
+
+The marker rates can be turned into an estimate of the share of AI-generated reviews. If a share α
+of reviews is AI-generated, the expected share of reviews containing an evaluative marker is
+(1 − α)·h + α·a, so
+
+    α = (m − h) / (a − h)
+
+with h the marker rate in pre-ChatGPT human reviews (excluding the discovery half), a the rate in
+held-out AI reviews (not used to choose the markers; platform-specific where at least 40 exist,
+otherwise all platforms), and m the rate in post-ChatGPT reviews. Banglish words are
+spelling-normalised. Intervals come from bootstrapping all three groups.
+
+**Validation on known mixtures.** For each series, the human baseline and the AI reviews are each
+split at random into two halves. One half gives h and a; the other halves are mixed with a known AI
+share (0%, 5%, 10%, 20%) into a sample the size of the series' post-ChatGPT sample, and α is
+estimated. This is repeated 1,000 times.
+
+### Validation results
+
+| Series | Mixture size | 0% → | 10% → | 20% → | 90% range at 10% |
+|---|---|---|---|---|---|
+| Daraz – Bangla | 372 | −1.1% | 9.2% | 20.0% | −13 to 29% |
+| Daraz – Banglish | 183 | −3.2% | 7.3% | 18.4% | −37 to 42% |
+| Daraz – English | 211 | −4.9% | 5.8% | 17.2% | −51 to 49% |
+| Rokomari – Bangla | 55 | −0.3% | 10.1% | 19.1% | −23 to 40% |
+| Rokomari – English | 31 | −4.1% | 6.0% | 17.6% | −56 to 59% |
+| Shajgoj – Banglish | 62 | −1.4% | 7.2% | 18.9% | −33 to 45% |
+
+On average the estimator recovers the true share (bias within 5 points; a 10% mixture returns
+6–10%). Single estimates, however, are very imprecise at the current sample sizes, mainly because the
+human baselines are small. The validation halves the baseline, so it somewhat overstates the spread
+of the real estimates.
+
+### Estimates after ChatGPT
+
+| Series | Human rate h | AI rate a | Post rate m | Estimated AI share (95% CI) | Placebo (Jan–Nov 2022) |
+|---|---|---|---|---|---|
+| Daraz – Bangla | 14.5% | 78.3% | 20.2% | 8.9% (−6.5, 20.6) | −1.9% (−31, 23) |
+| Daraz – Banglish | 25.6% | 81.4% | 10.9% | −26.4% (−72.9, −1.9) | −7.1% (−77, 43) |
+| Daraz – English | 14.3% | 54.5% | 14.7% | 1.0% (−44.1, 25.6) | −57.9% (−214, −15) |
+| Rokomari – Bangla | 36.5% | 93.4% | 30.9% | −9.7% (−41.6, 15.6) | −22.0% (−72, 19) |
+| Rokomari – English | 15.0% | 54.5% | 19.4% | 11.0% (−44.4, 56.3) | 18.8% (−44, 77) |
+| Shajgoj – Banglish | 19.3% | 68.2% | 12.9% | −13.1% (−52.5, 11.9) | −14.2% (−79, 28) |
+
+- No series shows an AI share clearly above zero. The most precise series, Daraz Bangla, gives
+  8.9% with a one-sided 95% upper bound of 18.7%.
+- A negative estimate means that human use of marker words fell; the model assumes that human
+  writing stays constant over time. The clearly negative Daraz Banglish estimate shows that this
+  assumption does not fully hold, so the estimates measure AI use together with changes in human
+  writing style.
+- The placebo estimate includes zero in five of six series. Daraz English fails because none of its
+  12 Jan–Nov 2022 reviews contains a marker.
+
+### Sample size needed
+
+Reviews needed in each period (pre- and post-ChatGPT, equal sizes) for a 95% interval of about
+±10 percentage points, from the normal approximation (`reviews_needed_pm10` in
+`results/ai_share_estimates.csv`):
+
+| Series | Daraz Bangla | Daraz Banglish | Daraz English | Rokomari Bangla | Rokomari English | Shajgoj Banglish |
+|---|---|---|---|---|---|---|
+| Needed per period | 275 | 459 | 589 | 532 | 838 | 463 |
+| Current pre-ChatGPT | 69 | 39 | 42 | 96 | 40 | 57 |
+
+The current data can rule out only large AI shares. Reliable prevalence estimates require roughly
+5–15 times more pre-ChatGPT reviews per series, which sets the target for further data collection.
+
 ## Files
 
 | Path | Contents |
@@ -267,6 +341,9 @@ consistent with a broader move towards Bengali-language reviewing.
 | `results/fig_banglish.png` | Standard-form share by year and period; cross-fitted markers |
 | `results/language_mix_by_year.csv`, `language_mix_changes.csv` | Language shares by platform and year; changes |
 | `results/fig_language_mix.png` | Language of reviews by year and platform |
+| `results/ai_share_validation.csv` | Known-mixture validation of the AI-share estimate |
+| `results/ai_share_estimates.csv` | Estimated AI share after ChatGPT, placebo, reviews needed |
+| `results/fig_ai_share.png` | Validation and estimates |
 
 ## Next phases
 

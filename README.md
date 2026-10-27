@@ -50,6 +50,7 @@ python trend_analysis\scripts\03_marker_words.py          # AI-associated marker
 python trend_analysis\scripts\04_trends.py                # marker-word trends per platform
 python trend_analysis\scripts\05_banglish.py              # Banglish spelling and marker analysis
 python trend_analysis\scripts\06_language_mix.py          # language of reviews over time
+python trend_analysis\scripts\07_ai_share.py              # estimated AI share, validated on known mixtures
 ```
 
 Requires Python 3.10+ with `pandas`, `numpy` and `matplotlib`.
