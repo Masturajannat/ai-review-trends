@@ -10,3 +10,4 @@ venv/
 # local scratch / caches
 archive/week5_mixture_translated/data/test1_*.csv
 archive/week5_mixture_translated/data/ai_translation_cache.json
+raw_daraz/
