@@ -1,42 +1,42 @@
 ﻿platform,language,word,meaning,group,pre_share,post_share
-Daraz,bangla,চমৎকার,excellent,evaluative,0.028985507246376812,0.010752688172043012
-Daraz,bangla,দারুণ,great,evaluative,0.014492753623188406,0.016129032258064516
-Daraz,bangla,বেশ,quite,evaluative,0.028985507246376812,0.02956989247311828
-Daraz,bangla,সত্যিই,truly,evaluative,0.0,0.010752688172043012
-Daraz,bangla,অত্যন্ত,extremely,evaluative,0.0,0.0
-Daraz,bangla,একদম,absolutely,evaluative,0.014492753623188406,0.04838709677419355
-Daraz,bangla,অদ্ভুত,wonderful/strange,evaluative,0.014492753623188406,0.0
-Daraz,bangla,সন্তুষ্ট,satisfied,evaluative,0.0,0.01881720430107527
-Daraz,bangla,ভীষণ,immensely,evaluative,0.014492753623188406,0.0
-Daraz,bangla,সন্তোষজনক,satisfactory,evaluative,0.0,0.005376344086021506
-Daraz,bangla,অন্যরকম,unique,evaluative,0.0,0.0
+Daraz,bangla,চমৎকার,excellent,evaluative,0.014380530973451327,0.008361204013377926
+Daraz,bangla,দারুণ,great,evaluative,0.004424778761061947,0.011705685618729096
+Daraz,bangla,বেশ,quite,evaluative,0.02101769911504425,0.03511705685618729
+Daraz,bangla,সত্যিই,truly,evaluative,0.011061946902654867,0.006688963210702341
+Daraz,bangla,অত্যন্ত,extremely,evaluative,0.004424778761061947,0.0016722408026755853
+Daraz,bangla,একদম,absolutely,evaluative,0.02101769911504425,0.038461538461538464
+Daraz,bangla,অদ্ভুত,wonderful/strange,evaluative,0.0011061946902654867,0.0
+Daraz,bangla,সন্তুষ্ট,satisfied,evaluative,0.012168141592920354,0.01839464882943144
+Daraz,bangla,ভীষণ,immensely,evaluative,0.0011061946902654867,0.0
+Daraz,bangla,সন্তোষজনক,satisfactory,evaluative,0.0011061946902654867,0.005016722408026756
+Daraz,bangla,অন্যরকম,unique,evaluative,0.0022123893805309734,0.0
 Daraz,bangla,গভীর,deep,evaluative,0.0,0.0
 Daraz,bangla,জীবন্ত,vivid,evaluative,0.0,0.0
 Daraz,bangla,মাস্টারপিস,masterpiece,evaluative,0.0,0.0
-Daraz,bangla,সম্পূর্ণ,complete,evaluative,0.0,0.005376344086021506
-Daraz,bangla,নিখুঁত,flawless,evaluative,0.0,0.002688172043010753
-Daraz,bangla,এককথায়,in a word,evaluative,0.0,0.0
+Daraz,bangla,সম্পূর্ণ,complete,evaluative,0.0011061946902654867,0.0033444816053511705
+Daraz,bangla,নিখুঁত,flawless,evaluative,0.0,0.0016722408026755853
+Daraz,bangla,এককথায়,in a word,evaluative,0.0011061946902654867,0.0
 Daraz,bangla,গভীরভাবে,deeply,evaluative,0.0,0.0
-Daraz,bangla,অসাধারণ,extraordinary,evaluative,0.028985507246376812,0.0967741935483871
+Daraz,bangla,অসাধারণ,extraordinary,evaluative,0.033185840707964605,0.06856187290969899
 Daraz,bangla,অমূল্য,invaluable,evaluative,0.0,0.0
-Daraz,bangla,এটি,this (formal; colloquial এটা),formal,0.014492753623188406,0.010752688172043012
-Daraz,bangla,এবং,and (formal; colloquial আর),formal,0.10144927536231885,0.10215053763440861
-Daraz,bangla,প্রতিটি,each (formal),formal,0.0,0.002688172043010753
-Daraz,bangla,একটি,a/one (formal; colloquial একটা),formal,0.028985507246376812,0.06451612903225806
-Daraz,banglish,ekdom,absolutely,evaluative,0.0,0.01092896174863388
-Daraz,banglish,darun,great,evaluative,0.02564102564102564,0.0
-Daraz,banglish,khub,very,evaluative,0.1282051282051282,0.060109289617486336
-Daraz,banglish,highly,highly,evaluative,0.0,0.01092896174863388
-Daraz,banglish,recommended,recommended,evaluative,0.02564102564102564,0.01092896174863388
+Daraz,bangla,এটি,this (formal; colloquial এটা),formal,0.014380530973451327,0.008361204013377926
+Daraz,bangla,এবং,and (formal; colloquial আর),formal,0.10730088495575221,0.10033444816053512
+Daraz,bangla,প্রতিটি,each (formal),formal,0.00331858407079646,0.0016722408026755853
+Daraz,bangla,একটি,a/one (formal; colloquial একটা),formal,0.04314159292035398,0.048494983277591976
+Daraz,banglish,ekdom,absolutely,evaluative,0.005319148936170213,0.011811023622047244
+Daraz,banglish,darun,great,evaluative,0.007978723404255319,0.0
+Daraz,banglish,khub,very,evaluative,0.10106382978723404,0.07480314960629922
+Daraz,banglish,highly,highly,evaluative,0.0026595744680851063,0.007874015748031496
+Daraz,banglish,recommended,recommended,evaluative,0.02127659574468085,0.007874015748031496
 Daraz,banglish,khuboi,very much,evaluative,0.0,0.0
 Daraz,banglish,shobcheye,most/best,evaluative,0.0,0.0
-Daraz,banglish,ebong,and (formal; colloquial ar),formal,0.0,0.0
-Daraz,english,truly,truly,evaluative,0.0,0.009478672985781991
-Daraz,english,highly,highly,evaluative,0.023809523809523808,0.03317535545023697
-Daraz,english,amazing,amazing,evaluative,0.0,0.037914691943127965
+Daraz,banglish,ebong,and (formal; colloquial ar),formal,0.0,0.003937007874015748
+Daraz,english,truly,truly,evaluative,0.0,0.005305039787798408
+Daraz,english,highly,highly,evaluative,0.013777267508610792,0.03183023872679045
+Daraz,english,amazing,amazing,evaluative,0.003444316877152698,0.023872679045092837
 Daraz,english,absolute,absolute,evaluative,0.0,0.0
-Daraz,english,masterpiece,masterpiece,evaluative,0.0,0.004739336492890996
-Daraz,english,recommended,recommended,evaluative,0.14285714285714285,0.08056872037914692
+Daraz,english,masterpiece,masterpiece,evaluative,0.0,0.002652519893899204
+Daraz,english,recommended,recommended,evaluative,0.05625717566016074,0.07692307692307693
 Rokomari,bangla,চমৎকার,excellent,evaluative,0.05825242718446602,0.06725146198830409
 Rokomari,bangla,দারুণ,great,evaluative,0.02696871628910464,0.02046783625730994
 Rokomari,bangla,বেশ,quite,evaluative,0.10032362459546926,0.04093567251461988

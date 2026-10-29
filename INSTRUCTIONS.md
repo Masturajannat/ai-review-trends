@@ -137,8 +137,12 @@ rokomari_reviews_round2.csv,Rokomari,2026-10-29,2,round 2: 12 additional books
    ```
    The scraper skips reviews already in `rokomari_reviews.csv`, saves after every book and can be
    restarted; add `--redo` to collect books again, `--headed` to watch the browser.
-   **Daraz and Shajgoj:** copy the scraper, change its product list and output file name so the
-   round-1 file is not overwritten.
+   **Daraz:** `daraz_scraper(2019-2021).py` collects all reviews of the products in its list into
+   `daraz_reviews(2019-2021).csv` and resumes from `done_items(2019-2021).txt`; for a further round,
+   copy it and change the product list and both file names. `sample_products.py` estimates how many
+   usable 2019–2021 reviews a product has before scraping it. Do not change the product list of
+   `daraz_scraper_v2.py`: it would overwrite the round-1 file with different products.
+   **Shajgoj:** copy the scraper and change its product list and output file name.
 3. **Register the file:** add a row to `sources.csv` with the file name, platform, scrape date
    (YYYY-MM-DD) and the next batch number. The scrape date is used to convert Daraz dates such as
    "3 weeks ago", so it must be the day the file was collected.
