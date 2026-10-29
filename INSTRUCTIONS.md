@@ -118,19 +118,37 @@ Step 1 is needed only after the scraped files change. All results are written to
 
 ## 4. Adding new reviews
 
+New reviews are collected in **rounds**. Each round writes a new CSV file; earlier files are never
+overwritten. `sources.csv` lists every file to include, with its platform, scrape date and round
+(`batch`):
+
+```
+file,platform,scrape_date,batch,note
+rokomari_reviews.csv,Rokomari,2026-10-16,1,round 1
+rokomari_reviews_round2.csv,Rokomari,2026-10-29,2,round 2: 12 additional books
+```
+
 1. **Choose products.** Prefer products that have reviews both before and after 30 November 2022,
    in the existing categories (Daraz: earphones and gadgets; Rokomari: books; Shajgoj: skincare).
-2. **Add the product links** to `PRODUCT_URLS` at the top of the scraper:
-   `daraz_scraper_v2.py`, `rokomari_scraper.py` or `shajgoj_scraper.py`.
-3. **Run the scraper**, for example `python daraz_scraper_v2.py`. Each scraper re-collects all
-   products in its list and overwrites its CSV file (`daraz_reviews_v2.csv`, ...). Keep the
-   existing links in the list so earlier reviews are not lost.
-4. **Daraz only:** recent Daraz reviews are dated "x weeks ago". Set `DARAZ_SCRAPE_DATE` in
-   `trend_analysis/scripts/01_build_dataset.py` to the date of the new scrape, otherwise these dates
-   are converted wrongly.
-5. **Rerun steps 1–8** of section 3.
-6. **Check** `results/dataset_counts.csv` and the summary printed by `01_build_dataset.py`:
-   the number of kept reviews should rise, and no date warnings should appear.
+2. **Rokomari:** put one book link per line in `rokomari_urls_round2.txt` (or a new URL file) and run
+   ```powershell
+   python rokomari_scraper_round2.py
+   python rokomari_scraper_round2.py --urls rokomari_urls_round3.txt --out rokomari_reviews_round3.csv --batch 3
+   ```
+   The scraper skips reviews already in `rokomari_reviews.csv`, saves after every book and can be
+   restarted; add `--redo` to collect books again, `--headed` to watch the browser.
+   **Daraz and Shajgoj:** copy the scraper, change its product list and output file name so the
+   round-1 file is not overwritten.
+3. **Register the file:** add a row to `sources.csv` with the file name, platform, scrape date
+   (YYYY-MM-DD) and the next batch number. The scrape date is used to convert Daraz dates such as
+   "3 weeks ago", so it must be the day the file was collected.
+4. **Rerun steps 1–8** of section 3. `combine_reviews_all.py` prints the number of reviews per
+   file; a review that appears in two files is kept once, from the earlier round.
+5. **Check** `results/dataset_counts.csv` and the summary printed by `01_build_dataset.py`
+   (kept reviews by platform and batch). No date warnings should appear.
+
+Scraped CSV files contain no reviewer names. Raw API responses (`raw_daraz/`) stay local and are
+not committed.
 
 ## 5. Editing the word lists
 

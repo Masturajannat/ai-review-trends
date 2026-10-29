@@ -1,0 +1,25 @@
+# Rokomari books for round 2 - one URL per line. Lines starting with # are ignored.
+#
+# Choose books that were reviewed both BEFORE and AFTER 30 November 2022 (popular classics,
+# bestsellers, well-known authors), preferably with many reviews. The post-ChatGPT side is the
+# bottleneck for Rokomari, so books that are still being reviewed today are the most useful.
+# Target: about 1,100 raw reviews in total (roughly 15-20 books).
+#
+# Example format (books already collected in round 1 - do not repeat them):
+#   https://www.rokomari.com/book/7652/borof-gola-nodi
+#
+# Add the new book links below:
+
+https://www.rokomari.com/book/222273/opekkha
+https://www.rokomari.com/book/62834/deyal
+https://www.rokomari.com/book/968/jochna-o-jononir-golpo
+https://www.rokomari.com/book/6773/joddopi-amar-guru
+https://www.rokomari.com/book/7653/shesh-bikaler-meye
+https://www.rokomari.com/book/7655/hazar-bosor-dhore
+https://www.rokomari.com/book/7652/borof-gola-nodi
+https://www.rokomari.com/book/170978/ma-ma-ma-ebong-baba
+https://www.rokomari.com/book/890/moyurakkhi-himu-series-er-1st-book
+https://www.rokomari.com/book/80413/shobnom
+https://www.rokomari.com/book/176874/rabindronath-ekhane-kokhono-asenni
+https://www.rokomari.com/book/5321/cracher-cornel-bangla-academy-puroshkarprapto
+https://www.rokomari.com/book/33653/contract

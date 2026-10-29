@@ -1,0 +1,5 @@
+file,platform,scrape_date,batch,note
+daraz_reviews_v2.csv,Daraz,2026-10-16,1,round 1
+shajgoj_reviews.csv,Shajgoj,2026-10-16,1,round 1
+rokomari_reviews.csv,Rokomari,2026-10-16,1,round 1
+rokomari_reviews_round2.csv,Rokomari,2026-10-29,2,round 2: 12 additional books

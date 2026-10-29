@@ -30,10 +30,13 @@ to machine-translated reviews. They are kept in `archive/` with a summary of why
 | Path | Contents |
 |---|---|
 | `daraz_scraper_v2.py`, `rokomari_scraper.py`, `shajgoj_scraper.py` | Review scrapers for each platform |
+| `rokomari_scraper_round2.py`, `rokomari_urls_round2.txt` | Scraper for additional Rokomari books; writes a new file |
 | `inspect_daraz_api.py`, `shajgoj_discover.py` | Helpers used to locate each site's review API |
-| `daraz_reviews_v2.csv`, `rokomari_reviews.csv`, `shajgoj_reviews.csv` | Scraped reviews per platform |
+| `daraz_reviews_v2.csv`, `rokomari_reviews.csv`, `shajgoj_reviews.csv` | Scraped reviews per platform, round 1 |
+| `rokomari_reviews_round2.csv` | Rokomari reviews, round 2 |
+| `sources.csv` | Review files to combine, with platform, scrape date and round |
 | `raw_daraz/` | Raw Daraz API responses |
-| `combine_reviews_all.py` → `combined_reviews.csv` | All 2,899 scraped reviews in one file, original text |
+| `combine_reviews_all.py` → `combined_reviews.csv` | All 5,149 scraped reviews (files in `sources.csv`) in one file, original text |
 | `trend_analysis/` | Current pipeline: dataset preparation and trend analysis (see its README) |
 | `INSTRUCTIONS.md` | Setup, Git workflow, running the pipeline, adding new reviews |
 | `archive/` | Earlier translation-based approaches (see its README) |

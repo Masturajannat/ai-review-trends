@@ -2,9 +2,9 @@ platform,language,pre_2022,jan_nov_2022,pre_chatgpt,post_chatgpt,analysed
 Daraz,bangla,40,29,69,372,True
 Daraz,banglish,26,13,39,183,True
 Daraz,english,30,12,42,211,True
-Rokomari,bangla,74,22,96,55,True
-Rokomari,banglish,5,2,7,5,False
-Rokomari,english,25,15,40,31,True
+Rokomari,bangla,808,119,927,342,True
+Rokomari,banglish,32,3,35,29,False
+Rokomari,english,126,35,161,68,True
 Shajgoj,bangla,12,8,20,32,False
 Shajgoj,banglish,37,20,57,62,True
 Shajgoj,english,43,29,72,25,False

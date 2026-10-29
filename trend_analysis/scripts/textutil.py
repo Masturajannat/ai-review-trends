@@ -69,11 +69,16 @@ def normalize_banglish(words_):
     return [VARIANT_TO_CANONICAL.get(w, w) for w in words_]
 
 
+# button labels that the scrapers sometimes capture at the end of long reviews (Rokomari)
+SITE_LABEL = re.compile(r"\s*\b(?:Read More|Read Less|See More|See Less)\s*$", re.I)
+
+
 def clean_text(text):
     """Original text without emojis, emoticons and other symbols; spacing normalised."""
     if text is None or (isinstance(text, float) and text != text):
         return ""
     t = html.unescape(str(text))
+    t = SITE_LABEL.sub("", t)
     t = EMOTICON.sub(" ", t)
     out = []
     for ch in t:

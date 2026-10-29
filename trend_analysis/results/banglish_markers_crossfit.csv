@@ -1,5 +1,5 @@
 kind,fold,markers,heldout_ai_share,heldout_human_share,heldout_ai_reviews,heldout_human_reviews,platform,pre_reviews,post_reviews,pre_share,post_share,change,ci_low,ci_high,clear
-markers,A,darun ekdom highly khub khuboi recommended shobcheye,0.7283950617283951,0.23529411764705882,162.0,68.0,,,,,,,,,
-markers,B,awesome darun ekdom highly khub khubi perfect recommended sundor,0.75625,0.26229508196721313,160.0,61.0,,,,,,,,,
-change,,,,,,,Daraz,60.0,183.0,0.26055806938159876,0.13661202185792348,-0.12394604752367527,-0.2560343944264832,-0.003812326657080212,decrease
-change,,,,,,,Shajgoj,95.0,62.0,0.21718088324258922,0.1532258064516129,-0.06395507679097631,-0.1823309533395315,0.05492601456677592,no clear change
+markers,A,darun ekdom highly khub khuboi recommended shobcheye,0.7283950617283951,0.21052631578947367,162.0,95.0,,,,,,,,,
+markers,B,awesome darun ekdom highly khub khubi perfect recommended,0.75625,0.2459016393442623,160.0,61.0,,,,,,,,,
+change,,,,,,,Daraz,60.0,183.0,0.26055806938159876,0.12568306010928962,-0.13487500927230914,-0.2641438291899358,-0.015629657228017905,decrease
+change,,,,,,,Shajgoj,95.0,62.0,0.20856019358741681,0.13709677419354838,-0.07146341939386844,-0.1899617864236174,0.04437378507589463,no clear change
