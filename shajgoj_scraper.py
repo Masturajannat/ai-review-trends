@@ -11,17 +11,23 @@ from urllib.parse import urlparse
 import requests
 
 PRODUCT_URLS = [
-    "https://shop.shajgoj.com/product/ribana-castor-oil-2",
-    "https://shop.shajgoj.com/product/the-ordinary-niacinamide-10-zinc1",
-    "https://shop.shajgoj.com/product/skin-cafe-jojoba-oil-cold-pressed%3Fsrsltid%3DAfmBOor8y3W_sf64UQms3O4JIro7dWOyMdUuc5IHbZkwiNKS_47JQrvc?",
-    "https://shop.shajgoj.com/product/lilac-advanced-brightening-face-wash-dry-and-sensitive-skin?add-to-cart=96785&",
-    "https://shop.shajgoj.com/product/clariss-face-wash-milk",
-    "https://shop.shajgoj.com/product/jigott-natural-tomato-moisture-soothing-gel",
-    "https://shop.shajgoj.com/product/neogen-surmedic-azulene-mild-5-5-uv-protect-sun",
-    "https://shop.shajgoj.com/product/maybelline-fit-me-matte-poreless-foundation-natural-beige-220",
-    "https://shop.shajgoj.com/product/the-body-shop-black-musk-fragrance-mist",
-    "https://shop.shajgoj.com/product/wow-anti-aging-night-cream",
-    "https://shop.shajgoj.com/product/meena-herbal-uptan-face-pack",
+    "https://shop.shajgoj.com/product/3w-clinic-honey-eye-cream",
+    "https://shop.shajgoj.com/product/skin-cafe-100-natural-rose-water-face-and-body-mist",
+    "https://shop.shajgoj.com/product/cosrx-salicylic-acid-daily-gentle-cleanser",
+    "https://shop.shajgoj.com/product/missha-all-around-safe-block-soft-finish-sun-milk-spf50-or-pa",
+    "https://shop.shajgoj.com/product/banana-dreams-loose-powder",
+    "https://shop.shajgoj.com/product/lakme-ultimate-glam-eyeliner",
+    "https://shop.shajgoj.com/product/neutrogena-hydro-boost-water-gel-cream",
+    "https://shop.shajgoj.com/product/visibly-clear-pink-grapefruit-oil-free-moisturiser",
+    "https://shop.shajgoj.com/product/simple-kind-to-skin-hydrating-light-moisturiser-125-gm-hungary",
+    "https://shop.shajgoj.com/product/skin-cafe-lightweight-non-greasy-sunscreen-spf-50-pa",
+    "https://shop.shajgoj.com/product/nivea-soft-light-moisturising-cream-500-ml?fbclid=IwVERDUAVQTkJleHRuA2FlbQIxMABwZG9mBXNydGMGYXBwX2lkDDM1MDY4NTUzMTcyOAABH2NppMC6Rg9-Ne0vdIoTg8ZMPd7eKek9IoaRe7qbaESuZIC3NL3iiiqdawaI_aem_oyfbVUdfaap_OdpCEA9Haw&utm_id=97759_v0_s00_e0_tv3",
+    "https://shop.shajgoj.com/product/lux-body-wash-black-orchid-scent-juniper-oil-2450-ml",
+    "https://shop.shajgoj.com/product/ponds-bb-cream-instant-spot-coverage-light-make-up-glow-ivory",
+    "https://shop.shajgoj.com/product/vaseline-intensive-care-cocoa-radiant-body-lotion",
+    "https://shop.shajgoj.com/product/vaseline-lip-therapy-rosy-lips",
+    "https://shop.shajgoj.com/product/livon-anti-frizz-serum-180ml",
+    "https://shop.shajgoj.com/product/ponds-face-wash-bright-beauty-50g",
 ]
 MANUAL_IDS = {
 }
