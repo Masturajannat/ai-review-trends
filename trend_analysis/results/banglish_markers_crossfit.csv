@@ -1,5 +1,5 @@
 kind,fold,markers,heldout_ai_share,heldout_human_share,heldout_ai_reviews,heldout_human_reviews,platform,pre_reviews,post_reviews,pre_share,post_share,change,ci_low,ci_high,clear
-markers,A,darun ekdom highly khub khuboi recommended shobcheye,0.7283950617283951,0.1586021505376344,162.0,372.0,,,,,,,,,
+markers,A,darun ekdom highly khub khuboi recommended shobcheye,0.7283950617283951,0.16932907348242812,162.0,626.0,,,,,,,,,
 markers,B,awesome darun ekdom highly khub khubi osadharon perfect recommended sundor,0.7625,0.26229508196721313,160.0,61.0,,,,,,,,,
-change,,,,,,,Daraz,397.0,254.0,0.19414893617021278,0.15748031496062992,-0.03666862120958286,-0.10266127622597047,0.028822860679589415,no clear change
-change,,,,,,,Shajgoj,95.0,62.0,0.21718088324258922,0.1532258064516129,-0.06395507679097631,-0.17885983646349593,0.05096920821114368,no clear change
+change,,,,,,,Daraz,397.0,254.0,0.19414893617021278,0.15748031496062992,-0.03666862120958286,-0.10436638954300649,0.02987569626051736,no clear change
+change,,,,,,,Shajgoj,569.0,491.0,0.23298987928301426,0.2729124236252546,0.039922544342240324,-0.011037577237104712,0.09600312532079183,no clear change

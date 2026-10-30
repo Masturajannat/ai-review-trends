@@ -1,10 +1,10 @@
 measure,group,reviews_with_family_words,mean_standard_share
 spelling + register,AI (Gemini),314,0.8135253823770614
-spelling + register,"human pre-2022, held-out half",332,0.4684987201553467
-spelling + register,"human pre-2022, all",387,0.4836569550089842
+spelling + register,"human pre-2022, held-out half",565,0.520376564265164
+spelling + register,"human pre-2022, all",620,0.5252361698495474
 spelling only,AI (Gemini),310,0.8143222133459825
-spelling only,"human pre-2022, held-out half",320,0.4894929202741703
-spelling only,"human pre-2022, all",375,0.5044879268879269
+spelling only,"human pre-2022, held-out half",551,0.5336841596596587
+spelling only,"human pre-2022, all",606,0.5389524918609077
 register only,AI (Gemini),123,0.8021680216802167
-register only,"human pre-2022, held-out half",75,0.3
-register only,"human pre-2022, all",91,0.3516483516483517
+register only,"human pre-2022, held-out half",109,0.3669724770642202
+register only,"human pre-2022, all",125,0.396

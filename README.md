@@ -31,14 +31,15 @@ to machine-translated reviews. They are kept in `archive/` with a summary of why
 |---|---|
 | `daraz_scraper_v2.py`, `rokomari_scraper.py`, `shajgoj_scraper.py` | Review scrapers for each platform |
 | `rokomari_scraper_round2.py`, `rokomari_urls_round2.txt` | Scraper for additional Rokomari books; writes a new file |
+| `shajgoj_scraper_round2.py` | Shajgoj round-2 scraper (17 additional products); writes `shajgoj_reviews_round2.csv` |
 | `daraz_scraper(2019-2021).py`, `done_items(2019-2021).txt` | Daraz round-2 scraper for products with many 2019–2021 reviews; resumable |
 | `sample_products.py`, `count_reviews.py`, `product_sample_ranking.csv` | Helpers for choosing Daraz products: review counts and estimated usable 2019–2021 reviews |
 | `inspect_daraz_api.py`, `shajgoj_discover.py` | Helpers used to locate each site's review API |
 | `daraz_reviews_v2.csv`, `rokomari_reviews.csv`, `shajgoj_reviews.csv` | Scraped reviews per platform, round 1 |
-| `rokomari_reviews_round2.csv`, `daraz_reviews(2019-2021).csv` | Round-2 reviews (Rokomari books; Daraz household products) |
+| `rokomari_reviews_round2.csv`, `daraz_reviews(2019-2021).csv`, `shajgoj_reviews_round2.csv` | Round-2 reviews (Rokomari books; Daraz household products; Shajgoj skincare) |
 | `sources.csv` | Review files to combine, with platform, scrape date and round |
 | `raw_daraz/` | Raw Daraz API responses |
-| `combine_reviews_all.py` → `combined_reviews.csv` | All 11,238 scraped reviews (files in `sources.csv`) in one file, original text |
+| `combine_reviews_all.py` → `combined_reviews.csv` | All 14,214 scraped reviews (files in `sources.csv`) in one file, original text |
 | `trend_analysis/` | Current pipeline: dataset preparation and trend analysis (see its README) |
 | `INSTRUCTIONS.md` | Setup, Git workflow, running the pipeline, adding new reviews |
 | `archive/` | Earlier translation-based approaches (see its README) |
