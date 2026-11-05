@@ -21,32 +21,48 @@ Reads `combined_reviews.csv` (all scraped reviews) and produces the analysis dat
 | Cleaning | Emojis, text emoticons (`:)`, `<3`, `xD`) and other symbols removed; HTML entities decoded |
 | Word count | Whitespace tokens of the cleaned text that contain at least one letter |
 | Language | `bangla`: at least 80% of letters in Bengali script. `mixed`: 20–80%. Latin-script text is `banglish` if it contains two or more common Banglish words (or one, with at most two common English words), otherwise `english`. The Banglish word list includes every spelling variant in `banglish_variants.csv` |
-| Date | Parsed from the review date. Daraz shows reviews newer than about a month as "x weeks ago"; these are converted using the scrape date (16 Oct 2026) and marked `date_is_approx` |
+| Date | Parsed from the review date. Daraz shows reviews newer than about a month as "x weeks ago"; these are converted using the scrape date of the file the review came from (`sources.csv`) and marked `date_is_approx` |
 | Period | `period`: `pre_chatgpt` (before 30 Nov 2022) or `post_chatgpt` (30 Nov 2022 onwards). `period_detail` splits the pre-ChatGPT period into `pre_2022` and `jan_nov_2022`, used for a placebo check. Calendar half-years in `half_year` |
 | Exclusion | In order: duplicate review ID; no text; exact repeat of a review on the same platform (earliest kept); restock or availability request of 15 words or fewer; **5 words or fewer** |
 
 `keep_10` and `keep_25` mark reviews longer than 10 and 25 words, for sensitivity checks.
 
-Of 2,899 scraped reviews, 1,740 are kept (774 too short, 279 exact repeats, 99 stock requests,
-7 without text).
+Reviews come from two collection rounds, listed in `sources.csv` and recorded in the `batch` and
+`scrape_date` columns:
+
+| Round | Files | Scraped | Kept |
+|---|---|---|---|
+| 1 (16 Oct 2026) | Daraz, Rokomari, Shajgoj | 2,899 | 1,740 |
+| 2 (29 Oct 2026) | Rokomari, 12 additional books | 2,250 | 1,339 |
+| 2 (29 Oct 2026) | Daraz, 14 household products with many 2019–2021 reviews | 6,089 | 2,522 |
+| 2 (30 Oct 2026) | Shajgoj, 17 additional skincare products | 2,976 | 1,864 |
+
+Of 14,214 scraped reviews, 7,465 are kept (3,790 too short, 2,649 exact repeats, 244 stock requests,
+66 without text). Most exact repeats are one-word reviews such as "Good" or অসাধারণ. Rokomari's
+"Read More" link text, captured at the end of truncated reviews, is removed during cleaning.
 
 **Kept reviews by platform, language and period**
 
 | Platform | Language | Pre-ChatGPT | of which pre-2022 | of which Jan–Nov 2022 | Post-ChatGPT |
 |---|---|---|---|---|---|
-| Daraz | Bangla | 106 | 77 | 29 | 372 |
-| Daraz | Banglish | 60 | 47 | 13 | 183 |
-| Daraz | English | 75 | 63 | 12 | 211 |
-| Rokomari | Bangla | 172 | 150 | 22 | 55 |
-| Rokomari | English | 58 | 43 | 15 | 31 |
-| Shajgoj | Banglish | 95 | 75 | 20 | 62 |
-| Shajgoj | English | 118 | 89 | 29 | 25 |
-| Shajgoj | Bangla | 29 | 21 | 8 | 32 |
+| Daraz | Bangla | 941 | 766 | 175 | 598 |
+| Daraz | Banglish | 397 | 324 | 73 | 254 |
+| Daraz | English | 904 | 793 | 111 | 377 |
+| Rokomari | Bangla | 1,003 | 884 | 119 | 342 |
+| Rokomari | English | 179 | 144 | 35 | 68 |
+| Shajgoj | Banglish | 569 | 329 | 240 | 491 |
+| Shajgoj | English | 539 | 361 | 178 | 249 |
+| Shajgoj | Bangla | 157 | 90 | 67 | 188 |
 
 Smaller groups (Rokomari Banglish, mixed-script reviews) are in `results/dataset_counts.csv`.
 
 The earlier pipeline labelled many English reviews as Banglish and translated them. With the
 corrected language tags, English is a substantial group on Daraz and Shajgoj.
+
+Daraz round 1 covers gadgets and accessories, most reviewed after ChatGPT; Daraz round 2 covers
+household products (detergent, hand wash, disinfectant, masks, prayer mats), most reviewed in
+2019–2021. The two rounds therefore contribute unequally to the two periods, which matters for the
+Daraz results (see Phase 2).
 
 ### `02_build_ai_reference.py`
 
@@ -104,50 +120,82 @@ Share of held-out reviews containing at least one word of each group:
 
 | Language | Group | AI reviews | Human pre-2022 reviews |
 |---|---|---|---|
-| Bangla | evaluative (20 words) | 85.7% | 29.4% |
-| Bangla | formal (4 words) | 65.5% | 40.5% |
-| Bangla | control (15 words) | 81.5% | 78.6% |
-| Banglish | evaluative (7 words) | 72.8% | 19.1% |
-| Banglish | control (10 words) | 79.0% | 72.1% |
-| English | evaluative (6 words) | 54.5% | 9.2% |
-| English | control (15 words) | 90.9% | 90.8% |
+| Bangla | evaluative (20 words) | 85.7% | 28.4% |
+| Bangla | formal (4 words) | 65.5% | 35.4% |
+| Bangla | control (15 words) | 81.5% | 80.7% |
+| Banglish | evaluative (7 words) | 72.8% | 14.5% |
+| Banglish | control (10 words) | 79.0% | 67.6% |
+| English | evaluative (6 words) | 54.5% | 6.9% |
+| English | control (15 words) | 90.9% | 89.0% |
 
-The markers separate AI from human text on reviews they were not selected on; the control words do
-not. The English list rests on 44 AI reviews and is the least reliable.
+Held-out human reviews: 1,618 Bangla, 626 Banglish, 1,201 English. The markers separate AI from human
+text on reviews they were not selected on; the control words do not (Bangla, English) or only
+weakly (Banglish). Rokomari book reviews use evaluative words such as অসাধারণ more often than product
+reviews, so each platform's own baseline is used in the trend. The English list rests on 44 AI
+reviews and is the least reliable.
 
 ### Results
 
-Six series meet the size requirement. Share of reviews containing an evaluative marker word, with
+Eight series meet the size requirement. Share of reviews containing an evaluative marker word, with
 95% bootstrap intervals:
 
-| Series | Pre-ChatGPT | Post-ChatGPT | Change (points) |
-|---|---|---|---|
-| Daraz – Bangla | 14.5% (n = 69) | 20.2% (n = 372) | +5.7 [−4.0, +14.4] |
-| Daraz – Banglish | 17.9% (n = 39) | 8.2% (n = 183) | −9.8 [−23.0, +1.8] |
-| Daraz – English | 14.3% (n = 42) | 14.7% (n = 211) | +0.4 [−11.5, +11.4] |
-| Rokomari – Bangla | 36.5% (n = 96) | 30.9% (n = 55) | −5.5 [−21.1, +10.3] |
-| Rokomari – English | 15.0% (n = 40) | 19.4% (n = 31) | +4.4 [−13.5, +21.5] |
-| Shajgoj – Banglish | 19.3% (n = 57) | 11.3% (n = 62) | −8.0 [−21.5, +4.3] |
+| Series | Pre-ChatGPT | Post-ChatGPT | Change (points) | Same products only |
+|---|---|---|---|---|
+| Daraz – Bangla | 11.2% (n = 904) | 16.7% (n = 598) | **+5.5 [+2.2, +9.4]** | +1.4 [−2.6, +5.0] |
+| Daraz – Banglish | 13.3% (n = 376) | 9.4% (n = 254) | −3.8 [−9.0, +1.3] | −2.0 [−8.4, +4.9] |
+| Daraz – English | 6.3% (n = 871) | 11.9% (n = 377) | **+5.6 [+2.1, +9.2]** | +2.5 [−1.8, +7.2] |
+| Rokomari – Bangla | 42.5% (n = 927) | 39.5% (n = 342) | −3.0 [−9.2, +3.2] | −3.1 [−9.3, +2.9] |
+| Rokomari – English | 9.9% (n = 161) | 16.2% (n = 68) | +6.2 [−3.8, +16.5] | +5.4 [−4.8, +15.0] |
+| Shajgoj – Bangla | 17.6% (n = 148) | 11.7% (n = 188) | −5.9 [−13.6, +1.7] | −6.2 [−13.6, +1.5] |
+| Shajgoj – Banglish | 18.1% (n = 531) | 18.1% (n = 491) | 0.0 [−4.6, +5.0] | +0.1 [−4.7, +4.9] |
+| Shajgoj – English | 6.9% (n = 493) | 8.8% (n = 249) | +1.9 [−2.1, +6.2] | +1.9 [−2.3, +6.2] |
 
-No series shows a clear increase in AI-associated words after ChatGPT's release. Markers per
-100 words, reviews over 10 words, same-product reviews and a pre-2022-only baseline lead to the
-same conclusion (all `no clear change` in `results/trend_changes.csv`).
+**Shajgoj** (round 2 added 17 products reviewed in both periods) is the best-balanced platform:
+nearly every post-ChatGPT review is of a product that also has pre-ChatGPT reviews, so the pooled and
+same-product comparisons agree. None of its three languages shows an increase, and all three pass
+the placebo check.
 
-- **Longer reviews.** Among reviews over 25 words, Daraz Bangla (+26.9 points [+11.8, +40.2]) and
-  Daraz English (+13.0 [+5.6, +22.2]) show increases, but their pre-ChatGPT groups contain only 19 and
-  6 reviews. These are two of 30 robustness comparisons and are treated as leads, not findings.
-- **Placebo.** Jan–Nov 2022 does not differ from pre-2022 in five of six series. The exception is
-  Daraz English (−20 points), where no marker appears in the 12 Jan–Nov 2022 reviews.
-- **Control words** show no clear change in five of six series; Rokomari English shows a decrease
-  (−24 points, 40 vs 31 reviews).
-- **Word level** (`fig_word_shift.png`). On Daraz, অসাধারণ "extraordinary" rose from 2.9% to 9.7% of
-  Bangla reviews and একদম "absolutely" from 1.4% to 4.8%; these individual shifts are not reflected in
-  the overall marker share.
+**Daraz Bangla and Daraz English show a clear increase overall, but not within the same products.**
+The pooled increase comes from the change in product mix between the periods:
+
+| Daraz | Round 1 (gadgets): pre → post | Round 2 (household): pre → post |
+|---|---|---|
+| Bangla | 14.5% (69) → 20.2% (372) | 10.9% (835) → 11.1% (226) |
+| Banglish | 17.9% (39) → 8.2% (183) | 12.8% (337) → 12.7% (71) |
+| English | 14.3% (42) → 14.7% (211) | 5.9% (829) → 8.4% (166) |
+
+The pre-ChatGPT period is now mostly household reviews, which use few evaluative words; the
+post-ChatGPT period is mostly gadget reviews, which use more. Within each round the rates barely
+move. Products with at least 10 reviews in both periods give an average within-product change of
++3.1 points (Bangla, 7 products) and +1.9 points (English, 7 products). Control words also rise in
+the pooled Daraz Bangla comparison (+8.1 points), which a change in AI use would not cause. The
+pooled Daraz increase is therefore not evidence of AI use; the same-product comparison is the
+appropriate one for Daraz.
+
+- **Placebo.** Jan–Nov 2022 does not differ from pre-2022 on Daraz (Bangla +2.4, Banglish +3.9,
+  English 0.0 points; all intervals include zero), Shajgoj (Bangla −7.6, Banglish +2.7, English −0.2)
+  or Rokomari English. Rokomari Bangla
+  (45.0% vs 25.2%, −19.8 points) shows that Rokomari reviewing changed before ChatGPT; its
+  before/after comparison should be read alongside the half-year trend.
+- **Longer reviews.** Among Daraz Bangla reviews over 25 words the share rose by 11.2 points
+  [+0.4, +22.0] (124 vs 111 reviews); this subset has the same product-mix problem.
+- **Markers per 100 words, Rokomari Bangla.** Rose from 1.6 to 2.6, but control words per 100 words
+  rose even more (7.8 to 10.1), already before ChatGPT. Post-ChatGPT Rokomari reviews are shorter,
+  which raises all per-100-word rates.
+- **Formal words.** The share of Bangla reviews containing a formal word (এটি, একটি, এবং …) fell on
+  Rokomari (52.0% to 34.5%, also in the placebo comparison) and on Shajgoj (−7.8 points), against
+  the direction expected from AI use.
 
 ### Interpretation and limitations
 
-- The baselines are small (39–96 reviews per series), so changes of about 10–15 points cannot be
-  ruled out.
+- No series shows an increase in AI-associated words that survives a same-product comparison.
+- Daraz pre- and post-ChatGPT reviews come largely from different products. Comparisons across
+  rounds must hold the product (or product category) fixed; additional post-ChatGPT reviews of the
+  round-2 household products, or pre-ChatGPT reviews of gadgets, would make the Daraz comparison
+  balanced.
+- Rokomari's review style changed before ChatGPT (placebo), so a constant-baseline comparison is less
+  reliable there than the size of its sample suggests.
+- Rokomari English still has a small sample (161 pre-, 68 post-ChatGPT reviews).
 - Marker words were derived from Gemini output; reviews written with ChatGPT may favour other words.
 - The English marker list is based on 44 AI reviews.
 - Banglish spelling varies widely; this analysis counts spellings as written. The Banglish-specific
@@ -183,17 +231,18 @@ AI-generated Banglish uses standard spellings far more consistently than reviewe
 | Group | Reviews | Standard-form share |
 |---|---|---|
 | AI (Gemini) | 314 | 81.4% |
-| Human pre-2022, held-out half | 61 | 48.5% |
-| Human pre-2022, all | 116 | 52.8% |
+| Human pre-2022, held-out half | 332 | 46.8% |
+| Human pre-2022, all | 387 | 48.4% |
 
 Before and after ChatGPT (95% bootstrap interval):
 
 | Platform | Pre-ChatGPT | Post-ChatGPT | Change (points) | Placebo (Jan–Nov 2022 − pre-2022) |
 |---|---|---|---|---|
-| Daraz | 43.3% (n = 57) | 46.0% (n = 166) | +2.7 [−7.1, +12.8] | −8.3 [−27.0, +10.1] |
-| Shajgoj | 58.3% (n = 83) | 53.7% (n = 54) | −4.6 [−17.4, +7.9] | −4.0 [−21.3, +12.1] |
+| Daraz | 45.5% (n = 355) | 45.4% (n = 233) | −0.1 [−5.7, +5.5] | −0.3 [−9.1, +9.0] |
+| Shajgoj | 57.6% (n = 496) | 51.7% (n = 453) | −5.9 [−10.2, −1.7] | −4.4 [−10.6, +1.7] |
 
-Spelling has not moved towards the AI pattern on either platform.
+Spelling has not moved towards the AI pattern on either platform; on Shajgoj it moved slightly away
+from it (less standard spelling after ChatGPT).
 
 ### Cross-fitted marker words (`05_banglish.py`, part B)
 
@@ -205,18 +254,17 @@ words (`EVALUATIVE` in the script, defined before the analysis) as those with lo
 
 | Fold | Markers selected | Held-out AI | Held-out human |
 |---|---|---|---|
-| A | darun, ekdom, highly, khub, khuboi, recommended, shobcheye | 72.8% | 23.5% |
-| B | awesome, darun, ekdom, highly, khub, khubi, perfect, recommended, sundor | 75.6% | 26.2% |
+| A | darun, ekdom, highly, khub, khuboi, recommended, shobcheye | 72.8% | 15.9% |
+| B | awesome, darun, ekdom, highly, khub, khubi, osadharon, perfect, recommended, sundor | 76.2% | 26.2% |
 
 Both halves select largely the same words.
 
 | Platform | Pre-ChatGPT | Post-ChatGPT | Change (points) |
 |---|---|---|---|
-| Daraz | 26.1% (n = 60) | 13.7% (n = 183) | −12.4 [−25.6, −0.4] |
-| Shajgoj | 21.7% (n = 95) | 15.3% (n = 62) | −6.4 [−18.2, +5.5] |
+| Daraz | 19.4% (n = 397) | 15.7% (n = 254) | −3.7 [−10.3, +2.9] |
+| Shajgoj | 23.3% (n = 569) | 27.3% (n = 491) | +4.0 [−1.1, +9.6] |
 
-Banglish reviews did not become more AI-like after ChatGPT; on Daraz, marker words became less
-frequent.
+Banglish reviews did not become more AI-like after ChatGPT on either platform.
 
 ### Language mix (`06_language_mix.py`)
 
@@ -227,27 +275,114 @@ pre-ChatGPT, for products reviewed in both periods:
 
 | Platform | Bengali script | Banglish | English |
 |---|---|---|---|
-| Daraz (240 → 232 reviews) | +20.9 [+12.4, +29.7] | −2.2 [−9.8, +5.4] | −18.8 [−25.9, −11.9] |
-| Rokomari (241 → 89) | −11.4 [−22.5, +0.1] | +1.9 [−2.9, +7.6] | +7.4 [−3.8, +18.3] |
-| Shajgoj (218 → 124) | +13.9 [+5.1, +23.1] | +13.3 [+2.4, +24.5] | −29.4 [−39.0, −20.0] |
+| Daraz (2,292 → 702 reviews) | +12.5 [+8.2, +16.9] | +0.3 [−2.8, +3.6] | −12.0 [−15.6, −8.1] |
+| Rokomari (1,226 → 443) | −5.0 [−9.2, −0.5] | +3.5 [+1.2, +6.1] | +0.1 [−3.9, +3.9] |
+| Shajgoj (1,241 → 949) | +7.6 [+4.5, +10.6] | +7.9 [+3.7, +12.0] | −16.1 [−20.1, −12.4] |
 
-The Banglish share did not fall on any platform; on Shajgoj it rose. English declined on Daraz
+The Banglish share did not fall on any platform; on Shajgoj and Rokomari it rose. English declined on Daraz
 and Shajgoj, while Bengali script grew. This pattern does not match a shift towards
 AI-produced text, which would favour polished English or Bengali script over Banglish; it is more
 consistent with a broader move towards Bengali-language reviewing.
 
 ### Limitations
 
-- The pre-ChatGPT Banglish groups are small (57–95 reviews).
 - The AI reference is Gemini's Banglish, which overuses some words (*khub* in 49% of AI reviews
   against 10% of human ones). Banglish written with ChatGPT may differ.
 - The variant table covers frequent words; rarer variants remain unnormalised.
+
+## Phase 4: estimated AI share
+
+```powershell
+python trend_analysis\scripts\07_ai_share.py
+```
+
+### Method
+
+The marker rates can be turned into an estimate of the share of AI-generated reviews. If a share α
+of reviews is AI-generated, the expected share of reviews containing an evaluative marker is
+(1 − α)·h + α·a, so
+
+    α = (m − h) / (a − h)
+
+with h the marker rate in pre-ChatGPT human reviews (excluding the discovery half), a the rate in
+held-out AI reviews (not used to choose the markers; platform-specific where at least 40 exist,
+otherwise all platforms), and m the rate in post-ChatGPT reviews. Banglish words are
+spelling-normalised. Intervals come from bootstrapping all three groups.
+
+**Validation on known mixtures.** For each series, the human baseline and the AI reviews are each
+split at random into two halves. One half gives h and a; the other halves are mixed with a known AI
+share (0%, 5%, 10%, 20%) into a sample the size of the series' post-ChatGPT sample, and α is
+estimated. This is repeated 1,000 times.
+
+### Validation results
+
+| Series | Mixture size | 0% → | 10% → | 20% → | 90% range at 10% |
+|---|---|---|---|---|---|
+| Daraz – Bangla | 598 | −0.2% | 10.1% | 20.0% | 4 to 17% |
+| Daraz – Banglish | 254 | −0.1% | 10.0% | 20.2% | −2 to 21% |
+| Daraz – English | 377 | −0.1% | 10.5% | 21.2% | 2 to 21% |
+| Rokomari – Bangla | 342 | −0.5% | 10.2% | 20.0% | −3 to 23% |
+| Rokomari – English | 68 | −0.2% | 9.0% | 21.0% | −14 to 34% |
+| Shajgoj – Bangla | 188 | −0.5% | 9.5% | 20.2% | −8 to 25% |
+| Shajgoj – Banglish | 491 | −0.6% | 10.0% | 20.3% | −3 to 23% |
+| Shajgoj – English | 249 | −0.2% | 10.0% | 21.3% | 0 to 23% |
+
+On average the estimator recovers the true share (bias within 3 points). With the round-2 Daraz
+baselines, a 10% AI share is now distinguishable from zero for Daraz Bangla and English and close to
+it for Shajgoj; Rokomari English remains imprecise. The validation halves the baseline, so it somewhat overstates the spread
+of the real estimates.
+
+### Estimates after ChatGPT
+
+| Series | Human rate h | AI rate a | Post rate m | Estimated AI share (95% CI) | Placebo (Jan–Nov 2022) |
+|---|---|---|---|---|---|
+| Daraz – Bangla | 11.2% | 78.3% | 16.7% | 8.3% (3.1, 14.0) | 3.6% (−4, 12) |
+| Daraz – Banglish | 15.4% | 81.4% | 12.2% | −4.9% (−14.1, 3.0) | 1.9% (−12, 17) |
+| Daraz – English | 6.3% | 54.5% | 11.9% | 11.7% (4.2, 21.6) | 0.0% (−10, 11) |
+| Rokomari – Bangla | 42.5% | 93.4% | 39.5% | −6.0% (−19.2, 6.0) | −41.0% (−63, −23) |
+| Rokomari – English | 9.9% | 54.5% | 16.2% | 14.0% (−8.0, 39.5) | −3.9% (−30, 22) |
+| Shajgoj – Bangla | 17.6% | 85.7% | 11.7% | −8.6% (−21.9, 2.0) | −11.7% (−35, 6) |
+| Shajgoj – Banglish | 20.3% | 68.2% | 21.0% | 1.3% (−9.8, 12.0) | 6.5% (−8, 20) |
+| Shajgoj – English | 6.9% | 54.5% | 8.8% | 4.1% (−4.4, 13.7) | −0.5% (−10, 10) |
+
+- The Daraz Bangla (8.3%) and Daraz English (11.7%) estimates are above zero and their placebo
+  estimates are not, but they compare different products before and after ChatGPT (see Phase 2).
+  Using the same-product changes instead (+1.4 and +2.5 points) gives roughly 2% and 5%, with
+  intervals that include zero. These figures are upper limits rather than evidence of AI use.
+- Shajgoj, where the periods are product-balanced, gives 1.3% (Banglish) and 4.1% (English) with
+  one-sided 95% upper bounds of 10.2% and 11.8%; Bangla is negative.
+- Rokomari Bangla gives −6.0% with an upper bound of 4.0%, but its placebo estimate (−41%) shows that
+  the Rokomari marker rate was already falling before ChatGPT.
+- A negative estimate means that human use of marker words fell; the model assumes that human
+  writing stays constant over time, so the estimates measure AI use together with changes in human
+  writing style and product mix.
+
+### Sample size needed
+
+Reviews needed in each period (pre- and post-ChatGPT, equal sizes) for a 95% interval of about
+±10 percentage points, from the normal approximation (`reviews_needed_pm10` in
+`results/ai_share_estimates.csv`):
+
+| Series | Needed per period | Current pre-ChatGPT | Current post-ChatGPT |
+|---|---|---|---|
+| Daraz – Bangla | 207 | 904 | 598 |
+| Daraz – Banglish | 212 | 376 | 254 |
+| Daraz – English | 311 | 871 | 377 |
+| Rokomari – Bangla | 720 | 927 | 342 |
+| Rokomari – English | 553 | 161 | 68 |
+| Shajgoj – Bangla | 207 | 148 | 188 |
+| Shajgoj – Banglish | 550 | 531 | 491 |
+| Shajgoj – English | 249 | 493 | 249 |
+
+Daraz and Shajgoj now meet or nearly meet the size target; for Daraz the remaining problem is balance
+between product types, not size. Rokomari needs more post-ChatGPT reviews, Rokomari English most of
+all.
 
 ## Files
 
 | Path | Contents |
 |---|---|
-| `data/reviews_all.csv` | All 2,899 reviews with cleaned text, word count, language, date, period, `keep` flags and `exclude_reason` |
+| `data/reviews_all.csv` | All 14,214 reviews with cleaned text, word count, language, date, period, `keep` flags and `exclude_reason` |
 | `data/reviews_daraz.csv`, `reviews_rokomari.csv`, `reviews_shajgoj.csv` | Kept reviews, one file per platform |
 | `data/ai_reference_original.csv` | AI-generated reference reviews in the original language |
 | `markers.csv` | Curated marker words by language and group |
@@ -267,11 +402,15 @@ consistent with a broader move towards Bengali-language reviewing.
 | `results/fig_banglish.png` | Standard-form share by year and period; cross-fitted markers |
 | `results/language_mix_by_year.csv`, `language_mix_changes.csv` | Language shares by platform and year; changes |
 | `results/fig_language_mix.png` | Language of reviews by year and platform |
+| `results/ai_share_validation.csv` | Known-mixture validation of the AI-share estimate |
+| `results/ai_share_estimates.csv` | Estimated AI share after ChatGPT, placebo, reviews needed |
+| `results/fig_ai_share.png` | Validation and estimates |
 
 ## Next phases
 
-1. Collect additional reviews, prioritising the pre-ChatGPT baselines (Daraz, Shajgoj) and
-   post-ChatGPT Rokomari and Shajgoj reviews, then rerun scripts 01–04.
+1. Make the Daraz comparison product-balanced (post-ChatGPT reviews of household products or
+   pre-ChatGPT reviews of gadgets) and add a product-stratified estimate; collect more post-ChatGPT
+   Rokomari reviews; rerun scripts 01–07.
 2. Generate additional English AI reviews (and a small ChatGPT-written set) to strengthen the
    English marker list and check that the markers are not specific to Gemini.
 3. Apply AI-text detectors to the original text where a suitable detector exists (Bengali script,

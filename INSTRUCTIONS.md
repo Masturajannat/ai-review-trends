@@ -97,6 +97,7 @@ output of the previous one, so run them in order after any change to the data.
 | 5 | `python trend_analysis\scripts\04_trends.py` | Marker-word trends per platform and language, charts |
 | 6 | `python trend_analysis\scripts\05_banglish.py` | Banglish standard-spelling share and cross-fitted markers |
 | 7 | `python trend_analysis\scripts\06_language_mix.py` | Language of reviews over time |
+| 8 | `python trend_analysis\scripts\07_ai_share.py` | Estimated AI share, validated on known mixtures |
 
 Step 1 is needed only after the scraped files change. All results are written to
 `trend_analysis/results/`; each script prints a summary when it finishes.
@@ -113,22 +114,47 @@ Step 1 is needed only after the scraped files change. All results are written to
 | `results/fig_word_shift.png` | Each marker word before and after ChatGPT |
 | `results/fig_banglish.png` | Banglish standard-spelling share and markers |
 | `results/fig_language_mix.png` | Language of reviews by year |
+| `results/fig_ai_share.png` | Validation of the AI-share estimate and estimates per series |
 
 ## 4. Adding new reviews
 
+New reviews are collected in **rounds**. Each round writes a new CSV file; earlier files are never
+overwritten. `sources.csv` lists every file to include, with its platform, scrape date and round
+(`batch`):
+
+```
+file,platform,scrape_date,batch,note
+rokomari_reviews.csv,Rokomari,2026-10-16,1,round 1
+rokomari_reviews_round2.csv,Rokomari,2026-10-29,2,round 2: 12 additional books
+```
+
 1. **Choose products.** Prefer products that have reviews both before and after 30 November 2022,
    in the existing categories (Daraz: earphones and gadgets; Rokomari: books; Shajgoj: skincare).
-2. **Add the product links** to `PRODUCT_URLS` at the top of the scraper:
-   `daraz_scraper_v2.py`, `rokomari_scraper.py` or `shajgoj_scraper.py`.
-3. **Run the scraper**, for example `python daraz_scraper_v2.py`. Each scraper re-collects all
-   products in its list and overwrites its CSV file (`daraz_reviews_v2.csv`, ...). Keep the
-   existing links in the list so earlier reviews are not lost.
-4. **Daraz only:** recent Daraz reviews are dated "x weeks ago". Set `DARAZ_SCRAPE_DATE` in
-   `trend_analysis/scripts/01_build_dataset.py` to the date of the new scrape, otherwise these dates
-   are converted wrongly.
-5. **Rerun steps 1–7** of section 3.
-6. **Check** `results/dataset_counts.csv` and the summary printed by `01_build_dataset.py`:
-   the number of kept reviews should rise, and no date warnings should appear.
+2. **Rokomari:** put one book link per line in `rokomari_urls_round2.txt` (or a new URL file) and run
+   ```powershell
+   python rokomari_scraper_round2.py
+   python rokomari_scraper_round2.py --urls rokomari_urls_round3.txt --out rokomari_reviews_round3.csv --batch 3
+   ```
+   The scraper skips reviews already in `rokomari_reviews.csv`, saves after every book and can be
+   restarted; add `--redo` to collect books again, `--headed` to watch the browser.
+   **Daraz:** `daraz_scraper(2019-2021).py` collects all reviews of the products in its list into
+   `daraz_reviews(2019-2021).csv` and resumes from `done_items(2019-2021).txt`; for a further round,
+   copy it and change the product list and both file names. `sample_products.py` estimates how many
+   usable 2019–2021 reviews a product has before scraping it. Do not change the product list of
+   `daraz_scraper_v2.py`: it would overwrite the round-1 file with different products.
+   **Shajgoj:** `shajgoj_scraper_round2.py` writes `shajgoj_reviews_round2.csv`; for a further round,
+   copy it and change the product list and `OUTPUT_FILE`. Do not change the product list of
+   `shajgoj_scraper.py`: it writes the round-1 file.
+3. **Register the file:** add a row to `sources.csv` with the file name, platform, scrape date
+   (YYYY-MM-DD) and the next batch number. The scrape date is used to convert Daraz dates such as
+   "3 weeks ago", so it must be the day the file was collected.
+4. **Rerun steps 1–8** of section 3. `combine_reviews_all.py` prints the number of reviews per
+   file; a review that appears in two files is kept once, from the earlier round.
+5. **Check** `results/dataset_counts.csv` and the summary printed by `01_build_dataset.py`
+   (kept reviews by platform and batch). No date warnings should appear.
+
+Scraped CSV files contain no reviewer names. Raw API responses (`raw_daraz/`) stay local and are
+not committed.
 
 ## 5. Editing the word lists
 
@@ -141,7 +167,7 @@ message, and choose words without looking at post-ChatGPT results.
 | `trend_analysis/banglish_variants.csv` | Banglish spelling variants and their standard (Avro Phonetic) form | One canonical form per word; a spelling may appear in only one family |
 | `EVALUATIVE` list in `05_banglish.py` | Banglish evaluative words from which markers are chosen automatically | Evaluative words only, in canonical spelling |
 
-After editing, rerun steps 2–7.
+After editing, rerun steps 2–8.
 
 ## 6. Troubleshooting
 

@@ -14,7 +14,8 @@ Steps
   3. Tag the language: bangla (Bengali script), banglish (Bengali in Latin letters), english,
      mixed (both scripts in one review).
   4. Parse the review date. Daraz shows reviews younger than about a month as "x weeks ago"; these are
-     converted using the scrape date and marked date_is_approx.
+     converted using the scrape date of the review's file (scrape_date, from sources.csv) and marked
+     date_is_approx.
   5. Assign periods relative to ChatGPT's release on 30 Nov 2022: period = pre_chatgpt | post_chatgpt.
      period_detail splits pre_chatgpt further into pre_2022 and jan_nov_2022 (used for a placebo check).
      Calendar half-years in half_year.
@@ -41,9 +42,9 @@ IN_FILE = ROOT / "combined_reviews.csv"
 DATA = ROOT / "trend_analysis" / "data"
 RESULTS = ROOT / "trend_analysis" / "results"
 
-# Date the Daraz reviews were scraped (time stamp of the raw Daraz files). Only used to convert the
-# relative "x weeks ago" dates of the newest Daraz reviews.
-DARAZ_SCRAPE_DATE = pd.Timestamp("2026-10-16")
+# Relative dates ("x weeks ago") are converted from each review's scrape_date (set per file in
+# sources.csv). This is only a fallback for rows without one.
+DEFAULT_SCRAPE_DATE = pd.Timestamp("2026-10-16")
 CHATGPT_RELEASE = pd.Timestamp("2022-11-30")
 MIN_WORDS = 5                     # reviews with MIN_WORDS words or fewer are excluded
 
@@ -55,7 +56,7 @@ DATE_FORMATS = ["%d %b %Y", "%b %d, %Y", "%d-%b-%y", "%d %B %Y"]
 RELATIVE = re.compile(r"(\d+)\s+(hour|day|week|month)s?\s+ago", re.I)
 
 
-def parse_date(raw, platform):
+def parse_date(raw, scrape_date):
     """(date, is_approximate)"""
     raw = str(raw).strip()
     m = RELATIVE.search(raw)
@@ -63,7 +64,9 @@ def parse_date(raw, platform):
         n, unit = int(m.group(1)), m.group(2).lower()
         delta = {"hour": pd.Timedelta(hours=n), "day": pd.Timedelta(days=n),
                  "week": pd.Timedelta(weeks=n), "month": pd.Timedelta(days=30 * n)}[unit]
-        return (DARAZ_SCRAPE_DATE - delta).normalize(), True
+        base = pd.to_datetime(scrape_date, errors="coerce")
+        base = DEFAULT_SCRAPE_DATE if pd.isna(base) else base
+        return (base - delta).normalize(), True
     for fmt in DATE_FORMATS:
         try:
             return pd.Timestamp(pd.to_datetime(raw, format=fmt)), False
@@ -85,6 +88,9 @@ def period_detail_of(date):
 def main():
     df = pd.read_csv(IN_FILE, encoding="utf-8-sig", dtype=str, keep_default_na=False)
     df = df.drop(columns=[c for c in ["period", "year"] if c in df.columns])
+    for col in ["scrape_date", "batch"]:
+        if col not in df.columns:
+            df[col] = ""
     df = df.rename(columns={"review_text": "text_original", "review_date": "review_date_raw"})
     df["rating"] = pd.to_numeric(df.rating, errors="coerce")
 
@@ -94,7 +100,7 @@ def main():
     df["language"] = df.text_clean.map(tu.language_of)
 
     # 4-5: dates and periods
-    parsed = [parse_date(r, p) for r, p in zip(df.review_date_raw, df.platform)]
+    parsed = [parse_date(r, s) for r, s in zip(df.review_date_raw, df.scrape_date)]
     df["date"] = [d for d, _ in parsed]
     df["date_is_approx"] = [a for _, a in parsed]
     df["year"] = df.date.dt.year.astype("Int64")
@@ -118,7 +124,8 @@ def main():
     df["keep_10"] = df.keep & (df.n_words > 10)
     df["keep_25"] = df.keep & (df.n_words > 25)
 
-    cols = ["review_id", "platform", "product_id", "product_name", "rating", "review_date_raw", "date",
+    cols = ["review_id", "platform", "batch", "scrape_date", "product_id", "product_name", "rating",
+            "review_date_raw", "date",
             "date_is_approx", "year", "half_year", "period", "period_detail", "language", "n_words", "keep", "keep_10",
             "keep_25", "exclude_reason", "text_original", "text_clean"]
     df = df[cols]
@@ -148,6 +155,8 @@ def main():
     if unparsed:
         print(f"WARNING: {unparsed} dates could not be read: {df[df.date.isna()].review_date_raw.unique()[:5]}")
     print(f"Approximate (relative) dates among kept reviews: {kept.date_is_approx.sum()}")
+    print("\nKept reviews by platform and collection batch")
+    print(kept.groupby(["platform", "batch"]).size().to_string())
     print("\nKept reviews by platform, language and period")
     print(counts.to_string())
     print(f"\nSaved to {DATA} and {RESULTS}")

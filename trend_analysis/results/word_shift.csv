@@ -1,77 +1,107 @@
 ﻿platform,language,word,meaning,group,pre_share,post_share
-Daraz,bangla,চমৎকার,excellent,evaluative,0.028985507246376812,0.010752688172043012
-Daraz,bangla,দারুণ,great,evaluative,0.014492753623188406,0.016129032258064516
-Daraz,bangla,বেশ,quite,evaluative,0.028985507246376812,0.02956989247311828
-Daraz,bangla,সত্যিই,truly,evaluative,0.0,0.010752688172043012
-Daraz,bangla,অত্যন্ত,extremely,evaluative,0.0,0.0
-Daraz,bangla,একদম,absolutely,evaluative,0.014492753623188406,0.04838709677419355
-Daraz,bangla,অদ্ভুত,wonderful/strange,evaluative,0.014492753623188406,0.0
-Daraz,bangla,সন্তুষ্ট,satisfied,evaluative,0.0,0.01881720430107527
-Daraz,bangla,ভীষণ,immensely,evaluative,0.014492753623188406,0.0
-Daraz,bangla,সন্তোষজনক,satisfactory,evaluative,0.0,0.005376344086021506
-Daraz,bangla,অন্যরকম,unique,evaluative,0.0,0.0
+Daraz,bangla,চমৎকার,excellent,evaluative,0.014380530973451327,0.008361204013377926
+Daraz,bangla,দারুণ,great,evaluative,0.004424778761061947,0.011705685618729096
+Daraz,bangla,বেশ,quite,evaluative,0.02101769911504425,0.03511705685618729
+Daraz,bangla,সত্যিই,truly,evaluative,0.011061946902654867,0.006688963210702341
+Daraz,bangla,অত্যন্ত,extremely,evaluative,0.004424778761061947,0.0016722408026755853
+Daraz,bangla,একদম,absolutely,evaluative,0.02101769911504425,0.038461538461538464
+Daraz,bangla,অদ্ভুত,wonderful/strange,evaluative,0.0011061946902654867,0.0
+Daraz,bangla,সন্তুষ্ট,satisfied,evaluative,0.012168141592920354,0.01839464882943144
+Daraz,bangla,ভীষণ,immensely,evaluative,0.0011061946902654867,0.0
+Daraz,bangla,সন্তোষজনক,satisfactory,evaluative,0.0011061946902654867,0.005016722408026756
+Daraz,bangla,অন্যরকম,unique,evaluative,0.0022123893805309734,0.0
 Daraz,bangla,গভীর,deep,evaluative,0.0,0.0
 Daraz,bangla,জীবন্ত,vivid,evaluative,0.0,0.0
 Daraz,bangla,মাস্টারপিস,masterpiece,evaluative,0.0,0.0
-Daraz,bangla,সম্পূর্ণ,complete,evaluative,0.0,0.005376344086021506
-Daraz,bangla,নিখুঁত,flawless,evaluative,0.0,0.002688172043010753
-Daraz,bangla,এককথায়,in a word,evaluative,0.0,0.0
+Daraz,bangla,সম্পূর্ণ,complete,evaluative,0.0011061946902654867,0.0033444816053511705
+Daraz,bangla,নিখুঁত,flawless,evaluative,0.0,0.0016722408026755853
+Daraz,bangla,এককথায়,in a word,evaluative,0.0011061946902654867,0.0
 Daraz,bangla,গভীরভাবে,deeply,evaluative,0.0,0.0
-Daraz,bangla,অসাধারণ,extraordinary,evaluative,0.028985507246376812,0.0967741935483871
+Daraz,bangla,অসাধারণ,extraordinary,evaluative,0.033185840707964605,0.06856187290969899
 Daraz,bangla,অমূল্য,invaluable,evaluative,0.0,0.0
-Daraz,bangla,এটি,this (formal; colloquial এটা),formal,0.014492753623188406,0.010752688172043012
-Daraz,bangla,এবং,and (formal; colloquial আর),formal,0.10144927536231885,0.10215053763440861
-Daraz,bangla,প্রতিটি,each (formal),formal,0.0,0.002688172043010753
-Daraz,bangla,একটি,a/one (formal; colloquial একটা),formal,0.028985507246376812,0.06451612903225806
-Daraz,banglish,ekdom,absolutely,evaluative,0.0,0.01092896174863388
-Daraz,banglish,darun,great,evaluative,0.02564102564102564,0.0
-Daraz,banglish,khub,very,evaluative,0.1282051282051282,0.060109289617486336
-Daraz,banglish,highly,highly,evaluative,0.0,0.01092896174863388
-Daraz,banglish,recommended,recommended,evaluative,0.02564102564102564,0.01092896174863388
+Daraz,bangla,এটি,this (formal; colloquial এটা),formal,0.014380530973451327,0.008361204013377926
+Daraz,bangla,এবং,and (formal; colloquial আর),formal,0.10730088495575221,0.10033444816053512
+Daraz,bangla,প্রতিটি,each (formal),formal,0.00331858407079646,0.0016722408026755853
+Daraz,bangla,একটি,a/one (formal; colloquial একটা),formal,0.04314159292035398,0.048494983277591976
+Daraz,banglish,ekdom,absolutely,evaluative,0.005319148936170213,0.011811023622047244
+Daraz,banglish,darun,great,evaluative,0.007978723404255319,0.0
+Daraz,banglish,khub,very,evaluative,0.10106382978723404,0.07480314960629922
+Daraz,banglish,highly,highly,evaluative,0.0026595744680851063,0.007874015748031496
+Daraz,banglish,recommended,recommended,evaluative,0.02127659574468085,0.007874015748031496
 Daraz,banglish,khuboi,very much,evaluative,0.0,0.0
 Daraz,banglish,shobcheye,most/best,evaluative,0.0,0.0
-Daraz,banglish,ebong,and (formal; colloquial ar),formal,0.0,0.0
-Daraz,english,truly,truly,evaluative,0.0,0.009478672985781991
-Daraz,english,highly,highly,evaluative,0.023809523809523808,0.03317535545023697
-Daraz,english,amazing,amazing,evaluative,0.0,0.037914691943127965
+Daraz,banglish,ebong,and (formal; colloquial ar),formal,0.0,0.003937007874015748
+Daraz,english,truly,truly,evaluative,0.0,0.005305039787798408
+Daraz,english,highly,highly,evaluative,0.013777267508610792,0.03183023872679045
+Daraz,english,amazing,amazing,evaluative,0.003444316877152698,0.023872679045092837
 Daraz,english,absolute,absolute,evaluative,0.0,0.0
-Daraz,english,masterpiece,masterpiece,evaluative,0.0,0.004739336492890996
-Daraz,english,recommended,recommended,evaluative,0.14285714285714285,0.08056872037914692
-Rokomari,bangla,চমৎকার,excellent,evaluative,0.0625,0.07272727272727272
-Rokomari,bangla,দারুণ,great,evaluative,0.020833333333333332,0.05454545454545454
-Rokomari,bangla,বেশ,quite,evaluative,0.07291666666666667,0.03636363636363636
-Rokomari,bangla,সত্যিই,truly,evaluative,0.052083333333333336,0.01818181818181818
-Rokomari,bangla,অত্যন্ত,extremely,evaluative,0.020833333333333332,0.0
-Rokomari,bangla,একদম,absolutely,evaluative,0.010416666666666666,0.03636363636363636
-Rokomari,bangla,অদ্ভুত,wonderful/strange,evaluative,0.020833333333333332,0.03636363636363636
-Rokomari,bangla,সন্তুষ্ট,satisfied,evaluative,0.010416666666666666,0.0
-Rokomari,bangla,ভীষণ,immensely,evaluative,0.0,0.01818181818181818
+Daraz,english,masterpiece,masterpiece,evaluative,0.0,0.002652519893899204
+Daraz,english,recommended,recommended,evaluative,0.05625717566016074,0.07692307692307693
+Rokomari,bangla,চমৎকার,excellent,evaluative,0.05825242718446602,0.06725146198830409
+Rokomari,bangla,দারুণ,great,evaluative,0.02696871628910464,0.02046783625730994
+Rokomari,bangla,বেশ,quite,evaluative,0.10032362459546926,0.04093567251461988
+Rokomari,bangla,সত্যিই,truly,evaluative,0.043149946062567425,0.03508771929824561
+Rokomari,bangla,অত্যন্ত,extremely,evaluative,0.032362459546925564,0.023391812865497075
+Rokomari,bangla,একদম,absolutely,evaluative,0.012944983818770227,0.023391812865497075
+Rokomari,bangla,অদ্ভুত,wonderful/strange,evaluative,0.039913700107874865,0.03508771929824561
+Rokomari,bangla,সন্তুষ্ট,satisfied,evaluative,0.005393743257820928,0.0
+Rokomari,bangla,ভীষণ,immensely,evaluative,0.007551240560949299,0.011695906432748537
 Rokomari,bangla,সন্তোষজনক,satisfactory,evaluative,0.0,0.0
-Rokomari,bangla,অন্যরকম,unique,evaluative,0.020833333333333332,0.0
-Rokomari,bangla,গভীর,deep,evaluative,0.020833333333333332,0.01818181818181818
-Rokomari,bangla,জীবন্ত,vivid,evaluative,0.020833333333333332,0.0
-Rokomari,bangla,মাস্টারপিস,masterpiece,evaluative,0.010416666666666666,0.0
-Rokomari,bangla,সম্পূর্ণ,complete,evaluative,0.0,0.0
-Rokomari,bangla,নিখুঁত,flawless,evaluative,0.0,0.0
-Rokomari,bangla,এককথায়,in a word,evaluative,0.010416666666666666,0.0
-Rokomari,bangla,গভীরভাবে,deeply,evaluative,0.0,0.0
-Rokomari,bangla,অসাধারণ,extraordinary,evaluative,0.13541666666666666,0.18181818181818182
-Rokomari,bangla,অমূল্য,invaluable,evaluative,0.0,0.0
-Rokomari,bangla,এটি,this (formal; colloquial এটা),formal,0.11458333333333333,0.05454545454545454
-Rokomari,bangla,এবং,and (formal; colloquial আর),formal,0.20833333333333334,0.18181818181818182
-Rokomari,bangla,প্রতিটি,each (formal),formal,0.0625,0.05454545454545454
-Rokomari,bangla,একটি,a/one (formal; colloquial একটা),formal,0.34375,0.21818181818181817
-Rokomari,english,truly,truly,evaluative,0.0,0.06451612903225806
-Rokomari,english,highly,highly,evaluative,0.0,0.03225806451612903
-Rokomari,english,amazing,amazing,evaluative,0.15,0.12903225806451613
+Rokomari,bangla,অন্যরকম,unique,evaluative,0.022653721682847898,0.014619883040935672
+Rokomari,bangla,গভীর,deep,evaluative,0.032362459546925564,0.03216374269005848
+Rokomari,bangla,জীবন্ত,vivid,evaluative,0.020496224379719527,0.017543859649122806
+Rokomari,bangla,মাস্টারপিস,masterpiece,evaluative,0.009708737864077669,0.008771929824561403
+Rokomari,bangla,সম্পূর্ণ,complete,evaluative,0.03559870550161812,0.014619883040935672
+Rokomari,bangla,নিখুঁত,flawless,evaluative,0.006472491909385114,0.0029239766081871343
+Rokomari,bangla,এককথায়,in a word,evaluative,0.003236245954692557,0.0
+Rokomari,bangla,গভীরভাবে,deeply,evaluative,0.003236245954692557,0.005847953216374269
+Rokomari,bangla,অসাধারণ,extraordinary,evaluative,0.1866235167206041,0.2046783625730994
+Rokomari,bangla,অমূল্য,invaluable,evaluative,0.003236245954692557,0.0029239766081871343
+Rokomari,bangla,এটি,this (formal; colloquial এটা),formal,0.08845738942826321,0.05555555555555555
+Rokomari,bangla,এবং,and (formal; colloquial আর),formal,0.284789644012945,0.16374269005847952
+Rokomari,bangla,প্রতিটি,each (formal),formal,0.07335490830636461,0.043859649122807015
+Rokomari,bangla,একটি,a/one (formal; colloquial একটা),formal,0.3516720604099245,0.22807017543859648
+Rokomari,english,truly,truly,evaluative,0.006211180124223602,0.029411764705882353
+Rokomari,english,highly,highly,evaluative,0.006211180124223602,0.029411764705882353
+Rokomari,english,amazing,amazing,evaluative,0.08695652173913043,0.10294117647058823
 Rokomari,english,absolute,absolute,evaluative,0.0,0.0
-Rokomari,english,masterpiece,masterpiece,evaluative,0.0,0.03225806451612903
-Rokomari,english,recommended,recommended,evaluative,0.0,0.0
-Shajgoj,banglish,ekdom,absolutely,evaluative,0.017543859649122806,0.0
-Shajgoj,banglish,darun,great,evaluative,0.017543859649122806,0.016129032258064516
-Shajgoj,banglish,khub,very,evaluative,0.17543859649122806,0.08064516129032258
-Shajgoj,banglish,highly,highly,evaluative,0.0,0.016129032258064516
-Shajgoj,banglish,recommended,recommended,evaluative,0.0,0.0
+Rokomari,english,masterpiece,masterpiece,evaluative,0.006211180124223602,0.029411764705882353
+Rokomari,english,recommended,recommended,evaluative,0.006211180124223602,0.014705882352941176
+Shajgoj,bangla,চমৎকার,excellent,evaluative,0.006756756756756757,0.010638297872340425
+Shajgoj,bangla,দারুণ,great,evaluative,0.0,0.010638297872340425
+Shajgoj,bangla,বেশ,quite,evaluative,0.08783783783783784,0.047872340425531915
+Shajgoj,bangla,সত্যিই,truly,evaluative,0.006756756756756757,0.010638297872340425
+Shajgoj,bangla,অত্যন্ত,extremely,evaluative,0.0,0.005319148936170213
+Shajgoj,bangla,একদম,absolutely,evaluative,0.06756756756756757,0.015957446808510637
+Shajgoj,bangla,অদ্ভুত,wonderful/strange,evaluative,0.0,0.0
+Shajgoj,bangla,সন্তুষ্ট,satisfied,evaluative,0.006756756756756757,0.005319148936170213
+Shajgoj,bangla,ভীষণ,immensely,evaluative,0.02027027027027027,0.0
+Shajgoj,bangla,সন্তোষজনক,satisfactory,evaluative,0.0,0.0
+Shajgoj,bangla,অন্যরকম,unique,evaluative,0.0,0.0
+Shajgoj,bangla,গভীর,deep,evaluative,0.0,0.0
+Shajgoj,bangla,জীবন্ত,vivid,evaluative,0.0,0.0
+Shajgoj,bangla,মাস্টারপিস,masterpiece,evaluative,0.0,0.0
+Shajgoj,bangla,সম্পূর্ণ,complete,evaluative,0.0,0.0
+Shajgoj,bangla,নিখুঁত,flawless,evaluative,0.0,0.0
+Shajgoj,bangla,এককথায়,in a word,evaluative,0.0,0.0
+Shajgoj,bangla,গভীরভাবে,deeply,evaluative,0.0,0.0
+Shajgoj,bangla,অসাধারণ,extraordinary,evaluative,0.006756756756756757,0.026595744680851064
+Shajgoj,bangla,অমূল্য,invaluable,evaluative,0.0,0.0
+Shajgoj,bangla,এটি,this (formal; colloquial এটা),formal,0.02027027027027027,0.005319148936170213
+Shajgoj,bangla,এবং,and (formal; colloquial আর),formal,0.13513513513513514,0.05851063829787234
+Shajgoj,bangla,প্রতিটি,each (formal),formal,0.0,0.0
+Shajgoj,bangla,একটি,a/one (formal; colloquial একটা),formal,0.02027027027027027,0.03723404255319149
+Shajgoj,banglish,ekdom,absolutely,evaluative,0.01694915254237288,0.008146639511201629
+Shajgoj,banglish,darun,great,evaluative,0.007532956685499058,0.012219959266802444
+Shajgoj,banglish,khub,very,evaluative,0.160075329566855,0.15478615071283094
+Shajgoj,banglish,highly,highly,evaluative,0.011299435028248588,0.012219959266802444
+Shajgoj,banglish,recommended,recommended,evaluative,0.005649717514124294,0.010183299389002037
 Shajgoj,banglish,khuboi,very much,evaluative,0.0,0.0
 Shajgoj,banglish,shobcheye,most/best,evaluative,0.0,0.0
-Shajgoj,banglish,ebong,and (formal; colloquial ar),formal,0.017543859649122806,0.0
+Shajgoj,banglish,ebong,and (formal; colloquial ar),formal,0.0018832391713747645,0.002036659877800407
+Shajgoj,english,truly,truly,evaluative,0.0,0.004016064257028112
+Shajgoj,english,highly,highly,evaluative,0.02231237322515213,0.0321285140562249
+Shajgoj,english,amazing,amazing,evaluative,0.032454361054766734,0.04819277108433735
+Shajgoj,english,absolute,absolute,evaluative,0.002028397565922921,0.0
+Shajgoj,english,masterpiece,masterpiece,evaluative,0.0,0.0
+Shajgoj,english,recommended,recommended,evaluative,0.028397565922920892,0.020080321285140562

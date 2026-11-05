@@ -1,165 +1,223 @@
 platform,language,subset,measure,comparison,n_a,n_b,change,ci_low,ci_high,clear
-Daraz,bangla,all,has_eval,post_chatgpt - pre_chatgpt,372,69,0.056685366993922376,-0.039971949509116395,0.14365649836372127,no clear change
-Daraz,bangla,words>10,has_eval,post_chatgpt - pre_chatgpt,246,47,0.09591766130427262,-0.02170904687770281,0.19417055872686387,no clear change
-Daraz,bangla,words>25,has_eval,post_chatgpt - pre_chatgpt,87,19,0.2692075015124017,0.11796733212341198,0.40229885057471265,increase
-Daraz,bangla,same products,has_eval,post_chatgpt - pre_chatgpt,149,69,0.0027234704795253417,-0.10436727944752455,0.10203287617935998,no clear change
-Daraz,bangla,baseline pre-2022 only,has_eval,post_chatgpt - pre_chatgpt,372,40,0.051612903225806445,-0.06720430107526881,0.1596774193548387,no clear change
-Daraz,bangla,placebo,has_eval,jan_nov_2022 - pre_2022,29,40,-0.012068965517241376,-0.17155172413793107,0.1663793103448276,no clear change
-Daraz,bangla,all,eval_per100,post_chatgpt - pre_chatgpt,372,69,0.24514280006678413,-0.7390308133639917,1.1429167252452028,no clear change
-Daraz,bangla,words>10,eval_per100,post_chatgpt - pre_chatgpt,246,47,0.4987785840607074,-0.23437176903682563,1.1251140717327515,no clear change
-Daraz,bangla,words>25,eval_per100,post_chatgpt - pre_chatgpt,87,19,1.0969203392527602,0.6419886142715908,1.599546885220659,increase
-Daraz,bangla,same products,eval_per100,post_chatgpt - pre_chatgpt,149,69,0.17804641273149158,-0.9574342925615537,1.2198980287598076,no clear change
-Daraz,bangla,baseline pre-2022 only,eval_per100,post_chatgpt - pre_chatgpt,372,40,0.2853147807785583,-0.8550772989343014,1.2687503919641456,no clear change
-Daraz,bangla,placebo,eval_per100,jan_nov_2022 - pre_2022,29,40,0.0955816092797388,-1.6103637321912452,1.9635787880052908,no clear change
-Daraz,bangla,all,has_formal,post_chatgpt - pre_chatgpt,372,69,0.03728377746610566,-0.056685366993922404,0.11407199625993455,no clear change
-Daraz,bangla,words>10,has_formal,post_chatgpt - pre_chatgpt,246,47,0.06244594360837227,-0.057083549558899854,0.1729177477944991,no clear change
-Daraz,bangla,words>25,has_formal,post_chatgpt - pre_chatgpt,87,19,0.17543859649122806,-0.028433151845130067,0.3563218390804598,no clear change
-Daraz,bangla,same products,has_formal,post_chatgpt - pre_chatgpt,149,69,-0.00855947864993678,-0.1033240929870635,0.07625717342670946,no clear change
-Daraz,bangla,baseline pre-2022 only,has_formal,post_chatgpt - pre_chatgpt,372,40,-0.046774193548387105,-0.1799260752688172,0.07741935483870968,no clear change
-Daraz,bangla,placebo,has_formal,jan_nov_2022 - pre_2022,29,40,-0.2,-0.325,-0.075,decrease
-Daraz,bangla,all,has_control,post_chatgpt - pre_chatgpt,372,69,0.038920056100981815,-0.06149193548387096,0.14036933146330066,no clear change
-Daraz,bangla,words>10,has_control,post_chatgpt - pre_chatgpt,246,47,0.0006919218128351723,-0.08847950181629471,0.10113085971285235,no clear change
-Daraz,bangla,words>25,has_control,post_chatgpt - pre_chatgpt,87,19,0.01814882032667886,-0.06896551724137934,0.1349062310949789,no clear change
-Daraz,bangla,same products,has_control,post_chatgpt - pre_chatgpt,149,69,0.048536134617255144,-0.059685341892811966,0.15884398404824435,no clear change
-Daraz,bangla,baseline pre-2022 only,has_control,post_chatgpt - pre_chatgpt,372,40,0.08602150537634412,-0.0425,0.22448252688172035,no clear change
-Daraz,bangla,placebo,has_control,jan_nov_2022 - pre_2022,29,40,0.11206896551724133,-0.07592672413793107,0.28103448275862064,no clear change
-Daraz,bangla,all,control_per100,post_chatgpt - pre_chatgpt,372,69,0.0417659950724385,-2.870830617658715,2.6798006290466136,no clear change
-Daraz,bangla,words>10,control_per100,post_chatgpt - pre_chatgpt,246,47,-0.32131433274934906,-2.711025036086634,2.0220624795321243,no clear change
-Daraz,bangla,words>25,control_per100,post_chatgpt - pre_chatgpt,87,19,1.3121056815145051,-0.5957627957430705,3.272378302552946,no clear change
-Daraz,bangla,same products,control_per100,post_chatgpt - pre_chatgpt,149,69,0.6685963079400512,-2.4431750562570187,3.3077447320228948,no clear change
-Daraz,bangla,baseline pre-2022 only,control_per100,post_chatgpt - pre_chatgpt,372,40,2.26625354761625,-0.8577541729456091,5.136951183120114,no clear change
-Daraz,bangla,placebo,control_per100,jan_nov_2022 - pre_2022,29,40,5.292746245707686,0.26023177318121676,11.115013839386412,increase
-Daraz,banglish,all,has_eval,post_chatgpt - pre_chatgpt,183,39,-0.0975199663724254,-0.22955023118957543,0.017707019756199795,no clear change
-Daraz,banglish,words>10,has_eval,post_chatgpt - pre_chatgpt,114,23,-0.09496567505720824,-0.2688787185354691,0.06178489702517162,no clear change
-Daraz,banglish,words>25,has_eval,post_chatgpt - pre_chatgpt,30,7,0.1,0.0,0.23333333333333334,no clear change
-Daraz,banglish,same products,has_eval,post_chatgpt - pre_chatgpt,53,39,-0.08514755684567005,-0.22703193033381713,0.05515239477503628,no clear change
-Daraz,banglish,baseline pre-2022 only,has_eval,post_chatgpt - pre_chatgpt,183,26,-0.07187894073139976,-0.23118957545187055,0.05443463640184952,no clear change
-Daraz,banglish,placebo,has_eval,jan_nov_2022 - pre_2022,13,26,0.07692307692307693,-0.15384615384615385,0.34615384615384615,no clear change
-Daraz,banglish,all,eval_per100,post_chatgpt - pre_chatgpt,183,39,-0.8339407195678257,-2.027726856407354,0.2501931282145587,no clear change
-Daraz,banglish,words>10,eval_per100,post_chatgpt - pre_chatgpt,114,23,-0.6460252372588239,-1.8139169451800405,0.34920329146880585,no clear change
-Daraz,banglish,words>25,eval_per100,post_chatgpt - pre_chatgpt,30,7,0.23771929824561405,0.0,0.517631578947368,no clear change
-Daraz,banglish,same products,eval_per100,post_chatgpt - pre_chatgpt,53,39,-0.8829967137416019,-2.3280030622596852,0.34920743126410814,no clear change
-Daraz,banglish,baseline pre-2022 only,eval_per100,post_chatgpt - pre_chatgpt,183,26,-0.8476177217358762,-2.422114005177181,0.5620040088867782,no clear change
-Daraz,banglish,placebo,eval_per100,jan_nov_2022 - pre_2022,13,26,-0.041031006504152145,-2.0913832278122557,1.9940173051586083,no clear change
-Daraz,banglish,all,has_formal,post_chatgpt - pre_chatgpt,183,39,0.0,0.0,0.0,no clear change
-Daraz,banglish,words>10,has_formal,post_chatgpt - pre_chatgpt,114,23,0.0,0.0,0.0,no clear change
-Daraz,banglish,words>25,has_formal,post_chatgpt - pre_chatgpt,30,7,0.0,0.0,0.0,no clear change
-Daraz,banglish,same products,has_formal,post_chatgpt - pre_chatgpt,53,39,0.0,0.0,0.0,no clear change
-Daraz,banglish,baseline pre-2022 only,has_formal,post_chatgpt - pre_chatgpt,183,26,0.0,0.0,0.0,no clear change
-Daraz,banglish,placebo,has_formal,jan_nov_2022 - pre_2022,13,26,0.0,0.0,0.0,no clear change
-Daraz,banglish,all,has_control,post_chatgpt - pre_chatgpt,183,39,-0.034888608659100484,-0.19588062211013035,0.12778478352248845,no clear change
-Daraz,banglish,words>10,has_control,post_chatgpt - pre_chatgpt,114,23,0.04157131960335625,-0.14187643020594964,0.2418096872616323,no clear change
-Daraz,banglish,words>25,has_control,post_chatgpt - pre_chatgpt,30,7,0.1523809523809524,-0.16666666666666663,0.5380952380952382,no clear change
-Daraz,banglish,same products,has_control,post_chatgpt - pre_chatgpt,53,39,0.07450411223996134,-0.10888969521045,0.26467102080309607,no clear change
-Daraz,banglish,baseline pre-2022 only,has_control,post_chatgpt - pre_chatgpt,183,26,0.029213955443463613,-0.15783942833123155,0.2382461118116849,no clear change
-Daraz,banglish,placebo,has_control,jan_nov_2022 - pre_2022,13,26,0.1923076923076923,-0.07692307692307698,0.46153846153846156,no clear change
-Daraz,banglish,all,control_per100,post_chatgpt - pre_chatgpt,183,39,0.08839613063246077,-2.7629305960130464,2.7329836418016042,no clear change
-Daraz,banglish,words>10,control_per100,post_chatgpt - pre_chatgpt,114,23,1.598271400234962,-1.750164233818577,4.764713990567013,no clear change
-Daraz,banglish,words>25,control_per100,post_chatgpt - pre_chatgpt,30,7,1.2719454812193902,-3.127340667269026,5.53955097273575,no clear change
-Daraz,banglish,same products,control_per100,post_chatgpt - pre_chatgpt,53,39,2.30926439040417,-1.0200409212359054,5.916050607512091,no clear change
-Daraz,banglish,baseline pre-2022 only,control_per100,post_chatgpt - pre_chatgpt,183,26,1.5314172173057035,-1.6868013881135606,4.492617257088652,no clear change
-Daraz,banglish,placebo,control_per100,jan_nov_2022 - pre_2022,13,26,4.329063260019726,-0.6757608554856535,9.24880880149545,no clear change
-Daraz,english,all,has_eval,post_chatgpt - pre_chatgpt,211,42,0.004062288422477994,-0.11487531031369894,0.11351839313924622,no clear change
-Daraz,english,words>10,has_eval,post_chatgpt - pre_chatgpt,128,14,0.07700892857142858,-0.08931361607142856,0.1953125,no clear change
-Daraz,english,words>25,has_eval,post_chatgpt - pre_chatgpt,54,6,0.12962962962962962,0.05555555555555555,0.2222222222222222,increase
-Daraz,english,same products,has_eval,post_chatgpt - pre_chatgpt,26,42,-0.027472527472527458,-0.184981684981685,0.14111721611721564,no clear change
-Daraz,english,baseline pre-2022 only,has_eval,post_chatgpt - pre_chatgpt,211,30,-0.05308056872037917,-0.21038309636650865,0.0848341232227488,no clear change
-Daraz,english,placebo,has_eval,jan_nov_2022 - pre_2022,12,30,-0.2,-0.3333333333333333,-0.06666666666666667,decrease
-Daraz,english,all,eval_per100,post_chatgpt - pre_chatgpt,211,42,-0.5955294692842845,-2.448396447747269,0.9418992581550498,no clear change
-Daraz,english,words>10,eval_per100,post_chatgpt - pre_chatgpt,128,14,0.38288136610026985,-0.7527847947936208,1.142998259552442,no clear change
-Daraz,english,words>25,eval_per100,post_chatgpt - pre_chatgpt,54,6,0.3317979251904467,0.10921177587844255,0.6109543984590967,increase
-Daraz,english,same products,eval_per100,post_chatgpt - pre_chatgpt,26,42,-1.0351839006324057,-3.147607410584986,1.1249039120716815,no clear change
-Daraz,english,baseline pre-2022 only,eval_per100,post_chatgpt - pre_chatgpt,211,30,-1.4299965894656903,-3.9707604660097116,0.6235851017932449,no clear change
-Daraz,english,placebo,eval_per100,jan_nov_2022 - pre_2022,12,30,-2.9206349206349205,-5.425099206349206,-0.8333333333333334,decrease
-Daraz,english,all,has_control,post_chatgpt - pre_chatgpt,211,42,0.08113292710449116,-0.014105168133604074,0.1905890318212593,no clear change
-Daraz,english,words>10,has_control,post_chatgpt - pre_chatgpt,128,14,-0.0078125,-0.0234375,0.0,no clear change
-Daraz,english,words>25,has_control,post_chatgpt - pre_chatgpt,54,6,0.0,0.0,0.0,no clear change
-Daraz,english,same products,has_control,post_chatgpt - pre_chatgpt,26,42,0.0421245421245422,-0.10622710622710618,0.19047619047619047,no clear change
-Daraz,english,baseline pre-2022 only,has_control,post_chatgpt - pre_chatgpt,211,30,0.0954186413902054,-0.018799368088467605,0.2382306477093208,no clear change
-Daraz,english,placebo,has_control,jan_nov_2022 - pre_2022,12,30,0.04999999999999993,-0.16666666666666674,0.23333333333333328,no clear change
-Daraz,english,all,control_per100,post_chatgpt - pre_chatgpt,211,42,1.1120595584566892,-2.052936724631663,4.4068293345490055,no clear change
-Daraz,english,words>10,control_per100,post_chatgpt - pre_chatgpt,128,14,-2.546543569936219,-6.445938389160181,1.01332670644115,no clear change
-Daraz,english,words>25,control_per100,post_chatgpt - pre_chatgpt,54,6,-2.013589764904438,-6.861447106651232,2.6702715725726964,no clear change
-Daraz,english,same products,control_per100,post_chatgpt - pre_chatgpt,26,42,0.9951324618125845,-3.9747483351390915,6.066790962284926,no clear change
-Daraz,english,baseline pre-2022 only,control_per100,post_chatgpt - pre_chatgpt,211,30,1.3689948627368764,-2.1374476368808777,4.928432512584473,no clear change
-Daraz,english,placebo,control_per100,jan_nov_2022 - pre_2022,12,30,0.8992735649806498,-5.858390824909908,7.093127611353917,no clear change
-Rokomari,bangla,all,has_eval,post_chatgpt - pre_chatgpt,55,96,-0.05549242424242423,-0.21136363636363636,0.10284564393939387,no clear change
-Rokomari,bangla,words>10,has_eval,post_chatgpt - pre_chatgpt,38,74,-0.02347083926031296,-0.20912162162162162,0.16145092460881932,no clear change
-Rokomari,bangla,words>25,has_eval,post_chatgpt - pre_chatgpt,18,52,0.038461538461538436,-0.2244123931623932,0.30341880341880345,no clear change
-Rokomari,bangla,same products,has_eval,post_chatgpt - pre_chatgpt,53,96,-0.06269654088050314,-0.21896128144654092,0.09610849056603776,no clear change
-Rokomari,bangla,baseline pre-2022 only,has_eval,post_chatgpt - pre_chatgpt,55,74,-0.0828009828009828,-0.2501228501228502,0.07518427518427517,no clear change
-Rokomari,bangla,placebo,has_eval,jan_nov_2022 - pre_2022,22,74,-0.11916461916461918,-0.3366093366093366,0.10319410319410316,no clear change
-Rokomari,bangla,all,eval_per100,post_chatgpt - pre_chatgpt,55,96,-0.43156159416013984,-1.6340180845488201,0.740003774913553,no clear change
-Rokomari,bangla,words>10,eval_per100,post_chatgpt - pre_chatgpt,38,74,-0.18180870265753568,-1.1929112496225855,0.7898751739394432,no clear change
-Rokomari,bangla,words>25,eval_per100,post_chatgpt - pre_chatgpt,18,52,-0.09427513768377227,-1.0360609970323735,0.9195532945918411,no clear change
-Rokomari,bangla,same products,eval_per100,post_chatgpt - pre_chatgpt,53,96,-0.4552950996448699,-1.68696829155015,0.8081892060773059,no clear change
-Rokomari,bangla,baseline pre-2022 only,eval_per100,post_chatgpt - pre_chatgpt,55,74,-0.3476766754601939,-1.5460906896858617,0.8982748782285498,no clear change
-Rokomari,bangla,placebo,eval_per100,jan_nov_2022 - pre_2022,22,74,0.3660432815997652,-1.6871068052228586,3.0326918323688643,no clear change
-Rokomari,bangla,all,has_formal,post_chatgpt - pre_chatgpt,55,96,-0.16231060606060604,-0.3210227272727273,0.0015151515151514694,no clear change
-Rokomari,bangla,words>10,has_formal,post_chatgpt - pre_chatgpt,38,74,-0.09317211948790899,-0.27953413940256044,0.10528093883357031,no clear change
-Rokomari,bangla,words>25,has_formal,post_chatgpt - pre_chatgpt,18,52,-0.1004273504273504,-0.3632478632478633,0.1581196581196581,no clear change
-Rokomari,bangla,same products,has_formal,post_chatgpt - pre_chatgpt,53,96,-0.16882861635220126,-0.3256682389937107,-0.006078026729559834,decrease
-Rokomari,bangla,baseline pre-2022 only,has_formal,post_chatgpt - pre_chatgpt,55,74,-0.1997542997542997,-0.3624201474201474,-0.03194103194103198,decrease
-Rokomari,bangla,placebo,has_formal,jan_nov_2022 - pre_2022,22,74,-0.16339066339066333,-0.3857493857493857,0.07248157248157244,no clear change
-Rokomari,bangla,all,has_control,post_chatgpt - pre_chatgpt,55,96,0.010795454545454497,-0.11401515151515151,0.12278882575757538,no clear change
-Rokomari,bangla,words>10,has_control,post_chatgpt - pre_chatgpt,38,74,-0.05120910384068278,-0.1699857752489331,0.05476529160739685,no clear change
-Rokomari,bangla,words>25,has_control,post_chatgpt - pre_chatgpt,18,52,-0.07264957264957272,-0.2585470085470085,0.05769230769230771,no clear change
-Rokomari,bangla,same products,has_control,post_chatgpt - pre_chatgpt,53,96,0.005306603773584939,-0.1248378537735849,0.12051395440251558,no clear change
-Rokomari,bangla,baseline pre-2022 only,has_control,post_chatgpt - pre_chatgpt,55,74,0.016707616707616668,-0.11007371007371003,0.14299754299754297,no clear change
-Rokomari,bangla,placebo,has_control,jan_nov_2022 - pre_2022,22,74,0.025798525798525818,-0.15122850122850123,0.17567567567567566,no clear change
-Rokomari,bangla,all,control_per100,post_chatgpt - pre_chatgpt,55,96,3.8527433418045414,0.8091322216550194,7.224240935911993,increase
-Rokomari,bangla,words>10,control_per100,post_chatgpt - pre_chatgpt,38,74,1.4523939064148648,-1.2599272130342116,4.160244784112887,no clear change
-Rokomari,bangla,words>25,control_per100,post_chatgpt - pre_chatgpt,18,52,-0.8756261726674941,-2.952805520601968,1.321074018375619,no clear change
-Rokomari,bangla,same products,control_per100,post_chatgpt - pre_chatgpt,53,96,3.750004860164343,0.5966194003872995,7.295847040818945,increase
-Rokomari,bangla,baseline pre-2022 only,control_per100,post_chatgpt - pre_chatgpt,55,74,4.589300287188723,1.4312583276691766,7.947670960418109,increase
-Rokomari,bangla,placebo,control_per100,jan_nov_2022 - pre_2022,22,74,3.214066670767342,-0.5371743250678326,7.650967183334833,no clear change
-Rokomari,english,all,has_eval,post_chatgpt - pre_chatgpt,31,40,0.043548387096774194,-0.13548387096774195,0.2153225806451613,no clear change
-Rokomari,english,words>10,has_eval,post_chatgpt - pre_chatgpt,15,26,0.141025641025641,-0.1358974358974359,0.4361538461538447,no clear change
-Rokomari,english,same products,has_eval,post_chatgpt - pre_chatgpt,28,40,0.02857142857142858,-0.15357142857142858,0.2107142857142857,no clear change
-Rokomari,english,baseline pre-2022 only,has_eval,post_chatgpt - pre_chatgpt,31,25,0.07354838709677419,-0.11096774193548387,0.25806451612903225,no clear change
-Rokomari,english,placebo,has_eval,jan_nov_2022 - pre_2022,15,25,0.08000000000000002,-0.1466666666666667,0.3333333333333333,no clear change
-Rokomari,english,all,eval_per100,post_chatgpt - pre_chatgpt,31,40,0.5514180119047557,-0.6820677224069744,1.8813726322734514,no clear change
-Rokomari,english,words>10,eval_per100,post_chatgpt - pre_chatgpt,15,26,1.2890424995375676,-0.4943498354292562,3.2212889158906686,no clear change
-Rokomari,english,same products,eval_per100,post_chatgpt - pre_chatgpt,28,40,0.5279566599765334,-0.7936464862977942,1.7975046838862878,no clear change
-Rokomari,english,baseline pre-2022 only,eval_per100,post_chatgpt - pre_chatgpt,31,25,0.9334936596869252,-0.2181774998409411,2.171940910959662,no clear change
-Rokomari,english,placebo,eval_per100,jan_nov_2022 - pre_2022,15,25,1.0188683940857854,-0.5072463768115941,2.857719404186794,no clear change
-Rokomari,english,all,has_control,post_chatgpt - pre_chatgpt,31,40,-0.2403225806451612,-0.4193548387096774,-0.06129032258064515,decrease
-Rokomari,english,words>10,has_control,post_chatgpt - pre_chatgpt,15,26,-0.06666666666666665,-0.19999999999999996,0.0,no clear change
-Rokomari,english,same products,has_control,post_chatgpt - pre_chatgpt,28,40,-0.23571428571428565,-0.4285714285714286,-0.05714285714285705,decrease
-Rokomari,english,baseline pre-2022 only,has_control,post_chatgpt - pre_chatgpt,31,25,-0.2503225806451612,-0.42858064516129035,-0.07354838709677425,decrease
-Rokomari,english,placebo,has_control,jan_nov_2022 - pre_2022,15,25,-0.026666666666666616,-0.19999999999999996,0.12,no clear change
-Rokomari,english,all,control_per100,post_chatgpt - pre_chatgpt,31,40,-6.176941491229117,-10.418393547346815,-1.9344430453403254,decrease
-Rokomari,english,words>10,control_per100,post_chatgpt - pre_chatgpt,15,26,-4.083305769115789,-7.763050063974998,-0.4277920005338335,decrease
-Rokomari,english,same products,control_per100,post_chatgpt - pre_chatgpt,28,40,-6.737967301766021,-10.827760590199432,-2.503343470255327,decrease
-Rokomari,english,baseline pre-2022 only,control_per100,post_chatgpt - pre_chatgpt,31,25,-6.376680012786563,-11.597482365234164,-1.3827570196450631,decrease
-Rokomari,english,placebo,control_per100,jan_nov_2022 - pre_2022,15,25,-0.5326360574865134,-5.859778507158391,4.833415217661284,no clear change
-Shajgoj,banglish,all,has_eval,post_chatgpt - pre_chatgpt,62,57,-0.08007923033389926,-0.21477079796264853,0.042727787209960386,no clear change
-Shajgoj,banglish,words>10,has_eval,post_chatgpt - pre_chatgpt,39,35,-0.043223443223443236,-0.20879120879120877,0.1164835164835165,no clear change
-Shajgoj,banglish,words>25,has_eval,post_chatgpt - pre_chatgpt,9,9,0.0,-0.4444444444444445,0.4444444444444444,no clear change
-Shajgoj,banglish,same products,has_eval,post_chatgpt - pre_chatgpt,61,57,-0.07822835777969513,-0.21285591026747194,0.0446361806154728,no clear change
-Shajgoj,banglish,baseline pre-2022 only,has_eval,post_chatgpt - pre_chatgpt,62,37,-0.10331299040976462,-0.26503923278116825,0.03705318221447254,no clear change
-Shajgoj,banglish,placebo,has_eval,jan_nov_2022 - pre_2022,20,37,-0.06621621621621623,-0.25135135135135134,0.14189189189189189,no clear change
-Shajgoj,banglish,all,eval_per100,post_chatgpt - pre_chatgpt,62,57,-0.5014962046202247,-1.6743922084721634,0.6411550504446956,no clear change
-Shajgoj,banglish,words>10,eval_per100,post_chatgpt - pre_chatgpt,39,35,0.20515778894874714,-0.8762832545726168,1.3838498362307885,no clear change
-Shajgoj,banglish,words>25,eval_per100,post_chatgpt - pre_chatgpt,9,9,-0.0345892735503619,-1.4009800679531073,1.354641625168584,no clear change
-Shajgoj,banglish,same products,eval_per100,post_chatgpt - pre_chatgpt,61,57,-0.4862471412484749,-1.7282264344344256,0.6785498758164492,no clear change
-Shajgoj,banglish,baseline pre-2022 only,eval_per100,post_chatgpt - pre_chatgpt,62,37,-0.7902313400415868,-2.211431073931074,0.6077308824818296,no clear change
-Shajgoj,banglish,placebo,eval_per100,jan_nov_2022 - pre_2022,20,37,-0.8228951359508816,-2.485358921158554,0.9288127413127412,no clear change
-Shajgoj,banglish,all,has_formal,post_chatgpt - pre_chatgpt,62,57,-0.017543859649122806,-0.05263157894736842,0.0,no clear change
-Shajgoj,banglish,words>10,has_formal,post_chatgpt - pre_chatgpt,39,35,-0.02857142857142857,-0.08571428571428572,0.0,no clear change
-Shajgoj,banglish,words>25,has_formal,post_chatgpt - pre_chatgpt,9,9,-0.1111111111111111,-0.3333333333333333,0.0,no clear change
-Shajgoj,banglish,same products,has_formal,post_chatgpt - pre_chatgpt,61,57,-0.017543859649122806,-0.05263157894736842,0.0,no clear change
-Shajgoj,banglish,baseline pre-2022 only,has_formal,post_chatgpt - pre_chatgpt,62,37,0.0,0.0,0.0,no clear change
-Shajgoj,banglish,placebo,has_formal,jan_nov_2022 - pre_2022,20,37,0.05,0.0,0.15,no clear change
-Shajgoj,banglish,all,has_control,post_chatgpt - pre_chatgpt,62,57,0.0506508205998869,-0.0854555744199208,0.20005659309564228,no clear change
-Shajgoj,banglish,words>10,has_control,post_chatgpt - pre_chatgpt,39,35,0.03443223443223442,-0.07399267399267395,0.1457875457875457,no clear change
-Shajgoj,banglish,words>25,has_control,post_chatgpt - pre_chatgpt,9,9,-0.2222222222222222,-0.5555555555555556,0.0,no clear change
-Shajgoj,banglish,same products,has_control,post_chatgpt - pre_chatgpt,61,57,0.04774230658613754,-0.09166666666666666,0.18464193270060392,no clear change
-Shajgoj,banglish,baseline pre-2022 only,has_control,post_chatgpt - pre_chatgpt,62,37,0.0387968613775066,-0.11246730601569321,0.21185701830863113,no clear change
-Shajgoj,banglish,placebo,has_control,jan_nov_2022 - pre_2022,20,37,-0.03378378378378377,-0.2797297297297297,0.19324324324324316,no clear change
-Shajgoj,banglish,all,control_per100,post_chatgpt - pre_chatgpt,62,57,0.9279940021978081,-2.3371596974823525,4.043092110745069,no clear change
-Shajgoj,banglish,words>10,control_per100,post_chatgpt - pre_chatgpt,39,35,0.6412173239176866,-2.7873593309121962,3.774234854418259,no clear change
-Shajgoj,banglish,words>25,control_per100,post_chatgpt - pre_chatgpt,9,9,1.3570995565336244,-5.357506109103088,7.8374758910709446,no clear change
-Shajgoj,banglish,same products,control_per100,post_chatgpt - pre_chatgpt,61,57,1.0114127554492462,-2.2688223313136575,4.189182701426834,no clear change
-Shajgoj,banglish,baseline pre-2022 only,control_per100,post_chatgpt - pre_chatgpt,62,37,-0.10737975068204442,-3.7710803670260957,3.4901428942091166,no clear change
-Shajgoj,banglish,placebo,control_per100,jan_nov_2022 - pre_2022,20,37,-2.950815195707584,-7.437468720139537,1.5416105692647166,no clear change
+Daraz,bangla,all,has_eval,post_chatgpt - pre_chatgpt,598,904,0.055498416550744376,0.022053600497232664,0.0938304673395093,increase
+Daraz,bangla,words>10,has_eval,post_chatgpt - pre_chatgpt,366,522,0.03909930280761256,-0.01064710131273161,0.08917153445135349,no clear change
+Daraz,bangla,words>25,has_eval,post_chatgpt - pre_chatgpt,111,124,0.11181342632955538,0.004117625690206366,0.22045371984888099,increase
+Daraz,bangla,same products,has_eval,post_chatgpt - pre_chatgpt,375,904,0.013607669616519172,-0.026078171091445432,0.05023008849557521,no clear change
+Daraz,bangla,baseline pre-2022 only,has_eval,post_chatgpt - pre_chatgpt,598,729,0.06022819549389598,0.022155642264337912,0.09949947470076294,increase
+Daraz,bangla,placebo,has_eval,jan_nov_2022 - pre_2022,175,729,0.024432686654908872,-0.027685675093082507,0.08089359200470311,no clear change
+Daraz,bangla,all,eval_per100,post_chatgpt - pre_chatgpt,598,904,0.39936080182410305,0.060193201363437934,0.757222080795339,increase
+Daraz,bangla,words>10,eval_per100,post_chatgpt - pre_chatgpt,366,522,0.048125282553479254,-0.2921805483112828,0.3972791868694575,no clear change
+Daraz,bangla,words>25,eval_per100,post_chatgpt - pre_chatgpt,111,124,0.4283807663991276,-0.02441982028930343,0.9286075038531089,no clear change
+Daraz,bangla,same products,eval_per100,post_chatgpt - pre_chatgpt,375,904,0.27169988762069086,-0.1474574694597639,0.7240360720663007,no clear change
+Daraz,bangla,baseline pre-2022 only,eval_per100,post_chatgpt - pre_chatgpt,598,729,0.4580711796308924,0.11604351406399892,0.8067900024622353,increase
+Daraz,bangla,placebo,eval_per100,jan_nov_2022 - pre_2022,175,729,0.3032810373562148,-0.23943147698739622,0.9039826077875588,no clear change
+Daraz,bangla,all,has_formal,post_chatgpt - pre_chatgpt,598,904,-0.011620593719477906,-0.04609391185959097,0.02342006540977298,no clear change
+Daraz,bangla,words>10,has_formal,post_chatgpt - pre_chatgpt,366,522,0.004051253061993582,-0.051410872432636145,0.05734642924439417,no clear change
+Daraz,bangla,words>25,has_formal,post_chatgpt - pre_chatgpt,111,124,0.055361813426329565,-0.05608834641092708,0.1639784946236559,no clear change
+Daraz,bangla,same products,has_formal,post_chatgpt - pre_chatgpt,375,904,-0.03642772861356931,-0.07708311209439528,0.0030654129793510096,no clear change
+Daraz,bangla,baseline pre-2022 only,has_formal,post_chatgpt - pre_chatgpt,598,729,-0.01423813259562054,-0.05351268058594949,0.022293906070073522,no clear change
+Daraz,bangla,placebo,has_formal,jan_nov_2022 - pre_2022,175,729,-0.013521457965902428,-0.06930393885949442,0.04568097197726823,no clear change
+Daraz,bangla,all,has_control,post_chatgpt - pre_chatgpt,598,904,0.0808447035842188,0.03697908959067097,0.12481131796252998,increase
+Daraz,bangla,words>10,has_control,post_chatgpt - pre_chatgpt,366,522,0.08425978267696743,0.032598454870925164,0.13267539727404046,increase
+Daraz,bangla,words>25,has_control,post_chatgpt - pre_chatgpt,111,124,0.12525428654460913,0.050784655623365316,0.19877942458587627,increase
+Daraz,bangla,same products,has_control,post_chatgpt - pre_chatgpt,375,904,0.061852507374631216,0.00857175516224189,0.11443864306784648,increase
+Daraz,bangla,baseline pre-2022 only,has_control,post_chatgpt - pre_chatgpt,598,729,0.09258341706006767,0.04819190396887655,0.13931864789352708,increase
+Daraz,bangla,placebo,has_control,jan_nov_2022 - pre_2022,175,729,0.06063883989809915,-0.008628061924358174,0.133098177542622,no clear change
+Daraz,bangla,all,control_per100,post_chatgpt - pre_chatgpt,598,904,1.5478125938244496,0.6089004699767447,2.500287374450117,increase
+Daraz,bangla,words>10,control_per100,post_chatgpt - pre_chatgpt,366,522,1.6596197529142618,0.795294761565723,2.5484687231665175,increase
+Daraz,bangla,words>25,control_per100,post_chatgpt - pre_chatgpt,111,124,2.2032803709641993,1.0272236682749334,3.34306742146923,increase
+Daraz,bangla,same products,control_per100,post_chatgpt - pre_chatgpt,375,904,1.4019028455460116,0.2710808662679817,2.5364832705226568,increase
+Daraz,bangla,baseline pre-2022 only,control_per100,post_chatgpt - pre_chatgpt,598,729,1.8667238312655687,0.9014772425002662,2.8650390568911535,increase
+Daraz,bangla,placebo,control_per100,jan_nov_2022 - pre_2022,175,729,1.6474043351244188,0.21534179935378417,3.2543618034925634,increase
+Daraz,banglish,all,has_eval,post_chatgpt - pre_chatgpt,254,376,-0.038490534427877365,-0.08998837745015914,0.012795275590551186,no clear change
+Daraz,banglish,words>10,has_eval,post_chatgpt - pre_chatgpt,144,202,-0.034447194719471955,-0.1027915291529153,0.03293454345434543,no clear change
+Daraz,banglish,words>25,has_eval,post_chatgpt - pre_chatgpt,32,33,-0.027462121212121215,-0.17992424242424243,0.1268939393939394,no clear change
+Daraz,banglish,same products,has_eval,post_chatgpt - pre_chatgpt,124,376,-0.020075497597803707,-0.08425060054907343,0.04942304392587506,no clear change
+Daraz,banglish,baseline pre-2022 only,has_eval,post_chatgpt - pre_chatgpt,254,303,-0.030924352277747452,-0.0856526597541644,0.021647046594423236,no clear change
+Daraz,banglish,placebo,has_eval,jan_nov_2022 - pre_2022,73,303,0.038971020389710204,-0.04652109046521091,0.1338668113386681,no clear change
+Daraz,banglish,all,eval_per100,post_chatgpt - pre_chatgpt,254,376,-0.3959666697839218,-0.9399999379528425,0.13862744060056578,no clear change
+Daraz,banglish,words>10,eval_per100,post_chatgpt - pre_chatgpt,144,202,-0.18230659987111486,-0.6656159944713799,0.365180918338441,no clear change
+Daraz,banglish,words>25,eval_per100,post_chatgpt - pre_chatgpt,32,33,-0.05518948060986373,-0.3944270756932774,0.2940359169622722,no clear change
+Daraz,banglish,same products,eval_per100,post_chatgpt - pre_chatgpt,124,376,-0.25193782236436424,-0.9293075572552885,0.420690649088225,no clear change
+Daraz,banglish,baseline pre-2022 only,eval_per100,post_chatgpt - pre_chatgpt,254,303,-0.4036227313050592,-0.9838610357046355,0.1690147758361522,no clear change
+Daraz,banglish,placebo,eval_per100,jan_nov_2022 - pre_2022,73,303,-0.03943396071161143,-0.8640806751480579,0.8856673133698642,no clear change
+Daraz,banglish,all,has_formal,post_chatgpt - pre_chatgpt,254,376,0.003937007874015748,0.0,0.011811023622047244,no clear change
+Daraz,banglish,words>10,has_formal,post_chatgpt - pre_chatgpt,144,202,0.006944444444444444,0.0,0.020833333333333332,no clear change
+Daraz,banglish,words>25,has_formal,post_chatgpt - pre_chatgpt,32,33,0.0,0.0,0.0,no clear change
+Daraz,banglish,same products,has_formal,post_chatgpt - pre_chatgpt,124,376,0.008064516129032258,0.0,0.024193548387096774,no clear change
+Daraz,banglish,baseline pre-2022 only,has_formal,post_chatgpt - pre_chatgpt,254,303,0.003937007874015748,0.0,0.011811023622047244,no clear change
+Daraz,banglish,placebo,has_formal,jan_nov_2022 - pre_2022,73,303,0.0,0.0,0.0,no clear change
+Daraz,banglish,all,has_control,post_chatgpt - pre_chatgpt,254,376,0.08343106047914228,0.005444798123638739,0.1576038699949739,increase
+Daraz,banglish,words>10,has_control,post_chatgpt - pre_chatgpt,144,202,0.11138613861386137,0.01716515401540153,0.2075099697469747,increase
+Daraz,banglish,words>25,has_control,post_chatgpt - pre_chatgpt,32,33,0.11647727272727271,-0.07256155303030304,0.30208333333333337,no clear change
+Daraz,banglish,same products,has_control,post_chatgpt - pre_chatgpt,124,376,0.07035003431708997,-0.031580301990391225,0.16952642415923125,no clear change
+Daraz,banglish,baseline pre-2022 only,has_control,post_chatgpt - pre_chatgpt,254,303,0.09133078662196925,0.010380122657935118,0.17094150359917887,increase
+Daraz,banglish,placebo,has_control,jan_nov_2022 - pre_2022,73,303,0.04068900040688994,-0.09103259641032595,0.16401396989013947,no clear change
+Daraz,banglish,all,control_per100,post_chatgpt - pre_chatgpt,254,376,1.690546603921324,0.35426791879613906,3.0313778976361636,increase
+Daraz,banglish,words>10,control_per100,post_chatgpt - pre_chatgpt,144,202,2.441009612841695,0.9174905103925179,3.931476256868099,increase
+Daraz,banglish,words>25,control_per100,post_chatgpt - pre_chatgpt,32,33,2.827553102992142,0.6165668881059372,5.123079651744155,increase
+Daraz,banglish,same products,control_per100,post_chatgpt - pre_chatgpt,124,376,1.6975625725750279,0.10059426931352689,3.4716530120302584,increase
+Daraz,banglish,baseline pre-2022 only,control_per100,post_chatgpt - pre_chatgpt,254,303,1.864744455956,0.5062566929897973,3.2805638613466845,increase
+Daraz,banglish,placebo,control_per100,jan_nov_2022 - pre_2022,73,303,0.897238251575863,-1.0686455727561153,2.9828885375579315,no clear change
+Daraz,english,all,has_eval,post_chatgpt - pre_chatgpt,377,871,0.05621758581099806,0.020582762579674566,0.09165544954273722,increase
+Daraz,english,words>10,has_eval,post_chatgpt - pre_chatgpt,194,375,0.041044673539518906,-0.013347079037800691,0.09775017182130581,no clear change
+Daraz,english,words>25,has_eval,post_chatgpt - pre_chatgpt,72,71,0.0964397496087637,-0.0007824726134585333,0.1942488262910798,no clear change
+Daraz,english,same products,has_eval,post_chatgpt - pre_chatgpt,192,871,0.025395857252200546,-0.0175117501435132,0.07210551808266359,no clear change
+Daraz,english,baseline pre-2022 only,has_eval,post_chatgpt - pre_chatgpt,377,760,0.05620550048862208,0.019132521289962304,0.09341136744380832,increase
+Daraz,english,placebo,has_eval,jan_nov_2022 - pre_2022,111,760,-9.483167377905e-05,-0.04402560455192034,0.05194997629208145,no clear change
+Daraz,english,all,eval_per100,post_chatgpt - pre_chatgpt,377,871,0.63743596164798,0.17402832665307078,1.1271993251499748,increase
+Daraz,english,words>10,eval_per100,post_chatgpt - pre_chatgpt,194,375,0.0948095072830546,-0.28325158838587633,0.4882728335319017,no clear change
+Daraz,english,words>25,eval_per100,post_chatgpt - pre_chatgpt,72,71,0.18483301191190202,-0.16326126828352117,0.5128617565720267,no clear change
+Daraz,english,same products,eval_per100,post_chatgpt - pre_chatgpt,192,871,0.40360880817002676,-0.2163954999957137,1.0791917240342517,no clear change
+Daraz,english,baseline pre-2022 only,eval_per100,post_chatgpt - pre_chatgpt,377,760,0.6623593129686403,0.19185127286745726,1.1813800583251803,increase
+Daraz,english,placebo,eval_per100,jan_nov_2022 - pre_2022,111,760,0.1955697207233792,-0.4144085766376684,0.9468626490025622,no clear change
+Daraz,english,all,has_control,post_chatgpt - pre_chatgpt,377,871,0.030088285363632727,-0.007563640682529088,0.0673047230690051,no clear change
+Daraz,english,words>10,has_control,post_chatgpt - pre_chatgpt,194,375,0.015120274914089293,-0.024522336769759456,0.05440549828178698,no clear change
+Daraz,english,words>25,has_control,post_chatgpt - pre_chatgpt,72,71,0.04225352112676062,0.0,0.09859154929577463,no clear change
+Daraz,english,same products,has_control,post_chatgpt - pre_chatgpt,192,871,-0.03578262533486409,-0.09539711299272864,0.01798100841944128,no clear change
+Daraz,english,baseline pre-2022 only,has_control,post_chatgpt - pre_chatgpt,377,760,0.03078319140025121,-0.007606624319419266,0.07169831076364652,no clear change
+Daraz,english,placebo,has_control,jan_nov_2022 - pre_2022,111,760,0.0054528212422948474,-0.06267188240872446,0.06852092223802742,no clear change
+Daraz,english,all,control_per100,post_chatgpt - pre_chatgpt,377,871,0.26967025981723225,-1.0458259976110607,1.6691480911685257,no clear change
+Daraz,english,words>10,control_per100,post_chatgpt - pre_chatgpt,194,375,0.7483873360689692,-0.7711895571481832,2.3610811104678544,no clear change
+Daraz,english,words>25,control_per100,post_chatgpt - pre_chatgpt,72,71,2.6204218068433107,0.6417477481340953,4.677957227129533,increase
+Daraz,english,same products,control_per100,post_chatgpt - pre_chatgpt,192,871,-1.965283571238663,-3.7092006318797988,-0.36907537220240855,decrease
+Daraz,english,baseline pre-2022 only,control_per100,post_chatgpt - pre_chatgpt,377,760,0.40944965450806237,-0.9833091873588069,1.7855396075899064,no clear change
+Daraz,english,placebo,control_per100,jan_nov_2022 - pre_2022,111,760,1.0968275024839116,-1.2573634784568422,3.3543053055092473,no clear change
+Rokomari,bangla,all,has_eval,post_chatgpt - pre_chatgpt,342,927,-0.030290126611025925,-0.09175041162777497,0.03163501391017988,no clear change
+Rokomari,bangla,words>10,has_eval,post_chatgpt - pre_chatgpt,237,768,-0.030557753164556944,-0.10296471189345989,0.0412776898734177,no clear change
+Rokomari,bangla,words>25,has_eval,post_chatgpt - pre_chatgpt,111,585,0.05599445599445596,-0.04389350889350892,0.15852044352044353,no clear change
+Rokomari,bangla,same products,has_eval,post_chatgpt - pre_chatgpt,340,927,-0.03090932165746557,-0.09267656577193985,0.02920085348055076,no clear change
+Rokomari,bangla,baseline pre-2022 only,has_eval,post_chatgpt - pre_chatgpt,342,808,-0.05575820739968734,-0.12179466301893345,0.004873234033929685,no clear change
+Rokomari,bangla,placebo,has_eval,jan_nov_2022 - pre_2022,119,808,-0.19839420916881606,-0.28048402529328564,-0.10965710541642408,decrease
+Rokomari,bangla,all,eval_per100,post_chatgpt - pre_chatgpt,342,927,1.050578339291406,0.5057656666176552,1.6363795664171836,increase
+Rokomari,bangla,words>10,eval_per100,post_chatgpt - pre_chatgpt,237,768,0.6286060455564659,0.23162099073323805,1.028666207124405,increase
+Rokomari,bangla,words>25,eval_per100,post_chatgpt - pre_chatgpt,111,585,0.5847009585805837,0.21932192372782955,0.9573221092759099,increase
+Rokomari,bangla,same products,eval_per100,post_chatgpt - pre_chatgpt,340,927,1.0533018259930247,0.5087967350185068,1.6323322306648946,increase
+Rokomari,bangla,baseline pre-2022 only,eval_per100,post_chatgpt - pre_chatgpt,342,808,1.116359460276542,0.5609755389002901,1.6993228054633993,increase
+Rokomari,bangla,placebo,eval_per100,jan_nov_2022 - pre_2022,119,808,0.5124294046489164,-0.2800261749280019,1.3293766570224994,no clear change
+Rokomari,bangla,all,has_formal,post_chatgpt - pre_chatgpt,342,927,-0.17492761028785558,-0.23747303128371083,-0.11176545733265217,decrease
+Rokomari,bangla,words>10,has_formal,post_chatgpt - pre_chatgpt,237,768,-0.1600903217299578,-0.23578380472046415,-0.08856020899261616,decrease
+Rokomari,bangla,words>25,has_formal,post_chatgpt - pre_chatgpt,111,585,-0.16170016170016177,-0.26376761376761376,-0.06568491568491575,decrease
+Rokomari,bangla,same products,has_formal,post_chatgpt - pre_chatgpt,340,927,-0.1758392029951139,-0.23409178881908754,-0.11141633352370078,decrease
+Rokomari,bangla,baseline pre-2022 only,has_formal,post_chatgpt - pre_chatgpt,342,808,-0.2106638295408489,-0.2720677001910718,-0.14970325979966428,decrease
+Rokomari,bangla,placebo,has_formal,jan_nov_2022 - pre_2022,119,808,-0.27838214493718283,-0.3644333971212247,-0.18466360554122666,decrease
+Rokomari,bangla,all,has_control,post_chatgpt - pre_chatgpt,342,927,-0.06540623403168111,-0.11206353261795256,-0.021091665247260555,decrease
+Rokomari,bangla,words>10,has_control,post_chatgpt - pre_chatgpt,237,768,-0.06147811181434604,-0.10956289556962029,-0.017927132779535844,decrease
+Rokomari,bangla,words>25,has_control,post_chatgpt - pre_chatgpt,111,585,-0.05590205590205588,-0.11601640101640108,-0.006179256179256195,decrease
+Rokomari,bangla,same products,has_control,post_chatgpt - pre_chatgpt,340,927,-0.0664382257757472,-0.11115338853988199,-0.02496414747128623,decrease
+Rokomari,bangla,baseline pre-2022 only,has_control,post_chatgpt - pre_chatgpt,342,808,-0.08137919055063403,-0.12771408719819355,-0.0354872329338198,decrease
+Rokomari,bangla,placebo,has_control,jan_nov_2022 - pre_2022,119,808,-0.12442798901738916,-0.2028064938846826,-0.04950885056993098,decrease
+Rokomari,bangla,all,control_per100,post_chatgpt - pre_chatgpt,342,927,2.318179115267415,1.2217754247624562,3.4881973049697232,increase
+Rokomari,bangla,words>10,control_per100,post_chatgpt - pre_chatgpt,237,768,1.7384025484573238,0.7187916944005729,2.842364071330115,increase
+Rokomari,bangla,words>25,control_per100,post_chatgpt - pre_chatgpt,111,585,-0.01734128093391174,-0.8208777235000375,0.8142695466366141,no clear change
+Rokomari,bangla,same products,control_per100,post_chatgpt - pre_chatgpt,340,927,2.2939812990840673,1.2172108907423096,3.418111933029438,increase
+Rokomari,bangla,baseline pre-2022 only,control_per100,post_chatgpt - pre_chatgpt,342,808,2.745495541015016,1.6093352696729069,3.830496176074209,increase
+Rokomari,bangla,placebo,control_per100,jan_nov_2022 - pre_2022,119,808,3.328759047630477,1.549831296970776,5.173495623973349,increase
+Rokomari,english,all,has_eval,post_chatgpt - pre_chatgpt,68,161,0.062385823894775316,-0.03828781512605042,0.1653681037632442,no clear change
+Rokomari,english,words>10,has_eval,post_chatgpt - pre_chatgpt,31,94,0.13040494166094715,-0.030542210020590266,0.3129718599862732,no clear change
+Rokomari,english,words>25,has_eval,post_chatgpt - pre_chatgpt,7,47,-0.006079027355623101,-0.23404255319148937,0.3009118541033434,no clear change
+Rokomari,english,same products,has_eval,post_chatgpt - pre_chatgpt,65,161,0.05446727185857622,-0.04758719541328235,0.15037028189202073,no clear change
+Rokomari,english,baseline pre-2022 only,has_eval,post_chatgpt - pre_chatgpt,68,126,0.05859010270774978,-0.045518207282913156,0.1627275910364144,no clear change
+Rokomari,english,placebo,has_eval,jan_nov_2022 - pre_2022,35,126,-0.017460317460317454,-0.11428571428571428,0.1,no clear change
+Rokomari,english,all,eval_per100,post_chatgpt - pre_chatgpt,68,161,0.982949859518651,0.033639464835210464,2.1032570821361363,increase
+Rokomari,english,words>10,eval_per100,post_chatgpt - pre_chatgpt,31,94,1.3498747106162736,0.12006430174857663,2.7696291017944907,increase
+Rokomari,english,words>25,eval_per100,post_chatgpt - pre_chatgpt,7,47,0.2485850978371767,-0.6309272704702971,1.5539258452552134,no clear change
+Rokomari,english,same products,eval_per100,post_chatgpt - pre_chatgpt,65,161,0.9838235556730615,-0.03015486325925786,2.1682549025222495,no clear change
+Rokomari,english,baseline pre-2022 only,eval_per100,post_chatgpt - pre_chatgpt,68,126,0.9828759878207014,-0.00346934364986297,2.1496626275890627,no clear change
+Rokomari,english,placebo,eval_per100,jan_nov_2022 - pre_2022,35,126,-0.0003398098105682479,-0.7334791811589366,0.8408821805770651,no clear change
+Rokomari,english,all,has_control,post_chatgpt - pre_chatgpt,68,161,-0.06695286810376322,-0.18003288271830475,0.037632444282060584,no clear change
+Rokomari,english,words>10,has_control,post_chatgpt - pre_chatgpt,31,94,0.010295126973232649,-0.07549759780370624,0.07446808510638303,no clear change
+Rokomari,english,words>25,has_control,post_chatgpt - pre_chatgpt,7,47,0.0,0.0,0.0,no clear change
+Rokomari,english,same products,has_control,post_chatgpt - pre_chatgpt,65,161,-0.060391782130912564,-0.17167940754897273,0.04758719541328238,no clear change
+Rokomari,english,baseline pre-2022 only,has_control,post_chatgpt - pre_chatgpt,68,126,-0.10387488328664796,-0.2226890756302521,-0.0009045284780580459,decrease
+Rokomari,english,placebo,has_control,jan_nov_2022 - pre_2022,35,126,-0.1698412698412698,-0.3285714285714286,-0.026904761904762355,decrease
+Rokomari,english,all,control_per100,post_chatgpt - pre_chatgpt,68,161,-0.975867067764538,-3.7457410269704075,1.7995734800500387,no clear change
+Rokomari,english,words>10,control_per100,post_chatgpt - pre_chatgpt,31,94,0.27656318664916135,-2.297765643960833,3.043166830074904,no clear change
+Rokomari,english,words>25,control_per100,post_chatgpt - pre_chatgpt,7,47,-1.4351048658936456,-3.8073116772330837,1.1632785028569748,no clear change
+Rokomari,english,same products,control_per100,post_chatgpt - pre_chatgpt,65,161,-1.077363470046615,-3.860802585140535,1.7248182749375478,no clear change
+Rokomari,english,baseline pre-2022 only,control_per100,post_chatgpt - pre_chatgpt,68,126,-1.2487538115352965,-4.2311292125881,1.5574553778801021,no clear change
+Rokomari,english,placebo,control_per100,jan_nov_2022 - pre_2022,35,126,-1.2552790213454887,-5.354010981457406,2.737647133782917,no clear change
+Shajgoj,bangla,all,has_eval,post_chatgpt - pre_chatgpt,188,148,-0.058654399079931,-0.13599769982748708,0.01667625071880391,no clear change
+Shajgoj,bangla,words>10,has_eval,post_chatgpt - pre_chatgpt,115,117,-0.04845782237086585,-0.15117428465254554,0.04704942400594572,no clear change
+Shajgoj,bangla,words>25,has_eval,post_chatgpt - pre_chatgpt,44,44,-0.022727272727272763,-0.20454545454545456,0.1590909090909091,no clear change
+Shajgoj,bangla,same products,has_eval,post_chatgpt - pre_chatgpt,185,148,-0.062162162162162166,-0.13648648648648648,0.014898648648648465,no clear change
+Shajgoj,bangla,baseline pre-2022 only,has_eval,post_chatgpt - pre_chatgpt,188,81,-0.09285526661413185,-0.1969874573154715,0.00785231153138936,no clear change
+Shajgoj,bangla,placebo,has_eval,jan_nov_2022 - pre_2022,67,81,-0.07554818500092131,-0.19439837847798047,0.04330200847613783,no clear change
+Shajgoj,bangla,all,eval_per100,post_chatgpt - pre_chatgpt,188,148,-0.12415864326995818,-0.6624689776802168,0.4221805812927625,no clear change
+Shajgoj,bangla,words>10,eval_per100,post_chatgpt - pre_chatgpt,115,117,-0.1390355149969802,-0.7918447058502117,0.5058910613577533,no clear change
+Shajgoj,bangla,words>25,eval_per100,post_chatgpt - pre_chatgpt,44,44,0.25486272072750604,-0.226402593498914,0.7836698517283629,no clear change
+Shajgoj,bangla,same products,eval_per100,post_chatgpt - pre_chatgpt,185,148,-0.16157848136803643,-0.6426729752210291,0.36300267113584234,no clear change
+Shajgoj,bangla,baseline pre-2022 only,eval_per100,post_chatgpt - pre_chatgpt,188,81,-0.3446005620709556,-1.0952685962643622,0.330971646280628,no clear change
+Shajgoj,bangla,placebo,eval_per100,jan_nov_2022 - pre_2022,67,81,-0.48694632809772564,-1.2433062296591564,0.22452828194485874,no clear change
+Shajgoj,bangla,all,has_formal,post_chatgpt - pre_chatgpt,188,148,-0.07849338700402529,-0.14994249568717655,-0.007044278320874078,decrease
+Shajgoj,bangla,words>10,has_formal,post_chatgpt - pre_chatgpt,115,117,-0.057599405425492384,-0.1522110739502044,0.03686733556298773,no clear change
+Shajgoj,bangla,words>25,has_formal,post_chatgpt - pre_chatgpt,44,44,-0.06818181818181815,-0.25,0.11363636363636362,no clear change
+Shajgoj,bangla,same products,has_formal,post_chatgpt - pre_chatgpt,185,148,-0.08243243243243242,-0.1581081081081081,-0.010810810810810811,decrease
+Shajgoj,bangla,baseline pre-2022 only,has_formal,post_chatgpt - pre_chatgpt,188,81,-0.03303125820856316,-0.12306277909114788,0.046361964801681116,no clear change
+Shajgoj,bangla,placebo,has_formal,jan_nov_2022 - pre_2022,67,81,0.1004238068914686,-0.021006080707573233,0.22959277685645846,no clear change
+Shajgoj,bangla,all,has_control,post_chatgpt - pre_chatgpt,188,148,0.028464634847613524,-0.06815339275445659,0.12406555491661875,no clear change
+Shajgoj,bangla,words>10,has_control,post_chatgpt - pre_chatgpt,115,117,0.06555183946488286,-0.046005202526941624,0.1610906726124107,no clear change
+Shajgoj,bangla,words>25,has_control,post_chatgpt - pre_chatgpt,44,44,0.09090909090909094,0.022727272727272707,0.18181818181818177,increase
+Shajgoj,bangla,same products,has_control,post_chatgpt - pre_chatgpt,185,148,0.02972972972972976,-0.06354729729729731,0.12570945945945933,no clear change
+Shajgoj,bangla,baseline pre-2022 only,has_control,post_chatgpt - pre_chatgpt,188,81,0.016285789335434675,-0.09311794063567114,0.13804012345679018,no clear change
+Shajgoj,bangla,placebo,has_control,jan_nov_2022 - pre_2022,67,81,-0.026902524414962214,-0.17764418647503222,0.11208310300350068,no clear change
+Shajgoj,bangla,all,control_per100,post_chatgpt - pre_chatgpt,188,148,0.955820189654462,-1.0138270136879637,2.858171900221704,no clear change
+Shajgoj,bangla,words>10,control_per100,post_chatgpt - pre_chatgpt,115,117,0.9212126868096222,-0.735827345945436,2.583175890780922,no clear change
+Shajgoj,bangla,words>25,control_per100,post_chatgpt - pre_chatgpt,44,44,1.3761638917713883,-0.1306778644733784,3.068313345057091,no clear change
+Shajgoj,bangla,same products,control_per100,post_chatgpt - pre_chatgpt,185,148,1.0157909318737737,-0.8965145315732439,3.025877475454535,no clear change
+Shajgoj,bangla,baseline pre-2022 only,control_per100,post_chatgpt - pre_chatgpt,188,81,1.3923188192529015,-1.0828758654448942,3.516317158048699,no clear change
+Shajgoj,bangla,placebo,control_per100,jan_nov_2022 - pre_2022,67,81,0.9642059280681927,-2.048906735090094,4.052469719376511,no clear change
+Shajgoj,banglish,all,has_eval,post_chatgpt - pre_chatgpt,491,531,0.0004717686722588432,-0.04591881743319486,0.050209706928095496,no clear change
+Shajgoj,banglish,words>10,has_eval,post_chatgpt - pre_chatgpt,313,361,-0.004132999389342723,-0.06206623419149859,0.059141937996159015,no clear change
+Shajgoj,banglish,words>25,has_eval,post_chatgpt - pre_chatgpt,71,111,-0.03476716152772491,-0.1659973353635326,0.09478492577084124,no clear change
+Shajgoj,banglish,same products,has_eval,post_chatgpt - pre_chatgpt,490,531,0.0008416926092471022,-0.04656981436642453,0.048718628694415574,no clear change
+Shajgoj,banglish,baseline pre-2022 only,has_eval,post_chatgpt - pre_chatgpt,491,291,0.01287784939915032,-0.04312994729880109,0.06583363078365906,no clear change
+Shajgoj,banglish,placebo,has_eval,jan_nov_2022 - pre_2022,240,291,0.02744845360824741,-0.0370350085910653,0.09339776632302402,no clear change
+Shajgoj,banglish,all,eval_per100,post_chatgpt - pre_chatgpt,491,531,0.31074693270033293,-0.1830697694946225,0.8193048394684992,no clear change
+Shajgoj,banglish,words>10,eval_per100,post_chatgpt - pre_chatgpt,313,361,0.1785281301707471,-0.28498009795608714,0.6347167543894819,no clear change
+Shajgoj,banglish,words>25,eval_per100,post_chatgpt - pre_chatgpt,71,111,-0.17699236708422061,-0.8630409348913054,0.47193812505554317,no clear change
+Shajgoj,banglish,same products,eval_per100,post_chatgpt - pre_chatgpt,490,531,0.31417350191984883,-0.1524895561631806,0.8194009698477867,no clear change
+Shajgoj,banglish,baseline pre-2022 only,eval_per100,post_chatgpt - pre_chatgpt,491,291,0.5040779652983121,-0.03410594546368393,1.0206366832682312,no clear change
+Shajgoj,banglish,placebo,eval_per100,jan_nov_2022 - pre_2022,240,291,0.427744909623029,-0.16848340889772065,1.054034559908384,no clear change
+Shajgoj,banglish,all,has_formal,post_chatgpt - pre_chatgpt,491,531,0.00015342070642564262,-0.005649717514124294,0.006109979633401222,no clear change
+Shajgoj,banglish,words>10,has_formal,post_chatgpt - pre_chatgpt,313,361,0.0004248050764206631,-0.008310249307479225,0.009584664536741214,no clear change
+Shajgoj,banglish,words>25,has_formal,post_chatgpt - pre_chatgpt,71,111,-0.009009009009009009,-0.02702702702702703,0.0,no clear change
+Shajgoj,banglish,same products,has_formal,post_chatgpt - pre_chatgpt,490,531,0.0001575771551558479,-0.005492140358968446,0.006122448979591836,no clear change
+Shajgoj,banglish,baseline pre-2022 only,has_formal,post_chatgpt - pre_chatgpt,491,291,0.002036659877800407,0.0,0.006109979633401222,no clear change
+Shajgoj,banglish,placebo,has_formal,jan_nov_2022 - pre_2022,240,291,0.004166666666666667,0.0,0.0125,no clear change
+Shajgoj,banglish,all,has_control,post_chatgpt - pre_chatgpt,491,531,-0.01856390547750275,-0.0699866907537176,0.033365168129916585,no clear change
+Shajgoj,banglish,words>10,has_control,post_chatgpt - pre_chatgpt,313,361,-0.053835193330560305,-0.1066703247103803,-0.0014248670271610475,decrease
+Shajgoj,banglish,words>25,has_control,post_chatgpt - pre_chatgpt,71,111,-0.07664002030199213,-0.15607156452226878,-0.0011419870574800317,decrease
+Shajgoj,banglish,same products,has_control,post_chatgpt - pre_chatgpt,490,531,-0.019066835773857482,-0.06929561089972715,0.03178830854375647,no clear change
+Shajgoj,banglish,baseline pre-2022 only,has_control,post_chatgpt - pre_chatgpt,491,291,-0.08148739160560192,-0.13978398107516038,-0.026879361146688513,decrease
+Shajgoj,banglish,placebo,has_control,jan_nov_2022 - pre_2022,240,291,-0.1392182130584193,-0.213794029209622,-0.0661082474226804,decrease
+Shajgoj,banglish,all,control_per100,post_chatgpt - pre_chatgpt,491,531,-0.8247404130255305,-1.9786955337258156,0.4028467357273348,no clear change
+Shajgoj,banglish,words>10,control_per100,post_chatgpt - pre_chatgpt,313,361,-1.378621991780209,-2.5765350302048713,-0.12322439667234257,decrease
+Shajgoj,banglish,words>25,control_per100,post_chatgpt - pre_chatgpt,71,111,-1.0406195832092635,-2.8369702538494193,0.7689059759752229,no clear change
+Shajgoj,banglish,same products,control_per100,post_chatgpt - pre_chatgpt,490,531,-0.8172983729745464,-1.93657987357519,0.30224944058405784,no clear change
+Shajgoj,banglish,baseline pre-2022 only,control_per100,post_chatgpt - pre_chatgpt,491,291,-2.1558502565015782,-3.5407848043924184,-0.8058699932710296,decrease
+Shajgoj,banglish,placebo,control_per100,jan_nov_2022 - pre_2022,240,291,-2.9450805286907524,-4.582657783359748,-1.234736754607655,decrease
+Shajgoj,english,all,has_eval,post_chatgpt - pre_chatgpt,249,493,0.019387896413239167,-0.021058880552636505,0.0616991291738964,no clear change
+Shajgoj,english,words>10,has_eval,post_chatgpt - pre_chatgpt,128,304,0.03289473684210527,-0.031661184210526314,0.10033922697368415,no clear change
+Shajgoj,english,words>25,has_eval,post_chatgpt - pre_chatgpt,38,97,-0.0035268583830710826,-0.09739555073250136,0.10743353228431904,no clear change
+Shajgoj,english,same products,has_eval,post_chatgpt - pre_chatgpt,249,493,0.019387896413239167,-0.02280419853857621,0.06174087832058456,no clear change
+Shajgoj,english,baseline pre-2022 only,has_eval,post_chatgpt - pre_chatgpt,249,315,0.018512143813348633,-0.024648116274622305,0.062497609485561295,no clear change
+Shajgoj,english,placebo,has_eval,jan_nov_2022 - pre_2022,178,315,-0.002425539504191193,-0.04858212948100589,0.04253031924380232,no clear change
+Shajgoj,english,all,eval_per100,post_chatgpt - pre_chatgpt,249,493,0.25239878240335223,-0.1440670993460885,0.6675361282175911,no clear change
+Shajgoj,english,words>10,eval_per100,post_chatgpt - pre_chatgpt,128,304,0.2517545062793276,-0.2147865584389148,0.7204012900736146,no clear change
+Shajgoj,english,words>25,eval_per100,post_chatgpt - pre_chatgpt,38,97,0.012370493651467196,-0.4200351133662215,0.5072264455468994,no clear change
+Shajgoj,english,same products,eval_per100,post_chatgpt - pre_chatgpt,249,493,0.25239878240335223,-0.12552922146414458,0.6514609415579198,no clear change
+Shajgoj,english,baseline pre-2022 only,eval_per100,post_chatgpt - pre_chatgpt,249,315,0.27365787766625443,-0.1262856214564983,0.7054564782541317,no clear change
+Shajgoj,english,placebo,eval_per100,jan_nov_2022 - pre_2022,178,315,0.058880527891071954,-0.3460319510618257,0.5129754415385771,no clear change
+Shajgoj,english,all,has_control,post_chatgpt - pre_chatgpt,249,493,-0.047541077087253636,-0.09780297661233162,-0.005228826054726019,decrease
+Shajgoj,english,words>10,has_control,post_chatgpt - pre_chatgpt,128,304,-0.014802631578947345,-0.05139802631578949,0.016447368421052655,no clear change
+Shajgoj,english,words>25,has_control,post_chatgpt - pre_chatgpt,38,97,0.0,0.0,0.0,no clear change
+Shajgoj,english,same products,has_control,post_chatgpt - pre_chatgpt,249,493,-0.047541077087253636,-0.09200269638391285,-0.003038523261402637,decrease
+Shajgoj,english,baseline pre-2022 only,has_control,post_chatgpt - pre_chatgpt,249,315,-0.04578313253012045,-0.09462612354178612,0.0015681774717919428,no clear change
+Shajgoj,english,placebo,has_control,jan_nov_2022 - pre_2022,178,315,0.004868913857677848,-0.040556447298020326,0.048850098091671096,no clear change
+Shajgoj,english,all,control_per100,post_chatgpt - pre_chatgpt,249,493,0.15596210232834196,-1.6708214757021007,1.9025329570052025,no clear change
+Shajgoj,english,words>10,control_per100,post_chatgpt - pre_chatgpt,128,304,0.5126133205063859,-1.146664786764337,2.147920803025376,no clear change
+Shajgoj,english,words>25,control_per100,post_chatgpt - pre_chatgpt,38,97,0.9347893428321044,-1.299147954454933,3.2470921017635077,no clear change
+Shajgoj,english,same products,control_per100,post_chatgpt - pre_chatgpt,249,493,0.15596210232834196,-1.599101236368373,1.9831459279894557,no clear change
+Shajgoj,english,baseline pre-2022 only,control_per100,post_chatgpt - pre_chatgpt,249,315,-0.08469495720764186,-1.995723189587842,1.7582171501321662,no clear change
+Shajgoj,english,placebo,control_per100,jan_nov_2022 - pre_2022,178,315,-0.6665389345575186,-2.7629957464289334,1.4885967348499658,no clear change
