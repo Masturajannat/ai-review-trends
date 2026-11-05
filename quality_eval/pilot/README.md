@@ -16,7 +16,7 @@ main sample or in the final human check, because the prompt may be adjusted afte
 | Checks | Stability between two runs; score distribution; manual read of about 30 scored reviews | Blind human check (pairs and single scores); length and language bias; stability again on a larger sample |
 | Prompt | May still change (`prompt_v2.txt`) | Frozen; the final pilot version |
 | Folder | `pilot/` | `main/` |
-| Scripts | 01, 03, 04 | 02, 03, 04, 05, 06 |
+| Scripts | 01, 03, 04, 07 | 02, 03, 04, 05, 06, 07 |
 | State | Scored; stability passed; manual read pending | Not started |
 
 The reviews come from `trend_analysis/data/reviews_all.csv` of the `ai-review-trends` project
@@ -94,6 +94,7 @@ $env:GEMINI_API_KEY = "<key>"                          # never commit API keys
 python scripts\01_make_pilot_sample.py                  # already done; the sample is in pilot\data
 python scripts\03_score.py --folder pilot --runs 2      # about 15 minutes, resumable
 python scripts\04_summarize.py --folder pilot           # table, summary and figures
+python scripts\07_make_page.py                         # readable page of all reviews, for the manual read
 ```
 
 Set the key in the same PowerShell window that runs the scoring. `set GEMINI_API_KEY=...` is
@@ -117,6 +118,7 @@ main run. They find their own folders, so they can be started from any directory
 | `04_summarize.py` | both | Builds the wide table, the stability summary and the figures |
 | `05_make_check_sheets.py` | main | Builds the blind sheets for the human check (pairs of high- and middle-scored reviews, and single reviews to score by hand) |
 | `06_check_results.py` | main | Compares the human judgments with the Gemini scores |
+| `07_make_page.py` | both | Builds a readable HTML page of all scored reviews, for reading them in a browser |
 
 ### `01_make_pilot_sample.py`
 
@@ -169,6 +171,18 @@ python scripts\04_summarize.py --folder pilot --version prompt_v1
 Reads `scores_raw.csv` and writes the wide table, `stability_summary.txt` and three figures into
 `results\`. Without `--version` it uses the latest prompt version in the file.
 
+### `07_make_page.py`
+
+```powershell
+python scripts\07_make_page.py                         # pilot
+python scripts\07_make_page.py --folder main
+```
+
+Reads `results\scores_wide.csv` and writes `results\review_page.html`: one card per review, lowest
+score first, with the score of both runs, platform, language, word count, product, ID, the review
+text and Gemini's reason. Open the file in a browser. It only reads the scores, so it can be run
+again at any time; run `04_summarize.py` first if the scores have changed.
+
 ### `05_make_check_sheets.py` and `06_check_results.py` (main stage)
 
 ```powershell
@@ -193,6 +207,7 @@ scores. These two steps are not used for the pilot.
 | `results/scores_raw.csv` | One row per review and run: `review_id`, `run`, `overall`, `reason`, `model`, `prompt_version`. Only ever appended to |
 | `results/scores_wide.csv` | One row per review: `run1`, `run2`, `mean` (the final score), `spread` (largest minus smallest score), `reason_run1`, and the sample columns including the review text. Rebuilt by step 04 |
 | `results/stability_summary.txt` | Run counts, stability, score spread, mean score by language and length |
+| `results/review_page.html` | Readable page of all scored reviews, built by step 07 |
 | `results/fig_differences.png` | How many reviews differ by 0, 1, 2 points between the two runs |
 | `results/fig_run1_vs_run2.png` | Grid of run 1 against run 2 scores; the diagonal means the same score |
 | `results/fig_score_distribution.png` | Number of reviews per score, by language |
@@ -280,6 +295,12 @@ These are observations from a first read of the sheet, not confirmed problems.
   in the middle of a sentence and may be pasted text; the judge cannot know whether text was copied.
 - **Some 7s may be generous.** For example review 14808 (18 words, "Best for dry skin. I like its
   smell…") scored 7 in both runs.
+- **Generic advice and mid-scale scores.** From the first part of the manual read: review 2675436
+  (a general tip to be patient with a skincare product, no personal use) scored 4, and review
+  2874259 (mostly about a product version and an apology to the shop) scored 8. Both look too
+  high, by one to two points. Review 5095806 (a month of use, no benefit, larger pores) scored 8 and
+  looks right. The order of the scores looks sensible; the offsets are small. Not confirmed until
+  the full read is done.
 - **Consistent is not correct.** Stable scores show that the prompt gives repeatable answers, not
   that the answers are right. That is tested by the human check on the main sample.
 
@@ -301,12 +322,14 @@ These are observations from a first read of the sheet, not confirmed problems.
 |---|---|
 | Pilot scored twice, summary and figures built | Done |
 | Stability check | Passed (99% within 1 point) |
-| Manual read of about 30 scored reviews (10 lowest, 10 middle, 10 highest) | To do |
+| Manual read of about 30 scored reviews (10 lowest, 10 middle, 10 highest) | In progress (page built with step 07) |
 | Decision to freeze `prompt_v1` for the main run | Pending the manual read |
 
 ## Next steps
 
-1. Read about 30 pilot reviews in `results/scores_wide.csv` and note any score that looks wrong.
+1. Run `python scripts\07_make_page.py`, open `results\review_page.html` and read about 30 reviews
+   (10 lowest, 10 middle, 10 highest). Note any score that looks wrong and whether it is too high or
+   too low.
    If the scores are acceptable, keep `prompt_v1` unchanged; if a pattern is wrong (for example
    book summaries), write `prompt_v2.txt` and rerun the pilot.
 2. Draw the main sample without the pilot reviews: `python scripts\02_make_main_sample.py`.
