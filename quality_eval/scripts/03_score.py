@@ -14,7 +14,7 @@ from common import ROOT, folder
 ap = argparse.ArgumentParser()
 ap.add_argument("--folder", required=True, choices=["pilot", "main"])
 ap.add_argument("--runs", type=int, default=2)
-ap.add_argument("--prompt", default="prompt_v1.txt")
+ap.add_argument("--prompt", default="prompt_v2.txt")
 ap.add_argument("--model", default="gemini-3.5-flash-lite")
 ap.add_argument("--pause", type=float, default=4.5)   # seconds between calls (free tier)
 a = ap.parse_args()
