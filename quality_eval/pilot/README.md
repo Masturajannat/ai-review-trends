@@ -14,14 +14,17 @@ The pilot has now been run with two prompt versions on the same 100 reviews: `pr
 version) and `prompt_v2` (revised after reading the v1 results). This README describes both, what
 was wrong with v1, what v2 changed, and how the two compare.
 
+The main run and the human check are described in `main/README.md`. This README covers the pilot
+and gives a short overview of the shared scripts.
+
 | | Pilot (100 reviews) | Main run (400 reviews) |
 |---|---|---|
 | Question | Does the prompt work: does it run cleanly, give stable scores and use the scale sensibly? | Does the score reflect quality: is a review scored 8 really better than one scored 5? |
-| Checks | Stability between two runs; score distribution; manual read of about 30 scored reviews; v1 against v2 | Blind human check (pairs and single scores); length and language bias; stability again on a larger sample |
-| Prompt | `prompt_v1.txt` and `prompt_v2.txt`; v2 is the candidate for freezing | Frozen; the final pilot version (planned: `prompt_v2.txt`) |
+| Checks | Stability between two runs; score distribution; manual read of scored reviews; v1 against v2 | Blind pair check by two raters; length and language bias; stability again on a larger sample |
+| Prompt | `prompt_v1.txt` and `prompt_v2.txt` | Frozen: `prompt_v2.txt` |
 | Folder | `pilot/` | `main/` |
-| Scripts | 01, 03, 04, 07 | 02, 03, 04, 05, 06, 07 |
-| State | Scored with v1 and v2; stability passed for both; manual read of v2 pending | Not started |
+| Scripts | 01, 03, 04, 07 | 02, 03, 04, 05, 05b, 06, 07 |
+| State | Done: scored with v1 and v2, stability passed for both; v2 used for the main run | Done: 400 reviews scored twice, 24 blind pairs checked by two raters (see `main/README.md`) |
 
 The reviews come from `trend_analysis/data/reviews_all.csv` of the `ai-review-trends` project
 (Daraz, Rokomari and Shajgoj; Bangla, Banglish and English). Run all commands from the
@@ -156,6 +159,24 @@ v1 files to `pilot\results_v1\` (`scores_raw.csv`, `scores_wide.csv`, `stability
 three figures and `review_page.html`). `results\` then holds v2, the current version, and
 `results_v1\` holds the first version for the comparison.
 
+## Main stage (short)
+
+Once the prompt is frozen, the main run uses the same scripts on a new 400-review sample. Details,
+options and results are in `main/README.md`. Order of commands:
+
+```powershell
+python scripts\02_make_main_sample.py                                       # once; 400 reviews without the pilot ones
+python scripts\03_score.py --folder main --runs 2 --prompt prompt_v2.txt     # about 1 hour, resumable
+python scripts\04_summarize.py --folder main --version prompt_v2
+python scripts\07_make_page.py --folder main                                # optional: readable page of the scores
+python scripts\05_make_check_sheets.py                                      # builds the blind pairs
+python scripts\05b_make_pair_page.py                                        # builds pair_page.html for the raters
+# send main\results\pair_page.html to each rater; save their pairs_filled_<name>.csv in main\results
+python scripts\06_check_results.py                                          # compares raters with the LLM scores
+```
+
+Do not run step 02 again after scoring, and do not change the prompt after step 03 has started.
+
 ## Scripts
 
 All scripts are in `scripts\` (one level above this folder) and are shared by the pilot and the
@@ -168,8 +189,9 @@ main run. They find their own folders, so they can be started from any directory
 | `02_make_main_sample.py` | main | Draws the 400-review main sample without the pilot IDs. Run after the prompt is frozen |
 | `03_score.py` | both | Scores every review with Gemini; appends to `scores_raw.csv` |
 | `04_summarize.py` | both | Builds the wide table, the stability summary and the figures |
-| `05_make_check_sheets.py` | main | Builds the blind sheets for the human check (pairs of high- and middle-scored reviews, and single reviews to score by hand) |
-| `06_check_results.py` | main | Compares the human judgments with the Gemini scores |
+| `05_make_check_sheets.py` | main | Builds the blind pairs for the human check (one high-scored and one middle-scored review per pair) and the answer key |
+| `05b_make_pair_page.py` | main | Turns the pairs into one HTML page; raters click A or B and download their answers as a CSV |
+| `06_check_results.py` | main | Compares the raters' choices with the Gemini scores and with each other |
 | `07_make_page.py` | both | Builds a readable HTML page of all scored reviews, for reading them in a browser |
 
 ### `01_make_pilot_sample.py`
@@ -235,20 +257,24 @@ score first, with the score of both runs, platform, language, word count, produc
 text and Gemini's reason. Open the file in a browser. It only reads the scores, so it can be run
 again at any time; run `04_summarize.py` first if the scores have changed.
 
-### `05_make_check_sheets.py` and `06_check_results.py` (main stage)
+### `05_make_check_sheets.py`, `05b_make_pair_page.py` and `06_check_results.py` (main stage)
 
 ```powershell
-python scripts\05_make_check_sheets.py
+python scripts\05_make_check_sheets.py                  # options: --pairs 50  --high-min 8
+python scripts\05b_make_pair_page.py
 python scripts\06_check_results.py
 ```
 
-Step 05 needs the scored main sample. It writes `pairs_for_raters.csv` and `single_for_raters.csv`
-(without scores, for the people doing the check) and `pairs_key.csv` (with scores). Raters fill
-`better_AorB` (A or B) in the pairs and `my_score` (1–10) in the single reviews; the filled copies
-are saved as `pairs_filled.csv` and `single_filled.csv` in `main\results\`. Step 06 then reports how
-often people chose the review that Gemini scored higher (with a 95% interval, also split by whether
-the higher-scored review is the longer one) and the rank correlation between the human and Gemini
-scores. These two steps are not used for the pilot.
+Step 05 needs the scored main sample. It pairs each high-scored review (mean 8 or more, or the
+`--high-min` value) with a middle-scored one (mean 4–6) of the same platform and language, in random
+A/B order, and writes `pairs_for_raters.csv` (no scores) and `pairs_key.csv` (with scores, never
+given to raters). Step 05b turns `pairs_for_raters.csv` into `pair_page.html`, a single file that
+raters open in a browser: they type a name, click A or B for each pair, and download
+`pairs_filled_<name>.csv`. Those files are saved in `main\results\`. Step 06 reads every
+`pairs_filled*.csv` and reports how often each rater picked the review Gemini scored higher (also
+split by whether it was the longer one), how often the raters agree with each other, and writes
+`check_summary.txt`. These steps are not used for the pilot. How they were used and what they
+showed is in `main/README.md`.
 
 ## Files
 
@@ -362,7 +388,7 @@ the top of the scale still separates clearly.
 
 ### Points to check
 
-These are observations, not confirmed problems; the manual read of the v2 page is still to be done.
+These are observations from reading the v2 results, not confirmed problems.
 
 - **The book plot-summary cap is not followed.** v2 says a review that mainly retells the plot should
   not score above 5, but the three *Kite Runner* reviews scored 6.5, 6 and 7.5 (v1: 6, 7, 6.5). The
@@ -392,9 +418,7 @@ evenly, delivery and service reviews are no longer buried at 1–2, books are ju
 experience, and the best reviews keep their high scores. The cost is a higher average (4.77 against
 4.20) and some generosity for authenticity and delivery-only reviews, plus a book cap that the model
 does not follow. None of these is large enough to justify a third prompt version before the human
-check; further rewording would also risk fitting the prompt to these 100 reviews. The recommended
-decision is to freeze `prompt_v2` for the main run, after the manual read of the v2 page confirms
-that the offsets above are small. The human check on the main sample is what shows whether the scores
+check; further rewording would also risk fitting the prompt to these 100 reviews. `prompt_v2` was therefore frozen and used for the main run (see `main/README.md`). The human check on the main sample is what shows whether the scores
 are right; the pilot only shows that the prompt runs cleanly and behaves sensibly.
 
 ## Limitations
@@ -407,8 +431,8 @@ are right; the pilot only shows that the prompt runs cleanly and behaves sensibl
 - Only one model and temperature 0 were tested. A second model has not been compared; a larger
   model might follow the book cap better.
 - The sample is balanced by length, so score shares do not describe the full dataset.
-- Gemini's scores have not yet been compared with human judgments. Stability does not show that
-  an 8 is better than a 5.
+- The pilot does not compare Gemini's scores with human judgments. Stability does not show that
+  an 8 is better than a 5; that check was done on the main sample (see `main/README.md`).
 - Only the text and the product name are scored. A review cannot be checked for truth, copied text
   or fake detail.
 - The 9–10 band has two reviews, so its behaviour is almost untested.
@@ -421,24 +445,9 @@ are right; the pilot only shows that the prompt runs cleanly and behaves sensibl
 | Pilot scored twice with `prompt_v2`, summary and figures built | Done |
 | Stability check | Passed for both versions (99% within 1 point) |
 | v1 against v2 comparison | Done (this README) |
-| Manual read of about 30 scored v2 reviews (10 lowest, 10 middle, 10 highest) | Pending (page built with step 07) |
-| Decision to freeze `prompt_v2` for the main run | Recommended, pending the manual read |
+| `prompt_v2` used for the main run | Done (see `main/README.md`) |
 
 ## Next steps
 
-1. Copy the v1 files to `results_v1\`, then run `python scripts\07_make_page.py`, open
-   `results\review_page.html` and read about 30 v2 reviews (10 lowest, 10 middle, 10 highest). Check
-   in particular the points listed above: book plot summaries, authenticity-only and delivery-only
-   reviews, and the restock request. Note whether any score is too high or too low.
-2. If the offsets are small, freeze `prompt_v2.txt` (set it as the default in `03_score.py` or always
-   pass `--prompt prompt_v2.txt`). Draw the main sample without the pilot reviews:
-   `python scripts\02_make_main_sample.py`.
-3. Score the main sample twice: `python scripts\03_score.py --folder main --runs 2 --prompt prompt_v2.txt`
-   (about one hour for 800 calls), then `python scripts\04_summarize.py --folder main`.
-4. Build the blind sheets with `python scripts\05_make_check_sheets.py`. At least two people mark the
-   better review in each pair and score some single reviews without seeing Gemini's scores.
-5. Run `python scripts\06_check_results.py` to test whether higher-scored reviews are better, whether
-   the result holds when the higher-scored review is the shorter one, and whether Bangla and
-   Banglish reviews are scored fairly.
-6. After the evaluator is validated: suggestions to the writer for improving a review, and a check
-   that the score rises when a review is improved.
+The pilot is finished. The main run, the blind pair check and what remains to be done are in
+`main/README.md`.
