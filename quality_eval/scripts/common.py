@@ -5,6 +5,18 @@ import pandas as pd
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 KEEP_COLS = ["review_id", "platform", "language", "n_words", "product_name", "text_original"]
 
+# sample file in <folder>/data for each stage
+SAMPLE_FILES = {"pilot": "pilot_sample.csv", "main": "main_sample.csv", "full": "full_sample.csv"}
+FOLDERS = list(SAMPLE_FILES)
+
+
+def read_scores(results_dir):
+    """All score files of a stage: scores_raw.csv plus scores_raw_<name>.csv from each teammate."""
+    files = sorted(glob.glob(os.path.join(results_dir, "scores_raw*.csv")))
+    if not files:
+        raise SystemExit("no scores_raw*.csv in " + results_dir)
+    return pd.concat([pd.read_csv(f, dtype={"review_id": str}) for f in files], ignore_index=True)
+
 def folder(name):
     # "pilot" or "main"
     p = os.path.join(ROOT, name)
