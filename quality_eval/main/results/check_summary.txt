@@ -1,0 +1,21 @@
+pairs in key: 24; raters: Fahima_Afrin_Anuva, Tazrian
+(LLM scored the pair's high review 8.0+ against a middle review)
+
+HUMANS vs LLM (did the rater pick the review the LLM scored higher?)
+[Fahima_Afrin_Anuva] answered A/B: 24, can't decide or blank: 0
+  all pairs: 21/24 = 88% (95% CI 69%-96%)
+  higher-scored is longer: 19/21 = 90% (95% CI 71%-97%)
+  higher-scored is shorter/equal: 2/3 = 67% (95% CI 21%-94%)
+[Tazrian] answered A/B: 24, can't decide or blank: 0
+  all pairs: 23/24 = 96% (95% CI 80%-99%)
+  higher-scored is longer: 21/21 = 100% (95% CI 85%-100%)
+  higher-scored is shorter/equal: 2/3 = 67% (95% CI 21%-94%)
+
+ALL RATERS TOGETHER (each answer counted; raters see the same pairs, so the interval is optimistic)
+  all: 44/48 = 92% (95% CI 80%-97%)
+  higher-scored is longer: 40/42 = 95%
+  higher-scored is shorter/equal: 4/6 = 67%
+
+RATER vs RATER (same pair, both answered A/B)
+  Fahima_Afrin_Anuva vs Tazrian: agree on 22/24 = 92%, Cohen's kappa = 0.83
+  pairs where all raters chose the same review: 22; LLM agrees on 21/22 = 95%

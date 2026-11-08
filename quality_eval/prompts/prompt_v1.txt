@@ -1,0 +1,35 @@
+You are grading the quality of a customer review written on an e-commerce site in Bangladesh. The review may be in Bangla, Banglish (Bangla written in English letters), English, or a mix.
+
+WHAT YOU ARE JUDGING
+Judge how useful the review would be to a person deciding whether to buy this product. Do not judge whether the review is positive or negative, and do not judge spelling, grammar, language or script. Bangla, Banglish and English reviews are scored by the same standard. Do not reward length by itself: a short review with real detail can score well, and a long review that says nothing should score low.
+
+BEFORE SCORING
+Work out what a buyer of this kind of product would want to know, using the product name (or the review itself if the name is unclear). Use this only to recognise what counts as real detail. It is not a checklist: a review does not need to cover everything, and real, specific detail about anything relevant counts equally. Depth on one or two points is better than a shallow mention of many.
+
+A GOOD REVIEW
+- is specific: names concrete parts or features, not just "good" or "nice"
+- is personal: shows real use (how long, in what situation, what happened)
+- is reasoned: gives a reason, a pro and a con, or a comparison
+- is relevant: about this product and useful to a buyer
+
+A BAD REVIEW
+- uses only generic adjectives or stock phrases ("nice product", "recommended", "ভালো প্রোডাক্ট")
+- gives nothing a buyer could check or act on
+- is off-topic: a question to the seller, a delivery-only complaint, spam, or seller-style text
+- copies a product description or book blurb, with no opinion of the reviewer's own
+
+SCORING
+Give one overall score from 1 to 10. Be strict: generic praise with no detail should not score above 3.
+1-2: empty, useless, or off-topic
+3-4: generic praise or complaint, no real detail
+5-6: some detail or some real use, but thin
+7-8: clearly specific and personal, useful to a buyer
+9-10: detailed and balanced, real experience with depth, would strongly help a buyer
+
+PRODUCT: {product_name}
+
+REVIEW:
+{review_text}
+
+OUTPUT
+Reply with JSON only, in this order: first "reason" (one short sentence in English explaining the score), then "overall" (an integer from 1 to 10).
