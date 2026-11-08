@@ -1,0 +1,32 @@
+prompt version: prompt_v2
+reviews scored in all three languages: 30
+source language: bangla 10, banglish 10, english 10
+runs per version: 2-2
+run-to-run spread within a version: same score 72%, within 1 point 98%
+
+MEAN SCORE PER LANGUAGE VERSION (same reviews)
+  bangla    5.15  (95% CI 4.47-5.82)
+  banglish  5.13  (95% CI 4.48-5.75)
+  english   5.30  (95% CI 4.70-5.88)
+
+DIFFERENCE BETWEEN VERSIONS OF THE SAME REVIEW (first minus second, points)
+  bangla - english: mean -0.15 (95% CI -0.52 to +0.18), Wilcoxon p = 0.71; same score 37%, within 1 point 87% -> no clear difference
+  banglish - english: mean -0.17 (95% CI -0.50 to +0.10), Wilcoxon p = 0.45; same score 30%, within 1 point 97% -> no clear difference
+  bangla - banglish: mean +0.02 (95% CI -0.22 to +0.20), Wilcoxon p = 0.35; same score 53%, within 1 point 97% -> no clear difference
+
+ORIGINAL AGAINST ITS TRANSLATIONS (original minus mean of the two translations)
+  mean -0.02 (95% CI -0.25 to +0.20); a value away from 0 means translating itself changes the score
+
+MEAN SCORE BY SOURCE LANGUAGE (rows) AND VERSION (columns)
+                   reviews  bangla  banglish  english
+  source_language                                    
+  bangla                10    5.35       5.2     5.55
+  banglish              10    5.20       5.0     5.15
+  english               10    4.90       5.2     5.20
+
+REVIEWS WITH THE LARGEST GAP BETWEEN LANGUAGES (check these by hand)
+  L01 (bangla original): bangla 2.0, banglish 2.0, english 5.5  gap 3.5
+  L26 (english original): bangla 4.0, banglish 6.5, english 6.0  gap 2.5
+  L09 (bangla original): bangla 7.0, banglish 6.5, english 5.5  gap 1.5
+  L06 (bangla original): bangla 4.5, banglish 5.0, english 6.0  gap 1.5
+  L07 (bangla original): bangla 8.0, banglish 8.0, english 7.0  gap 1.0
