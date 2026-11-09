@@ -1,0 +1,54 @@
+reviews compared: 40
+new score equals one of the two prompt_v2 scores: 82%
+within 1 point of the prompt_v2 mean: 98%
+mean difference (new minus prompt_v2): -0.07
+rank correlation: 0.98
+(two prompt_v2 runs: same score 78%, within 1 point 99%, rank correlation 0.96)
+
+verdict: scores unchanged; use prompt_v2_checks for the remaining reviews
+
+CHECKS: share of reviews with 1, by new score (should rise with the score)
+new_score               1-4   5-6   7-8  9-10
+product_detail          11%   55%  100%  100%
+service_detail          11%   36%   33%   50%
+depth                    6%   64%  100%  100%
+own_use                 56%  100%  100%  100%
+usage_context            6%    0%   56%  100%
+outcome                 11%   36%   89%  100%
+gives_reason             0%   82%  100%  100%
+balance                  0%    9%   33%  100%
+comparison_or_audience   0%   18%   11%  100%
+on_topic                78%  100%  100%  100%
+
+EXAMPLES
+- score 1 | 'Ata ki korean product? R akta use kore kaj hobe?'
+    checks: product_detail=0 service_detail=0 depth=0 own_use=0 usage_context=0 outcome=0 gives_reason=0 balance=0 comparison_or_audience=0 on_topic=0
+    specific: Add concrete details about the eye cream's texture, ingredients, or performance after using it.
+    personal: Describe your actual experience of purchasing and using the 3W Clinic Honey Eye Cream.
+    reasoned: Provide your own opinion and reasons on whether the eye cream is effective or worth buying.
+    relevant: Share your review of the product instead of asking questions to the seller.
+- score 2 | 'best bhai best🥵\r\netar upore kono kotha nai❤️'
+    checks: product_detail=0 service_detail=0 depth=0 own_use=0 usage_context=0 outcome=0 gives_reason=0 balance=0 comparison_or_audience=0 on_topic=1
+    specific: Mention concrete details about the texture, hydration effect, or authenticity of the essence.
+    personal: Describe your actual experience of using this product on your skin.
+    reasoned: Explain why you think it is the best product by giving specific reasons.
+- score 4 | 'porduct tar quality onak valo.\r\n1 ta niacilam, babohar kore falaci ti photo dite parlam na'
+    checks: product_detail=0 service_detail=0 depth=0 own_use=1 usage_context=0 outcome=0 gives_reason=0 balance=0 comparison_or_audience=0 on_topic=1
+    specific: Describe the comfort, thickness, or steel nose clip of the mask.
+    personal: Mention how long you used the mask or how it fit on your face.
+    reasoned: Explain why you think the quality is very good.
+- score 5 | 'প্রডাক্ট টা হাতে পেতে যদিও বা একটু সময় লেগেছে! তবে জীবনে প্রথম মনে হচ্ছে, ভালো একটা প্রডাক'
+    checks: product_detail=0 service_detail=0 depth=0 own_use=1 usage_context=0 outcome=1 gives_reason=0 balance=0 comparison_or_audience=0 on_topic=1
+    specific: Mention specific changes in your skin, such as how it affected acne or oiliness.
+    personal: Describe how your skin felt after washing with this cleanser.
+    reasoned: Explain why you are satisfied with its effectiveness.
+- score 6 | 'Apndr kache manus blv kore product ney r apnra expired date er product den...ata kmn kotha'
+    checks: product_detail=0 service_detail=1 depth=1 own_use=1 usage_context=0 outcome=1 gives_reason=1 balance=0 comparison_or_audience=0 on_topic=1
+    specific: Mention how the eye cream smells, feels on the skin, or if the packaging showed any other signs of damage.
+- score 7 | 'Ager barer moto in-take packet na....\r\nUpdate: প্রথমবার অর্ডার করে খুব ভালো লেগেছিল তাই এব'
+    checks: product_detail=1 service_detail=0 depth=1 own_use=1 usage_context=0 outcome=1 gives_reason=1 balance=0 comparison_or_audience=1 on_topic=1
+    personal: Mention how long you wore the mask before noticing the quality issue.
+- score 7 | 'একদা একসময়, আমার সাধারণ একজোড়া চোখ ছিলো। যেখানে সাদা থাকার কথা সেখানে সাদা, যেখানে কালো থা'
+    checks: product_detail=1 service_detail=0 depth=1 own_use=1 usage_context=1 outcome=1 gives_reason=1 balance=1 comparison_or_audience=0 on_topic=1
+    reasoned: Explain more objectively why the oil caused irritation and how it performs under normal application amounts.
+    relevant: Provide more practical purchasing details such as packaging condition, authenticity, or how long the bottle lasts.
