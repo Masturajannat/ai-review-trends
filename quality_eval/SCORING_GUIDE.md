@@ -23,9 +23,11 @@ The work is split into three parts, one per person, each with their own Gemini A
 
 ## Before you start
 
-Start only after Mastura has run the 40-review check (`scripts/13_check_feedback_prompt.py`) and
-pushed `quality_eval/main/results/feedback_check_summary.txt` with the verdict
-**"scores unchanged"**. If that file is missing or says the scores shifted, do not start.
+Start only after Mastura has run the 40-review check (`scripts/13_check_feedback_prompt.py`) on the
+current prompt and pushed `quality_eval/main/results/feedback_check_summary.txt` with the verdict
+**"scores unchanged"**. If that file is missing or says the scores shifted, do not start. (A first
+version of the prompt, with a longer instruction for "reason", shifted the scores and was replaced;
+its check is kept as `feedback_check_summary_try1.txt`.)
 
 ## Setup (once, in the VS Code terminal, PowerShell)
 

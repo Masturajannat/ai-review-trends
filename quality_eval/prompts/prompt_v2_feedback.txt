@@ -53,7 +53,7 @@ REVIEW:
 
 OUTPUT
 Reply with JSON only, with these keys in this order:
-1. "reason": exactly one concise sentence in English explaining why the review received its score: name the most important information the review gives or lacks, and how that affects its usefulness to a buyer. Base it only on the review text. Do not repeat the review, make assumptions, judge whether the review is genuine, or give suggestions in this field.
+1. "reason": one short sentence in English explaining the score.
 2. "overall": the score, an integer from 1 to 10.
 3. "weak_criteria": the criteria from A GOOD REVIEW on which this review falls short, as a list using only these words: "specific", "personal", "reasoned", "relevant". List every criterion that, if improved, would raise the score; it must agree with the shortcomings named in "reason". Use an empty list only when no meaningful improvement would make the review more useful to a buyer.
 4. "how_to_improve": an object with one entry for each criterion in weak_criteria, in the form {"criterion": "suggestion"}. Each suggestion is one short sentence in English telling the reviewer what to add or change in THIS review for THIS product (for example "Say how many hours the battery lasts with your daily use"). Base it only on what is missing from the review; do not invent facts about the product.
