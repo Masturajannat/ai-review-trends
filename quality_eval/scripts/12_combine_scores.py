@@ -3,7 +3,7 @@
 Combines the pilot (prompt_v2 scores only), main and full sets into
 quality_eval/all_scores.csv and the same table as quality_eval/all_scores.json:
   review_id, platform, language, n_words, product_name, text_original,
-  score (mean of the runs), runs, reason (first run), stage,
+  score (mean of the runs), runs, reason (first run), model (of the first run), stage,
   level, level_meaning, next_level (what the score level means and what the next level
     asks for, from the SCORING scale of the prompt; no API calls),
   weak_criteria, how_to_improve, feedback_from,
@@ -31,7 +31,7 @@ for stage, fname in SAMPLE_FILES.items():
     sample = pd.read_csv(os.path.join(folder(stage), "data", fname), dtype={"review_id": str})
     g = raw.sort_values("run").groupby("review_id")
     s = pd.DataFrame({"score": g["overall"].mean().round(2), "runs": g["overall"].size(),
-                      "reason": g["reason"].first()}).reset_index()
+                      "reason": g["reason"].first(), "model": g["model"].first()}).reset_index()
     s = sample.merge(s, on="review_id", how="inner").assign(stage=stage)
     ccols = [f"check_{n}" for n in CHECKS]
     if all(c in raw for c in ccols):          # checks from the first run that has them

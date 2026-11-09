@@ -5,8 +5,8 @@ their own file, so nobody overwrites anyone else's scores:
   python scripts/03_score.py --folder full --runs 1 --prompt prompt_v2_checks.txt --part 2 --of 3 --name Tazrian
 Reviews already in ANY scores_raw*.csv of the stage are skipped.
 
-  pip install google-genai pandas
-  set GEMINI_API_KEY (environment variable, never commit it)
+  pip install google-genai pandas            (and: pip install openai, for --model gpt-...)
+  set GEMINI_API_KEY (or OPENAI_API_KEY for gpt- models; environment variable, never commit it)
   python scripts/03_score.py --folder pilot --runs 2
 
 Rerunning does nothing for scores that already exist, so an interrupted
@@ -21,7 +21,7 @@ with prompt_v2 are skipped, and old and new scores are summarised together.
 """
 import argparse, glob, json, os, time
 import pandas as pd
-from common import ROOT, folder, FOLDERS, SAMPLE_FILES, parse_feedback, parse_checks, append_row
+from common import ROOT, folder, FOLDERS, SAMPLE_FILES, parse_feedback, parse_checks, append_row, LLM
 
 # prompts whose scoring part is identical to another version: stored under that version
 SAME_SCORING = {"prompt_v2_feedback": "prompt_v2", "prompt_v2_checks": "prompt_v2"}
@@ -70,18 +70,14 @@ def ask(client, prompt):
     # a few retries for rate limits or broken JSON
     for i in range(5):
         try:
-            r = client.models.generate_content(
-                model=a.model, contents=prompt,
-                config={"temperature": 0, "response_mime_type": "application/json"})
-            return parse(r.text)
+            return parse(client(prompt))
         except Exception as e:
             print("  retry", i + 1, "-", str(e)[:100])
             time.sleep(10 * (i + 1))
     return None
 
 def main():
-    from google import genai
-    client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+    client = LLM(a.model)
     df = pd.read_csv(sample_file, dtype={"review_id": str})
     if a.of > 1:
         # part k = every review whose row number is k-1 modulo --of (the sample is shuffled)

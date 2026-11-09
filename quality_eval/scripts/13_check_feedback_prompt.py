@@ -11,7 +11,7 @@ anything already done.
   set GEMINI_API_KEY (environment variable, never commit it)
   python scripts/13_check_feedback_prompt.py                                   # prompt_v2_checks, 40 calls
   python scripts/13_check_feedback_prompt.py --prompt prompt_v2_feedback.txt   # the older prompt
-  python scripts/13_check_feedback_prompt.py --model gemini-3.5-flash          # would another model
+  python scripts/13_check_feedback_prompt.py --model gpt-6-luna                # would another model
                                                     # give the same scores? (own files, _<model>)
 
 Writes main/results/check_<prompt>.csv and check_<prompt>_summary.txt (kept apart from
@@ -21,7 +21,7 @@ are feedback_check.csv and feedback_check_summary.txt, as before.
 import argparse, json, os, time
 import numpy as np
 import pandas as pd
-from common import ROOT, folder, parse_feedback, parse_checks, append_row, CHECKS
+from common import ROOT, folder, parse_feedback, parse_checks, append_row, CHECKS, LLM
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--n", type=int, default=40)
@@ -53,9 +53,7 @@ pick = pd.concat([pick, w.drop(pick.index).sample(max(0, a.n - len(pick)), rando
 def ask(client, prompt):
     for i in range(5):
         try:
-            r = client.models.generate_content(model=a.model, contents=prompt,
-                                               config={"temperature": 0, "response_mime_type": "application/json"})
-            j = json.loads(r.text)
+            j = json.loads(client(prompt))
             overall = int(j["overall"])
             if not 1 <= overall <= 10:
                 raise ValueError("overall out of range")
@@ -67,8 +65,7 @@ def ask(client, prompt):
 
 
 def main():
-    from google import genai
-    client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+    client = LLM(a.model)
     done = set(pd.read_csv(out, dtype={"review_id": str})["review_id"]) if os.path.exists(out) else set()
     fails = 0
     for k, r in enumerate(pick.itertuples(), 1):

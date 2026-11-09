@@ -39,6 +39,43 @@ LEVELS = {
 }
 
 
+class LLM:
+    """One model behind one call: Gemini (default) or an OpenAI model such as gpt-6-luna.
+
+    Gemini models use GEMINI_API_KEY, models whose name starts with "gpt-" use OPENAI_API_KEY.
+    Both are asked for JSON at temperature 0 (if a model does not accept a temperature, it is
+    asked without one)."""
+
+    def __init__(self, model):
+        self.model = model
+        self.openai = model.startswith("gpt-")
+        if self.openai:
+            from openai import OpenAI          # pip install openai
+            self.client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+            self.temperature = True
+        else:
+            from google import genai
+            self.client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+
+    def __call__(self, prompt):
+        if not self.openai:
+            r = self.client.models.generate_content(
+                model=self.model, contents=prompt,
+                config={"temperature": 0, "response_mime_type": "application/json"})
+            return r.text
+        kw = dict(model=self.model, messages=[{"role": "user", "content": prompt}],
+                  response_format={"type": "json_object"})
+        if self.temperature:
+            try:
+                return self.client.chat.completions.create(temperature=0, **kw).choices[0].message.content
+            except Exception as e:
+                if "temperature" not in str(e).lower():
+                    raise
+                self.temperature = False
+                print("  (this model does not take a temperature; asking without one)")
+        return self.client.chat.completions.create(**kw).choices[0].message.content
+
+
 def parse_checks(j):
     """The ten 0/1 checks as {"check_<name>": 0 or 1}; raises if any is missing or not 0/1."""
     c = j.get("checks")
