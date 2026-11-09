@@ -61,6 +61,14 @@ python trend_analysis\scripts\07_ai_share.py              # estimated AI share, 
 
 Requires Python 3.10+ with `pandas`, `numpy` and `matplotlib`.
 
+## Review quality scoring (team)
+
+The second part of the project scores every review for usefulness to a buyer (1 to 10) with
+Gemini, together with feedback on which criteria the review should improve, to train our own
+review-quality model. Teammates scoring their part: follow
+[`quality_eval/SCORING_GUIDE.md`](quality_eval/SCORING_GUIDE.md). You stay on your own branch;
+the guide shows how to copy the scoring files from `origin/Mastura`.
+
 ## Reference
 
 Liang, W., Izzo, Z., Zhang, Y., Lepp, H., Cao, H., Zhao, X., Chen, L., Ye, H., Liu, S., Huang, Z.,

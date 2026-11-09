@@ -21,32 +21,61 @@ The work is split into three parts, one per person, each with their own Gemini A
 | Tazrian | `--part 2 --of 3 --name Tazrian` | `quality_eval/full/results/scores_raw_Tazrian.csv` |
 | Fahima | `--part 3 --of 3 --name Fahima` | `quality_eval/full/results/scores_raw_Fahima.csv` |
 
+## You stay on your own branch
+
+You do **not** switch to Mastura's branch or merge it. You copy only the files needed for scoring
+from `origin/Mastura` into your own branch, score there, and push your own branch. Mastura copies
+your score file from your branch at the end.
+
 ## Before you start
 
-Start only after Mastura has run the 40-review check (`scripts/13_check_feedback_prompt.py`) on the
-current prompt and pushed `quality_eval/main/results/feedback_check_summary.txt` with the verdict
-**"scores unchanged"**. If that file is missing or says the scores shifted, do not start. (A first
-version of the prompt, with a longer instruction for "reason", shifted the scores and was replaced;
-its check is kept as `feedback_check_summary_try1.txt`.)
-
-## Setup (once, in the VS Code terminal, PowerShell)
-
-From the repository folder `ai-review-trends`:
+Start only after Mastura has pushed the 40-review check with the verdict **"scores unchanged"**.
+Check it without switching branches (from the repository folder `ai-review-trends`):
 
 ```powershell
 git fetch origin
-git switch Tazrian                 # Fahima: git switch Fahima
-git merge origin/Mastura           # brings in the scripts, prompt and full_sample.csv
+git show origin/Mastura:quality_eval/main/results/feedback_check_summary.txt
+```
+
+The last lines must say `verdict: scores unchanged`. If they do not, or the file is missing, do not
+start. (A first version of the prompt, with a longer instruction for "reason", shifted the scores
+and was replaced; its check is kept as `feedback_check_summary_try1.txt`.)
+
+## Setup (once, in the VS Code terminal, PowerShell)
+
+From the repository folder `ai-review-trends`. Commit or stash any unsaved work on your branch
+first (`git status` should show nothing to commit).
+
+```powershell
+git switch Tazrian                 # Fahima: git switch Fahima   (your OWN branch)
+git fetch origin
+git checkout origin/Mastura -- quality_eval/scripts quality_eval/prompts quality_eval/SCORING_GUIDE.md quality_eval/full
+git commit -m "Copy scoring files (scripts, prompt_v2_feedback, full set) from Mastura"
 python -m venv .venv               # skip if .venv already exists
 .\.venv\Scripts\Activate.ps1
 python -m pip install google-genai pandas
 ```
+
+The `git checkout origin/Mastura -- ...` line copies these into your branch, replacing older
+versions of the same files:
+
+| Copied | Why it is needed |
+|---|---|
+| `quality_eval/scripts/` | the scoring script `03_score.py` and `common.py` |
+| `quality_eval/prompts/` | `prompt_v2_feedback.txt`, the prompt with feedback |
+| `quality_eval/full/` | `full_sample.csv` (the 6,822 reviews) and Mastura's first 316 scores, so they are skipped |
+| `quality_eval/SCORING_GUIDE.md` | this guide |
 
 Check that the files are there:
 
 ```powershell
 Get-ChildItem quality_eval\prompts\prompt_v2_feedback.txt, quality_eval\full\data\full_sample.csv
 ```
+
+If Mastura says the scripts or prompt were updated, repeat only the `git fetch origin`,
+`git checkout origin/Mastura -- quality_eval/scripts quality_eval/prompts quality_eval/SCORING_GUIDE.md`
+and `git commit` lines. Do not copy `quality_eval/full` again after you have started scoring;
+your own score file is safe either way, but there is no need.
 
 ## Run your part (every day until it is finished)
 
@@ -91,7 +120,9 @@ Commit only your own `scores_raw_<name>.csv`. Mastura collects the three files a
    or anything in `pilot/` and `main/`. Do not run `scripts/11_make_full_set.py`.
 6. **Do not score the `main` folder.** The 400 main reviews are the test set for our model and
    must keep their original scores.
-7. If something fails in a way not described here (an error other than the quota message), stop
+7. **Work only on your own branch.** Do not switch to, merge, or push to `Mastura`; copy files
+   from it only with the `git checkout origin/Mastura -- ...` command above.
+8. If something fails in a way not described here (an error other than the quota message), stop
    and send the error to Mastura instead of changing code.
 
 ## What the output looks like
@@ -117,5 +148,5 @@ git checkout origin/Fahima -- quality_eval/full/results/scores_raw_Fahima.csv
 cd quality_eval
 python scripts\04_summarize.py --folder full --version prompt_v2
 python scripts\12_combine_scores.py                 # all_scores.csv + all_scores.json, one row per review
-python scripts\15_feedback_from_reasons.py          # feedback for the 816 reviews scored before
+python scripts\15_feedback_from_reasons.py          # feedback for the 816 reviews scored before (.csv + .json)
 ```
