@@ -7,8 +7,7 @@ in which order, and what must not be changed. Read it fully before running anyth
 
 Every cleaned review that is not in the pilot (100) or main (400) run is scored by Gemini for
 usefulness to a buyer, 1 to 10, together with ten yes/no checks on the review and feedback on
-what the review should improve. The
-reviews are in `quality_eval/full/data/full_sample.csv` (6,822 reviews, shuffled). The first 316
+what the review should improve. The reviews are in `quality_eval/full/data/full_sample.csv` (6,822 reviews, shuffled). The first 316
 were scored by Mastura before the checks and feedback were added; they are skipped automatically.
 
 The scores will be used to train our own review-quality model, so the scoring must stay
@@ -38,8 +37,8 @@ git fetch origin
 git show origin/Mastura:quality_eval/main/results/check_prompt_v2_checks_summary.txt
 ```
 
-The last lines must say `verdict: scores unchanged`. If they do not, or the file is missing, do not
-start. (Earlier prompt versions and their checks are kept for the record:
+The line starting with `verdict:` must say `scores unchanged`. If it does not, or the file is
+missing, do not start. (Earlier prompt versions and their checks are kept for the record:
 `feedback_check_summary_try1.txt` shifted the scores, `feedback_check_summary.txt` is the
 feedback-only prompt without the checks. Neither is used for scoring.)
 
@@ -57,6 +56,10 @@ python -m venv .venv               # skip if .venv already exists
 .\.venv\Scripts\Activate.ps1
 python -m pip install google-genai pandas
 ```
+
+If `Activate.ps1` is refused ("running scripts is disabled on this system"), run
+`Set-ExecutionPolicy -Scope Process Bypass` once in that terminal and activate again. In every new
+terminal, activate the environment again before scoring (the prompt then starts with `(.venv)`).
 
 The `git checkout origin/Mastura -- ...` line copies these into your branch, replacing older
 versions of the same files:
@@ -89,16 +92,21 @@ python scripts\03_score.py --folder full --runs 1 --prompt prompt_v2_checks.txt 
 
 Fahima uses `--part 3 --of 3 --name Fahima`.
 
-- One line is printed per review, e.g. `run 1  317/2274  -> 5   improve: specific|personal`.
+- One line is printed per review, e.g. `run 1  317/2274  -> 5   checks 4/10   improve: specific|personal`.
+- At the start it prints how many reviews of your part are still to do. Some of your part were
+  already scored by Mastura before the split; those are skipped, so the count is below 2,274.
 - About 5 seconds per review. The free daily quota stops it after a few hundred reviews; the script
   stops by itself after 3 failures in a row ("daily quota used up?"). That is expected.
 - Run the same command again the next day (the quota resets at about 2 PM Bangladesh time). It
   continues where it stopped; nothing is scored twice.
 - To score at most N reviews in a session, add `--limit N`.
+- To stop earlier, press Ctrl+C. Every finished review is already saved; the next run continues.
+- Lines like `retry 1 - 503 UNAVAILABLE` (Google busy) or `retry 1 - check ... is not 0 or 1`
+  (an incomplete answer) are normal: the script asks again by itself.
 
 ## Save and share your progress (after each session)
 
-From the repository folder `ai-review-trends`:
+From the repository folder `ai-review-trends` (if you are still in `quality_eval`, run `cd ..` first):
 
 ```powershell
 git add quality_eval/full/results/scores_raw_Tazrian.csv          # Fahima: scores_raw_Fahima.csv
@@ -106,7 +114,8 @@ git commit -m "Full run: Tazrian's scores so far"
 git push origin Tazrian                                           # Fahima: git push origin Fahima
 ```
 
-Commit only your own `scores_raw_<name>.csv`. Mastura collects the three files at the end.
+Commit only your own `scores_raw_<name>.csv` (do not use `git add .`). Mastura collects the three
+files at the end. Push at least once a day, so no scores are lost if a laptop has a problem.
 
 ## Rules (for people and AI assistants)
 
