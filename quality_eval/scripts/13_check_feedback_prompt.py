@@ -11,6 +11,8 @@ anything already done.
   set GEMINI_API_KEY (environment variable, never commit it)
   python scripts/13_check_feedback_prompt.py                                   # prompt_v2_checks, 40 calls
   python scripts/13_check_feedback_prompt.py --prompt prompt_v2_feedback.txt   # the older prompt
+  python scripts/13_check_feedback_prompt.py --model gemini-3.5-flash          # would another model
+                                                    # give the same scores? (own files, _<model>)
 
 Writes main/results/check_<prompt>.csv and check_<prompt>_summary.txt (kept apart from
 scores_raw*.csv, so the main-run results do not change); for prompt_v2_feedback the names
@@ -31,6 +33,9 @@ a = ap.parse_args()
 res = os.path.join(folder("main"), "results")
 pname = os.path.splitext(a.prompt)[0]
 tag = "feedback_check" if pname == "prompt_v2_feedback" else f"check_{pname}"
+DEFAULT_MODEL = "gemini-3.5-flash-lite"      # the model all earlier scores come from
+if a.model != DEFAULT_MODEL:                 # checking another model: keep its results apart
+    tag += "_" + a.model
 out = os.path.join(res, f"{tag}.csv")
 summary_file = os.path.join(res, f"{tag}_summary.txt")
 template = open(os.path.join(ROOT, "prompts", a.prompt), encoding="utf-8").read()
@@ -102,6 +107,7 @@ def report():
              f"rank correlation: {rho:.2f}",
              "(two prompt_v2 runs: same score 78%, within 1 point 99%, rank correlation 0.96)",
              "",
+             f"model: {a.model}" + ("" if a.model == DEFAULT_MODEL else f" (compared with {DEFAULT_MODEL} scores)"),
              "verdict: " + (f"scores unchanged; use {pname} for the remaining reviews"
                             if within1 >= 0.95 and abs(d.mean()) < 0.3 else
                             "scores shifted; check before using the new prompt"),
