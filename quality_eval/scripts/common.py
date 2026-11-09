@@ -14,6 +14,47 @@ FOLDERS = list(SAMPLE_FILES)
 CRITERIA = ["specific", "personal", "reasoned", "relevant"]
 FEEDBACK_COLS = ["weak_criteria", "how_to_improve"]
 
+# yes/no checks asked after the score (prompt_v2_checks), grouped under the four criteria.
+# They describe the review; they do not add up to the score.
+CHECK_GROUPS = {
+    "specific": ["product_detail", "service_detail", "depth"],
+    "personal": ["own_use", "usage_context", "outcome"],
+    "reasoned": ["gives_reason", "balance", "comparison_or_audience"],
+    "relevant": ["on_topic"],
+}
+CHECKS = [c for g in CHECK_GROUPS.values() for c in g]
+
+# what each score level means (the SCORING scale of the prompt), used to explain a score
+LEVELS = {
+    1: "empty, meaningless, spam, or off-topic",
+    2: "almost nothing a buyer could use",
+    3: "generic praise or complaint, no detail",
+    4: "a hint of information, but no concrete detail",
+    5: "one specific detail, with little explanation",
+    6: "specific detail about the product or the buying experience, with limited context",
+    7: "specific detail backed by the reviewer's own use or purchase",
+    8: "several useful details, or real depth on one point",
+    9: "detailed, personal and reasoned, strongly useful to a buyer",
+    10: "exceptionally informative, thorough and balanced",
+}
+
+
+def parse_checks(j):
+    """The ten 0/1 checks as {"check_<name>": 0 or 1}; raises if any is missing or not 0/1."""
+    c = j.get("checks")
+    if not isinstance(c, dict):
+        raise ValueError("checks missing")
+    c = {str(k).strip().lower(): v for k, v in c.items()}
+    out = {}
+    for name in CHECKS:
+        v = c.get(name)
+        if isinstance(v, bool):
+            v = int(v)
+        if str(v).strip() not in ("0", "1"):
+            raise ValueError(f"check {name} is not 0 or 1: {v!r}")
+        out["check_" + name] = int(str(v).strip())
+    return out
+
 
 def parse_feedback(j):
     """weak_criteria as 'specific|personal', how_to_improve as a JSON object; unknown criteria dropped."""
@@ -47,8 +88,8 @@ def append_row(path, rec):
 def save_table(df, csv_path):
     """Save a results table twice: as CSV and as JSON (same name, .json).
 
-    In the JSON file each review is one object; weak_criteria becomes a list and
-    how_to_improve an object, instead of the text form they have in the CSV."""
+    In the JSON file each review is one object; weak_criteria becomes a list,
+    how_to_improve an object, and the check_<name> columns one "checks" object."""
     import json
     df.to_csv(csv_path, index=False, encoding="utf-8-sig")
     recs = json.loads(df.to_json(orient="records", force_ascii=False))
@@ -56,6 +97,11 @@ def save_table(df, csv_path):
         if "weak_criteria" in r:
             w = r["weak_criteria"]
             r["weak_criteria"] = [c for c in str(w).split("|") if c] if w is not None else None
+        cols = [k for k in list(r) if k.startswith("check_")]
+        if cols:
+            vals = {k[6:]: r.pop(k) for k in cols}
+            r["checks"] = None if all(v is None for v in vals.values()) else \
+                {k: (int(v) if v is not None else None) for k, v in vals.items()}
         if "how_to_improve" in r and isinstance(r["how_to_improve"], str):
             try:
                 r["how_to_improve"] = json.loads(r["how_to_improve"])

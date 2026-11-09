@@ -2,7 +2,7 @@
 
 Teammates can share a large stage: each scores one part with their own key and writes
 their own file, so nobody overwrites anyone else's scores:
-  python scripts/03_score.py --folder full --runs 1 --prompt prompt_v2.txt --part 2 --of 3 --name Tazrian
+  python scripts/03_score.py --folder full --runs 1 --prompt prompt_v2_checks.txt --part 2 --of 3 --name Tazrian
 Reviews already in ANY scores_raw*.csv of the stage are skipped.
 
   pip install google-genai pandas
@@ -12,17 +12,19 @@ Reviews already in ANY scores_raw*.csv of the stage are skipped.
 Rerunning does nothing for scores that already exist, so an interrupted
 run just carries on. To add a third round, run again with --runs 3.
 
-With --prompt prompt_v2_feedback.txt each answer also says which criteria the review
-should improve (weak_criteria) and how (how_to_improve). Its scoring instructions are
-word for word those of prompt_v2, so its scores are stored as prompt_v2: reviews already
-scored with prompt_v2 are skipped, and old and new scores are summarised together.
+With --prompt prompt_v2_checks.txt each answer also gives ten yes/no checks on the review
+(check_product_detail ... check_on_topic, see common.CHECKS), the criteria the review should
+improve (weak_criteria) and how (how_to_improve). prompt_v2_feedback.txt gives only the last
+two. Both have the scoring instructions of prompt_v2 word for word and ask for the extra
+fields after the score, so their scores are stored as prompt_v2: reviews already scored
+with prompt_v2 are skipped, and old and new scores are summarised together.
 """
 import argparse, glob, json, os, time
 import pandas as pd
-from common import ROOT, folder, FOLDERS, SAMPLE_FILES, parse_feedback, append_row
+from common import ROOT, folder, FOLDERS, SAMPLE_FILES, parse_feedback, parse_checks, append_row
 
 # prompts whose scoring part is identical to another version: stored under that version
-SAME_SCORING = {"prompt_v2_feedback": "prompt_v2"}
+SAME_SCORING = {"prompt_v2_feedback": "prompt_v2", "prompt_v2_checks": "prompt_v2"}
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--folder", required=True, choices=FOLDERS)
@@ -49,6 +51,7 @@ template = open(os.path.join(ROOT, "prompts", a.prompt), encoding="utf-8").read(
 prompt_name = os.path.splitext(a.prompt)[0]
 version = SAME_SCORING.get(prompt_name, prompt_name)
 with_feedback = '"weak_criteria"' in template
+with_checks = '"checks"' in template
 
 def build(row):
     return (template.replace("{product_name}", str(row["product_name"]))
@@ -60,7 +63,8 @@ def parse(text):
     if not 1 <= overall <= 10:
         raise ValueError("overall out of range")
     fb = parse_feedback(j) if with_feedback else None
-    return overall, str(j.get("reason", "")), fb
+    ck = parse_checks(j) if with_checks else None
+    return overall, str(j.get("reason", "")), fb, ck
 
 def ask(client, prompt):
     # a few retries for rate limits or broken JSON
@@ -115,8 +119,12 @@ def main():
                        model=a.model, prompt_version=version)
             if res[2] is not None:
                 rec.update(weak_criteria=res[2][0], how_to_improve=res[2][1], prompt_file=a.prompt)
+            if res[3] is not None:
+                rec.update(res[3])
             append_row(out_file, rec)
             fb = f"   improve: {res[2][0] or '-'}" if res[2] is not None else ""
+            if res[3] is not None:
+                fb = f"   checks {sum(res[3].values())}/10" + fb
             print(f"run {run}  {i + 1}/{len(df)}  -> {res[0]}{fb}   ({new}/{todo} this session)")
             time.sleep(a.pause)
 
