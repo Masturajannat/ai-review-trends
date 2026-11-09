@@ -25,11 +25,11 @@ suggestion names it ("Add specific details about the plot.").
 This is an approximation built from the score's reason; it is not a new judgement by Gemini.
 
   python scripts/12_combine_scores.py          # first: one row per scored review
-  python scripts/15_feedback_from_reasons.py   # writes all_scores_feedback.csv
+  python scripts/15_feedback_from_reasons.py   # writes all_scores_feedback.csv and .json
 """
 import json, os, re
 import pandas as pd
-from common import ROOT
+from common import ROOT, save_table
 
 CRITERIA = ["specific", "personal", "reasoned", "relevant"]
 
@@ -132,10 +132,10 @@ def main():
     d.loc[todo, "how_to_improve"] = [json.dumps(t, ensure_ascii=False) for _, t in out]
     d.loc[todo, "feedback_from"] = "reason_rules"
     dst = os.path.join(ROOT, "all_scores_feedback.csv")
-    d.to_csv(dst, index=False, encoding="utf-8-sig")
+    js = save_table(d, dst)
 
     w = d["weak_criteria"].fillna("")
-    print(f"{len(d)} reviews -> {dst}")
+    print(f"{len(d)} reviews -> {dst}\n  and {js}")
     print("feedback source:", d["feedback_from"].value_counts().to_dict())
     print("criteria to improve (share of reviews):")
     for c in CRITERIA:

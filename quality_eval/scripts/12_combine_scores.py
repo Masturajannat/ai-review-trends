@@ -1,7 +1,7 @@
 """Step 12: one table with a quality score for every scored review.
 
 Combines the pilot (prompt_v2 scores only), main and full sets into
-quality_eval/all_scores.csv:
+quality_eval/all_scores.csv and the same table as quality_eval/all_scores.json:
   review_id, platform, language, n_words, product_name, text_original,
   score (mean of the runs), runs, reason (first run), stage,
   weak_criteria, how_to_improve, feedback_from
@@ -13,7 +13,7 @@ before feedback was added, from step 14 (feedback_raw*.csv); empty if neither ex
 import os
 import pandas as pd
 import glob
-from common import ROOT, folder, SAMPLE_FILES, read_scores
+from common import ROOT, folder, SAMPLE_FILES, read_scores, save_table
 
 VERSION = "prompt_v2"
 parts = []
@@ -44,6 +44,7 @@ for stage, fname in SAMPLE_FILES.items():
 
 allx = pd.concat(parts, ignore_index=True).drop_duplicates("review_id")
 out = os.path.join(ROOT, "all_scores.csv")
-allx.to_csv(out, index=False, encoding="utf-8-sig")
+js = save_table(allx, out)
 print(f"\n{len(allx)} reviews -> {out}")
+print(f"  and the same table as JSON -> {js}")
 print(allx.groupby(["platform", "language"])["score"].agg(["size", "mean"]).round(2).to_string())

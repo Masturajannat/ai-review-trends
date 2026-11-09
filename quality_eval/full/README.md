@@ -56,7 +56,7 @@ python scripts\11_make_full_set.py                             # only if full\da
 python scripts\03_score.py --folder full --runs 1 --prompt prompt_v2_feedback.txt
 python scripts\04_summarize.py --folder full --version prompt_v2
 python scripts\07_make_page.py --folder full                   # optional, large page
-python scripts\12_combine_scores.py                            # all_scores.csv: pilot + main + full
+python scripts\12_combine_scores.py                            # all_scores.csv + .json: pilot + main + full
 ```
 
 About 5 seconds per review, so roughly 9-10 hours in total. The free tier's daily quota will usually

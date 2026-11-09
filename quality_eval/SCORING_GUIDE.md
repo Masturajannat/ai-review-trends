@@ -116,6 +116,6 @@ git checkout origin/Tazrian -- quality_eval/full/results/scores_raw_Tazrian.csv
 git checkout origin/Fahima -- quality_eval/full/results/scores_raw_Fahima.csv
 cd quality_eval
 python scripts\04_summarize.py --folder full --version prompt_v2
-python scripts\12_combine_scores.py                 # all_scores.csv, one row per review
+python scripts\12_combine_scores.py                 # all_scores.csv + all_scores.json, one row per review
 python scripts\15_feedback_from_reasons.py          # feedback for the 816 reviews scored before
 ```

@@ -44,6 +44,29 @@ def append_row(path, rec):
         row.to_csv(path, index=False, encoding="utf-8-sig")
 
 
+def save_table(df, csv_path):
+    """Save a results table twice: as CSV and as JSON (same name, .json).
+
+    In the JSON file each review is one object; weak_criteria becomes a list and
+    how_to_improve an object, instead of the text form they have in the CSV."""
+    import json
+    df.to_csv(csv_path, index=False, encoding="utf-8-sig")
+    recs = json.loads(df.to_json(orient="records", force_ascii=False))
+    for r in recs:
+        if "weak_criteria" in r:
+            w = r["weak_criteria"]
+            r["weak_criteria"] = [c for c in str(w).split("|") if c] if w is not None else None
+        if "how_to_improve" in r and isinstance(r["how_to_improve"], str):
+            try:
+                r["how_to_improve"] = json.loads(r["how_to_improve"])
+            except ValueError:
+                pass
+    json_path = os.path.splitext(csv_path)[0] + ".json"
+    with open(json_path, "w", encoding="utf-8") as f:
+        json.dump(recs, f, ensure_ascii=False, indent=2)
+    return json_path
+
+
 def read_scores(results_dir):
     """All score files of a stage: scores_raw.csv plus scores_raw_<name>.csv from each teammate."""
     files = sorted(glob.glob(os.path.join(results_dir, "scores_raw*.csv")))
