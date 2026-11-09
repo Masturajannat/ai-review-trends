@@ -1,0 +1,59 @@
+You are grading the quality of a customer review written on an e-commerce site in Bangladesh. The review may be in Bangla, Banglish (Bangla written in English letters), English, or a mix.
+
+WHAT YOU ARE JUDGING
+Judge how useful the review would be to a person deciding whether to buy this product from this shop. Do not judge whether the review is positive or negative, and do not judge spelling, grammar, language or script. Bangla, Banglish and English reviews are scored by the same standard. Do not reward length by itself: a short review with real detail can score well, and a long review that says nothing should score low. Do not reward emotional or enthusiastic language by itself; score the information it carries. A review that mentions both good and bad points is not penalised for being mixed.
+
+Do not try to decide whether the review is genuine, fake or AI-generated. Do not lower a score because the writing sounds polished, promotional or machine-written; judge only the information the review gives.
+
+BEFORE SCORING
+Work out what a buyer of this kind of product would want to know, using the product name (or the review itself if the name is unclear). Use this only to recognise what counts as real detail. It is not a checklist: a review does not need to cover everything, and real, specific detail about anything relevant counts equally. Depth on one or two points is better than a shallow mention of many.
+
+Score only what the review actually says. Do not assume the reviewer tested a feature, used the product for some time or saw a result unless the review states it, and do not fill in missing context or read an unclear statement more favourably than its words support. A one-word claim such as "original" or "as described" is a small piece of information, not evidence of a detailed experience.
+
+WHAT COUNTS AS USEFUL DETAIL
+- The product itself: concrete parts, features, performance, quality, results over time.
+- The buying experience: delivery time, the condition the product arrived in, packaging, whether the product was original or genuine, whether it matched the photos or description, and how the seller handled a problem (replacement, refund, reply). Buyers in Bangladesh rely on this information, so specific comments about delivery and service count as useful detail, even when the review says little about the product itself.
+- Specific means checkable: "arrived in 2 days, box was sealed and undamaged" is useful; "fast delivery" or "good service" alone is generic.
+A review that is only about delivery or service, with nothing about the product itself, should not score above 6.
+
+BOOKS
+For a book, judge the reviewer's own reading experience: what they thought of the story, writing style, characters, ideas or translation, who would enjoy it, and how it affected them. The product name may include a format such as (Paperback) or (হার্ডকভার); do not lower the score because the review does not discuss binding, paper or print, although specific comments on them, or on the delivery, count as useful detail. A review that mainly retells the plot or the book's background, with little of the reviewer's own opinion, should not score above 5.
+
+A GOOD REVIEW
+- is specific: names concrete features, results or service details, not just "good" or "nice"
+- is personal: shows real use or a real purchase (how long, in what situation, what happened)
+- is reasoned: gives a reason, a pro and a con, or a comparison
+- is relevant: useful to someone deciding whether to buy this product from this shop
+
+A BAD REVIEW
+- uses only generic adjectives or stock phrases ("nice product", "recommended", "fast delivery", "ভালো প্রোডাক্ট")
+- gives nothing a buyer could check or act on
+- is off-topic: a question to the seller, a request to the shop (restock, price, offers), or spam
+- copies a product description or book blurb, with no opinion of the reviewer's own
+- is only advertising copy, with no experience of the reviewer's own
+- gives general advice or claims that are not tied to the reviewer's own use
+
+SCORING
+Give one overall score from 1 to 10. Be strict: generic praise or complaint with no detail, about the product or the delivery, should not score above 3. A 10 should be rare.
+1: empty, meaningless, spam, or off-topic
+2: almost nothing a buyer could use
+3: generic praise or complaint, no detail
+4: a hint of information, but no concrete detail
+5: one specific detail, with little explanation
+6: specific detail about the product or the buying experience, with limited context
+7: specific detail backed by the reviewer's own use or purchase
+8: several useful details, or real depth on one point
+9: detailed, personal and reasoned, strongly useful to a buyer
+10: exceptionally informative, thorough and balanced
+
+PRODUCT: {product_name}
+
+REVIEW:
+{review_text}
+
+OUTPUT
+Reply with JSON only, with these keys in this order:
+1. "reason": one short sentence in English explaining the score.
+2. "overall": the score, an integer from 1 to 10.
+3. "weak_criteria": the criteria from A GOOD REVIEW on which this review falls short, as a list using only these words: "specific", "personal", "reasoned", "relevant". List every criterion that, if improved, would raise the score; it must agree with the shortcomings named in "reason". Use an empty list only when no meaningful improvement would make the review more useful to a buyer.
+4. "how_to_improve": an object with one entry for each criterion in weak_criteria, in the form {"criterion": "suggestion"}. Each suggestion is one short sentence in English telling the reviewer what to add or change in THIS review for THIS product (for example "Say how many hours the battery lasts with your daily use"). Base it only on what is missing from the review; do not invent facts about the product.

@@ -5,19 +5,20 @@ import pandas as pd
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from common import folder
+from common import folder, FOLDERS, SAMPLE_FILES, read_scores
 
 ap = argparse.ArgumentParser()
-ap.add_argument("--folder", required=True, choices=["pilot", "main"])
+ap.add_argument("--folder", required=True, choices=FOLDERS)
 ap.add_argument("--version", default=None)   # default: latest prompt version in the file
 a = ap.parse_args()
 
 fdir = folder(a.folder)
 res = os.path.join(fdir, "results")
-sample = pd.read_csv(os.path.join(fdir, "data", "pilot_sample.csv" if a.folder == "pilot" else "main_sample.csv"))
-raw = pd.read_csv(os.path.join(res, "scores_raw.csv"))
+sample = pd.read_csv(os.path.join(fdir, "data", SAMPLE_FILES[a.folder]), dtype={"review_id": str})
+raw = read_scores(res)          # scores_raw.csv and every teammate's scores_raw_<name>.csv
 version = a.version or raw["prompt_version"].iloc[-1]
 raw = raw[raw["prompt_version"] == version]
+raw = raw.drop_duplicates(["review_id", "run", "prompt_version"])
 
 # wide table: one row per review, one column per run
 wide = raw.pivot(index="review_id", columns="run", values="overall")

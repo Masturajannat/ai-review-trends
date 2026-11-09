@@ -3,10 +3,10 @@ import html
 import os
 
 import pandas as pd
-from common import folder
+from common import folder, FOLDERS
 
 ap = argparse.ArgumentParser()
-ap.add_argument("--folder", default="pilot", choices=["pilot", "main"])
+ap.add_argument("--folder", default="pilot", choices=FOLDERS)
 a = ap.parse_args()
 
 results = os.path.join(folder(a.folder), "results")
@@ -33,7 +33,8 @@ parts.append("<h1>" + a.folder + " reviews (" + str(len(df)) + ")</h1>")
 
 for _, r in df.iterrows():
     parts.append("<div class='card'>")
-    parts.append("<div class='score'>Score " + str(r["mean"]) + " (run1 " + str(r["run1"]) + ", run2 " + str(r["run2"]) + ")</div>")
+    runs = ", ".join(f"{c} {r[c]:g}" for c in df.columns if c.startswith("run") and c[3:].isdigit() and pd.notna(r[c]))
+    parts.append("<div class='score'>Score " + str(r["mean"]) + " (" + runs + ")</div>")
     info = [r["platform"], r["language"], str(r["n_words"]) + " words", r["product_name"], "id " + str(r["review_id"])]
     parts.append("<div class='info'>" + html.escape(" | ".join(str(x) for x in info)) + "</div>")
     parts.append("<div class='text'>" + html.escape(str(r["text_original"])) + "</div>")
