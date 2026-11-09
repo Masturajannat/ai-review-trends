@@ -3,7 +3,10 @@
 Combines the pilot (prompt_v2 scores only), main and full sets into
 quality_eval/all_scores.csv:
   review_id, platform, language, n_words, product_name, text_original,
-  score (mean of the runs), runs, reason (first run), stage
+  score (mean of the runs), runs, reason (first run), stage,
+  weak_criteria, how_to_improve, feedback_from
+Feedback comes from the scoring call itself (prompt_v2_feedback) or, for reviews scored
+before feedback was added, from step 14 (feedback_raw*.csv); empty if neither exists yet.
 
   python scripts/12_combine_scores.py
 """
@@ -26,7 +29,17 @@ for stage, fname in SAMPLE_FILES.items():
     s = pd.DataFrame({"score": g["overall"].mean().round(2), "runs": g["overall"].size(),
                       "reason": g["reason"].first()}).reset_index()
     s = sample.merge(s, on="review_id", how="inner").assign(stage=stage)
-    print(f"{stage}: {len(s)} of {len(sample)} reviews scored")
+    # feedback: from the scoring call if it had any, else from the backfill (step 14)
+    fb = pd.DataFrame(columns=["review_id", "weak_criteria", "how_to_improve", "feedback_from"])
+    if "how_to_improve" in raw:
+        f1 = raw[raw["how_to_improve"].notna()].sort_values("run").drop_duplicates("review_id")
+        fb = pd.concat([fb, f1[["review_id", "weak_criteria", "how_to_improve"]].assign(feedback_from="scoring")])
+    for f in glob.glob(os.path.join(res_dir, "feedback_raw*.csv")):
+        f2 = pd.read_csv(f, dtype={"review_id": str})
+        fb = pd.concat([fb, f2[["review_id", "weak_criteria", "how_to_improve"]].assign(feedback_from="backfill")])
+    fb = fb.drop_duplicates("review_id")
+    s = s.merge(fb, on="review_id", how="left")
+    print(f"{stage}: {len(s)} of {len(sample)} reviews scored, {s['how_to_improve'].notna().sum()} with feedback")
     parts.append(s)
 
 allx = pd.concat(parts, ignore_index=True).drop_duplicates("review_id")

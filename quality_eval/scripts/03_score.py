@@ -11,10 +11,18 @@ Reviews already in ANY scores_raw*.csv of the stage are skipped.
 
 Rerunning does nothing for scores that already exist, so an interrupted
 run just carries on. To add a third round, run again with --runs 3.
+
+With --prompt prompt_v2_feedback.txt each answer also says which criteria the review
+should improve (weak_criteria) and how (how_to_improve). Its scoring instructions are
+word for word those of prompt_v2, so its scores are stored as prompt_v2: reviews already
+scored with prompt_v2 are skipped, and old and new scores are summarised together.
 """
 import argparse, glob, json, os, time
 import pandas as pd
-from common import ROOT, folder, FOLDERS, SAMPLE_FILES
+from common import ROOT, folder, FOLDERS, SAMPLE_FILES, parse_feedback, append_row
+
+# prompts whose scoring part is identical to another version: stored under that version
+SAME_SCORING = {"prompt_v2_feedback": "prompt_v2"}
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--folder", required=True, choices=FOLDERS)
@@ -38,7 +46,9 @@ if not 1 <= a.part <= a.of:
 res_dir = os.path.join(fdir, "results")
 out_file = os.path.join(res_dir, f"scores_raw_{a.name}.csv" if a.name else "scores_raw.csv")
 template = open(os.path.join(ROOT, "prompts", a.prompt), encoding="utf-8").read()
-version = os.path.splitext(a.prompt)[0]
+prompt_name = os.path.splitext(a.prompt)[0]
+version = SAME_SCORING.get(prompt_name, prompt_name)
+with_feedback = '"weak_criteria"' in template
 
 def build(row):
     return (template.replace("{product_name}", str(row["product_name"]))
@@ -49,7 +59,8 @@ def parse(text):
     overall = int(j["overall"])
     if not 1 <= overall <= 10:
         raise ValueError("overall out of range")
-    return overall, str(j.get("reason", ""))
+    fb = parse_feedback(j) if with_feedback else None
+    return overall, str(j.get("reason", "")), fb
 
 def ask(client, prompt):
     # a few retries for rate limits or broken JSON
@@ -102,10 +113,11 @@ def main():
             new += 1
             rec = dict(review_id=row["review_id"], run=run, overall=res[0], reason=res[1],
                        model=a.model, prompt_version=version)
-            pd.DataFrame([rec]).to_csv(out_file, mode="a", header=not exists,
-                                       index=False, encoding="utf-8-sig")
-            exists = True
-            print(f"run {run}  {i + 1}/{len(df)}  -> {res[0]}   ({new}/{todo} this session)")
+            if res[2] is not None:
+                rec.update(weak_criteria=res[2][0], how_to_improve=res[2][1], prompt_file=a.prompt)
+            append_row(out_file, rec)
+            fb = f"   improve: {res[2][0] or '-'}" if res[2] is not None else ""
+            print(f"run {run}  {i + 1}/{len(df)}  -> {res[0]}{fb}   ({new}/{todo} this session)")
             time.sleep(a.pause)
 
 if __name__ == "__main__":
