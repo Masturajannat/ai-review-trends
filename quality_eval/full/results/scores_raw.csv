@@ -1,0 +1,317 @@
+﻿review_id,run,overall,reason,model,prompt_version
+10657601,1,3,The review provides only generic praise and a vague skin type without concrete details about the product's performance.,gemini-3.5-flash-lite,prompt_v2
+b92d876ea10f8835,1,4,"The review praises the book as a masterpiece and notes that history is described well in a story format, but lacks deeper personal insights, specific examples, or detailed analysis.",gemini-3.5-flash-lite,prompt_v2
+13614491696608,1,6,"The review provides two specific details regarding the product's quality and the poor packaging, but lacks deeper context or explanation.",gemini-3.5-flash-lite,prompt_v2
+22687880060913,1,3,The review provides generic praise about packaging and product quality with no concrete details about the mask itself.,gemini-3.5-flash-lite,prompt_v2
+10653828,1,5,"The review provides two specific details about the price and scent, but lacks deeper context or extensive information.",gemini-3.5-flash-lite,prompt_v2
+15ee3d22151e98fc,1,3,The review provides only generic praise without any specific details about the book's content or reading experience.,gemini-3.5-flash-lite,prompt_v2
+57869658340477,1,6,The review provides delivery timing and a basic assessment of sound quality relative to the price.,gemini-3.5-flash-lite,prompt_v2
+58557840040477,1,3,The review provides only a generic recommendation and price-based praise with no specific details about the earbuds.,gemini-3.5-flash-lite,prompt_v2
+c5fdda49ca82e76d,1,3,"The review provides only generic praise and mentions packaging without any specific details about the book's contents, quality, or reading experience.",gemini-3.5-flash-lite,prompt_v2
+eb3f409e56a26b49,1,5,"The review expresses a strong emotional reaction to the book's contents, but lacks specific details about the plot, themes, or writing style.",gemini-3.5-flash-lite,prompt_v2
+13370705,1,5,"The review provides personal context regarding long-term use for sensitive skin, but lacks specific details on the product's performance.",gemini-3.5-flash-lite,prompt_v2
+55929164978920,1,5,"The review mentions specific delivery and packaging details, but contains no information about the product itself.",gemini-3.5-flash-lite,prompt_v2
+54180805436344,1,3,The review provides generic praise about product match and seller behavior without concrete details about the detergent's performance.,gemini-3.5-flash-lite,prompt_v2
+23492433948837,1,6,"The review provides specific details about poor packaging and the perceived age of the product based on stock levels, though it lacks details on the handwash's performance.",gemini-3.5-flash-lite,prompt_v2
+e788e210bfb46247,1,3,The review only mentions delivery service with no details about the book itself.,gemini-3.5-flash-lite,prompt_v2
+2218215,1,5,"The review provides a specific observation that the product produced no visible skin changes, though it remains somewhat vague.",gemini-3.5-flash-lite,prompt_v2
+20363048860913,1,3,The review only contains generic praise without any specific details about the product or delivery.,gemini-3.5-flash-lite,prompt_v2
+19549495432307,1,5,"The review mentions that the product is original and mostly fine except for the wrong color, providing a small specific detail about the purchase.",gemini-3.5-flash-lite,prompt_v2
+16165827312818,1,5,"The review mentions that everything was fine and notes a valid concern about short expiry dates, but lacks specific details about the product's performance.",gemini-3.5-flash-lite,prompt_v2
+18651056048837,1,3,"The review provides only generic praise about the seller, packaging, and delivery without any specific details about the product itself.",gemini-3.5-flash-lite,prompt_v2
+58173885640477,1,3,The review provides generic praise about the product quality and delivery personnel's behavior without offering specific details.,gemini-3.5-flash-lite,prompt_v2
+7e1668196e7379c9,1,3,"The review praises the book's presentation and recommends it, but lacks specific details about the plot, characters, or the reviewer's personal reading experience.",gemini-3.5-flash-lite,prompt_v2
+c9174574f0da127f,1,3,The review is extremely generic and provides no specific details about the reviewer's reading experience or the book's contents beyond a vague mention of the 1971 war.,gemini-3.5-flash-lite,prompt_v2
+57209706240477,1,3,The review provides only generic praise and a claim of originality without any specific details about the product or buying experience.,gemini-3.5-flash-lite,prompt_v2
+58211295740477,1,3,"The review only mentions receiving the item for free and that it looks premium, offering no checkable details about the earbuds themselves.",gemini-3.5-flash-lite,prompt_v2
+3393975,1,1,This review is a question addressed to the seller rather than an evaluation of the product.,gemini-3.5-flash-lite,prompt_v2
+13513489332348,1,5,"The review mentions specific buying experience details like good packaging and fast delivery, but lacks concrete information about the product itself.",gemini-3.5-flash-lite,prompt_v2
+2436435,1,7,"The review provides specific, personal negative details about the product causing acne and leaving marks, though it lacks context on delivery or buying experience.",gemini-3.5-flash-lite,prompt_v2
+57971972210859,1,3,The review only mentions the price and a generic positive comment with no details about the product or delivery.,gemini-3.5-flash-lite,prompt_v2
+58347966240477,1,8,"The review provides several useful details regarding sound quality, ANC/ENC performance, battery life, fit, connectivity, and delivery condition, backed by personal experience.",gemini-3.5-flash-lite,prompt_v2
+7095990,1,5,"The review provides a specific negative reaction to the product's fragrance and its effect on the reviewer's allergy, but lacks broader context.",gemini-3.5-flash-lite,prompt_v2
+47dfc6bf753a11da,1,2,"The review consists of generic advice without providing any specific details about the book, delivery, or reading experience.",gemini-3.5-flash-lite,prompt_v2
+13369073,1,4,The review provides a generic positive comment about the product along with a specific mention of the rose water's pleasant smell.,gemini-3.5-flash-lite,prompt_v2
+a51e3f7e9aaddd13,1,4,"The review expresses a personal sentiment about the book's theme but lacks specific details about the reading experience, plot, or edition.",gemini-3.5-flash-lite,prompt_v2
+58869538058117,1,7,The review provides specific performance details including battery backup at a specific volume level and user opinion on sound quality.,gemini-3.5-flash-lite,prompt_v2
+4045e849b75fbeff,1,6,"The review provides personal impressions of the book's themes and translation, but lacks deeper critical analysis.",gemini-3.5-flash-lite,prompt_v2
+3163655,1,3,"The review expresses emotional praise ('in love with this serum') without providing any specific details about its performance, ingredients, or results.",gemini-3.5-flash-lite,prompt_v2
+18464605756532,1,2,"The review only mentions receiving a free gift and thanking the seller, providing no details about the product itself.",gemini-3.5-flash-lite,prompt_v2
+673665a013cdceac,1,8,"The review provides thoughtful personal insights into the book's content, themes, and relationship dynamics, offering strong value to potential readers.",gemini-3.5-flash-lite,prompt_v2
+13399777,1,1,The review is off-topic as it is a question directed to the seller rather than a review of the product.,gemini-3.5-flash-lite,prompt_v2
+38313663279291,1,6,The review provides specific details about product flaws and fabric quality from a real purchase experience.,gemini-3.5-flash-lite,prompt_v2
+43192785956950,1,6,"The review provides specific, first-hand details about damaged packaging and liquid leakage, but lacks information about the product itself.",gemini-3.5-flash-lite,prompt_v2
+21747427230244,1,3,The review provides only generic praise about the picture match and fast delivery without any concrete details.,gemini-3.5-flash-lite,prompt_v2
+ab37110ac7d127dc,1,6,"The review praises the book's gripping nature, research depth, and biographical value, but lacks specific details about the plot or personal reading experience.",gemini-3.5-flash-lite,prompt_v2
+57285151140477,1,3,The review provides only generic praise and price satisfaction without specific details about the earbuds.,gemini-3.5-flash-lite,prompt_v2
+58876132558117,1,5,"The review praises the sound quality and value for money, but lacks specific technical details about ANC, battery life, or connectivity.",gemini-3.5-flash-lite,prompt_v2
+13994834696608,1,4,The review mentions the packaging quality but provides no concrete information about the product's actual effectiveness.,gemini-3.5-flash-lite,prompt_v2
+10198193,1,6,"The review provides specific performance details such as lathering capacity and fragrance longevity, but lacks context on delivery or packaging.",gemini-3.5-flash-lite,prompt_v2
+58442083740477,1,6,"The review provides personal experience over nine days and mentions specific performance aspects like sound quality and battery backup, but lacks deeper technical details or concrete metrics.",gemini-3.5-flash-lite,prompt_v2
+22503294116517,1,5,"The review provides specific detail about a damaged package and spoiled product, but lacks broader context.",gemini-3.5-flash-lite,prompt_v2
+13610804116876,1,5,"The review mentions specific delivery time and packaging details, but lacks information about the product itself.",gemini-3.5-flash-lite,prompt_v2
+58392100440477,1,7,The review provides specific performance details and a concrete flaw from a day of personal use.,gemini-3.5-flash-lite,prompt_v2
+21113046460913,1,6,"The review provides basic specific details about matching the pictures, product quality, and fit, but lacks deeper context or extensive information.",gemini-3.5-flash-lite,prompt_v2
+26591460016517,1,3,The review expresses frustration with the packaging and delivery experience but provides no specific details about the product itself.,gemini-3.5-flash-lite,prompt_v2
+2501076,1,5,"The review provides two specific performance details about the product, but lacks context about skin type or duration of use.",gemini-3.5-flash-lite,prompt_v2
+10595674910859,1,3,"The review provides only generic praise for price, quality, and delivery without any specific details.",gemini-3.5-flash-lite,prompt_v2
+11111091,1,5,The review provides generic praise along with a single specific detail about the included loofah being soft.,gemini-3.5-flash-lite,prompt_v2
+1892454fc5482586,1,6,"The review provides personal impressions of the book's pacing and learning impact, but lacks specific details about the plot or characters.",gemini-3.5-flash-lite,prompt_v2
+680b6d91ad590c18,1,6,"The review shares personal insight into the book's themes and impact, but lacks specific details about the edition or the buying experience.",gemini-3.5-flash-lite,prompt_v2
+10400344,1,3,The review provides only generic praise and a claim of authenticity without any concrete details about the product or buying experience.,gemini-3.5-flash-lite,prompt_v2
+30cc04ac96489294,1,5,The review retells a large portion of the plot without offering much personal opinion or analytical depth on the writing style or ideas.,gemini-3.5-flash-lite,prompt_v2
+58497341940477,1,4,"The review provides a repeat purchase experience and price-to-value opinion, but lacks specific details on features, performance, or delivery.",gemini-3.5-flash-lite,prompt_v2
+13636428816876,1,5,"The review provides a specific detail about poor packaging and damage, but lacks context or further information about the product itself.",gemini-3.5-flash-lite,prompt_v2
+35250319716876,1,3,"The review provides only generic praise and states that the product matches the picture, offering no specific details about performance or use.",gemini-3.5-flash-lite,prompt_v2
+18398275832307,1,4,"The review provides a price comparison and a strong recommendation, but lacks concrete details about the earphones' features or performance.",gemini-3.5-flash-lite,prompt_v2
+37844300479291,1,3,"The review mentions the quantity bought and finds the price acceptable, but lacks specific details about the product quality or delivery.",gemini-3.5-flash-lite,prompt_v2
+11246555,1,5,"The review provides a specific detail about the sweet scent and mentions a repeat purchase, but lacks deeper information about its moisturizing performance.",gemini-3.5-flash-lite,prompt_v2
+2019907,1,7,The review provides specific performance details and mentions both a positive and a drawback from personal use.,gemini-3.5-flash-lite,prompt_v2
+8759688,1,1,This review is off-topic as it is a purchase request rather than a review of the product.,gemini-3.5-flash-lite,prompt_v2
+834de98f0fa0470b,1,4,"The review expresses strong enthusiasm for completing a book series but lacks specific details about the plot, characters, or writing style of this particular volume.",gemini-3.5-flash-lite,prompt_v2
+13387220,1,1,This review is a question directed to the seller rather than an evaluation of the product or shopping experience.,gemini-3.5-flash-lite,prompt_v2
+35865921032307,1,4,"The review mentions repeat purchase and gifting, but provides minimal concrete detail about the earphones' performance or features beyond generic praise.",gemini-3.5-flash-lite,prompt_v2
+27621898607784,1,7,"The review provides specific negative and positive details about the backpack's smell, dirt accumulation, and the user's personal experience over a few days.",gemini-3.5-flash-lite,prompt_v2
+32426711878920,1,4,"The review only mentions delivery speed, condition, and packaging without providing any details about the product itself.",gemini-3.5-flash-lite,prompt_v2
+5703288,1,2,The review consists only of generic emotional praise without providing any specific details about the product or buying experience.,gemini-3.5-flash-lite,prompt_v2
+8d280aeb001766b7,1,4,"The review expresses appreciation for the book's impact and style, but lacks specific details about the content, author's arguments, or reading experience.",gemini-3.5-flash-lite,prompt_v2
+18918467156950,1,6,"The review provides specific details about delivery speed, packaging, expiry date, price, and cashback offer, but lacks information on the product's performance.",gemini-3.5-flash-lite,prompt_v2
+27681824632307,1,6,"The review mentions a specific duration of use and mentions bass performance, but lacks deeper detail.",gemini-3.5-flash-lite,prompt_v2
+91bab5927db9a3b9,1,5,"The review provides a specific, actionable complaint about the print clarity and suggests action, but lacks broader context about the book itself.",gemini-3.5-flash-lite,prompt_v2
+2763008,1,7,"The review provides specific, personal experience about how the cream caused breakouts on combination skin.",gemini-3.5-flash-lite,prompt_v2
+20676482316517,1,6,"The review provides specific, actionable details about the poor delivery condition and a missing promotional item, though it lacks details about the washing powder itself.",gemini-3.5-flash-lite,prompt_v2
+25347680830244,1,3,The review consists only of generic praise with no specific details about the product or buying experience.,gemini-3.5-flash-lite,prompt_v2
+cda813ab8ecab1ab,1,2,"The review only expresses personal affection for the author and book without providing any specific details about the book's content, reading experience, or purchase.",gemini-3.5-flash-lite,prompt_v2
+22779667279291,1,3,The review provides generic praise without specific details about the product or delivery.,gemini-3.5-flash-lite,prompt_v2
+50951079896608,1,4,The review mentions a specific delivery timeframe but otherwise relies on generic praise without detailing the product itself.,gemini-3.5-flash-lite,prompt_v2
+3fa541a46a576ed1,1,4,"The review expresses appreciation for the book and characters but lacks specific details about the plot, writing style, or reading experience.",gemini-3.5-flash-lite,prompt_v2
+05dd8c2a9a88b0a3,1,6,"The review provides personal emotional impact and a strong recommendation to read the book, but lacks specific details about the plot, themes, or writing style.",gemini-3.5-flash-lite,prompt_v2
+21464053360913,1,6,"The review provides a specific detail about the product's thickness and its practical impact on wearability, though it lacks broader context.",gemini-3.5-flash-lite,prompt_v2
+38821884340412,1,3,The review provides generic praise and a claim of originality without any specific details about the product's performance or the buying experience.,gemini-3.5-flash-lite,prompt_v2
+21701823696608,1,3,The review contains only generic praise and stock phrases without any specific details about the product or delivery.,gemini-3.5-flash-lite,prompt_v2
+13378558,1,5,"The review provides specific details about skin type and product performance, but lacks personal context regarding usage duration or buying experience.",gemini-3.5-flash-lite,prompt_v2
+19084630932307,1,3,The review only provides generic praise without any specific details about the product or buying experience.,gemini-3.5-flash-lite,prompt_v2
+3449207,1,6,"The review provides specific negative performance details about how the moisturizer affected oily skin, though lacking broader context.",gemini-3.5-flash-lite,prompt_v2
+dc8bcea1d0d72f21,1,3,"The review offers only generic praise without detailing the reading experience, plot, or edition quality.",gemini-3.5-flash-lite,prompt_v2
+11342424916517,1,6,The review provides mixed feedback mentioning satisfaction with the product along with a specific complaint about delivery time.,gemini-3.5-flash-lite,prompt_v2
+54501175136344,1,3,The review provides only generic praise and mentions fast delivery without any checkable details about the product itself.,gemini-3.5-flash-lite,prompt_v2
+53388256737074,1,3,The review consists of generic praise and an unclear fragment about battery life without meaningful detail.,gemini-3.5-flash-lite,prompt_v2
+57383632778920,1,4,The review provides a brief positive opinion along with a specific complaint about the shipping cost.,gemini-3.5-flash-lite,prompt_v2
+23028819460913,1,3,The review provides only a generic praise about the price without giving any concrete details about the mask's quality or delivery experience.,gemini-3.5-flash-lite,prompt_v2
+13586845836344,1,6,"The review highlights a discrepancy between the online price and the printed MRP, providing a specific, actionable detail about the buying experience.",gemini-3.5-flash-lite,prompt_v2
+58087585140477,1,4,"The review mentions timely delivery and the weight of the product, but gives no information on performance or quality since it has not been tested yet.",gemini-3.5-flash-lite,prompt_v2
+f5824a15c1e82ada,1,3,"The review praises the author and recommends the book but lacks specific details about the content, writing style, or reading experience.",gemini-3.5-flash-lite,prompt_v2
+575cf482919ca5f3,1,4,The review mainly retells the plot and background of the book without sharing the reviewer's own opinion or reading experience.,gemini-3.5-flash-lite,prompt_v2
+932132,1,7,"The review provides specific performance details and practical usage tips, though it lacks context on long-term results.",gemini-3.5-flash-lite,prompt_v2
+23757040779291,1,3,"The review only provides generic praise for the price, product quality, and delivery personnel without any specific details.",gemini-3.5-flash-lite,prompt_v2
+5700610,1,2,The review only mentions the expiration date and lacks any useful details about the product's performance or the buying experience.,gemini-3.5-flash-lite,prompt_v2
+22297483432307,1,6,The review provides specific details about the packaging and the sound quality relative to the price.,gemini-3.5-flash-lite,prompt_v2
+19261649410859,1,6,"The review mentions specific details about originality, packaging, and pricing compared to MRP, but lacks deeper context on the product's performance.",gemini-3.5-flash-lite,prompt_v2
+10560220810859,1,3,"The review mentions ongoing personal use and product quality, but lacks specific, checkable details beyond generic praise.",gemini-3.5-flash-lite,prompt_v2
+20411870312818,1,5,"The review mentions specific details about the product like the smell and shares personal buying experience including delivery time, but lacks deep context.",gemini-3.5-flash-lite,prompt_v2
+13409742,1,3,The review provides generic praise about the scent and price without specific details on performance or purchase experience.,gemini-3.5-flash-lite,prompt_v2
+20388049560913,1,6,"The review provides a specific critique about the product not having five layers, while still noting its value and quality for the price.",gemini-3.5-flash-lite,prompt_v2
+b15d0a514f0f853b,1,3,The review consists only of generic praise with no specific details about the book or buying experience.,gemini-3.5-flash-lite,prompt_v2
+2089753,1,1,The review is off-topic as it only asks a question to the seller rather than sharing any product experience or useful details.,gemini-3.5-flash-lite,prompt_v2
+10340218213245,1,3,This is a generic complaint with no specific details about the product performance or buying experience.,gemini-3.5-flash-lite,prompt_v2
+04e2cf59cff5e3b1,1,6,"The review provides personal insight into the book's emotional impact and message, though it lacks deeper discussion of the writing style or plot.",gemini-3.5-flash-lite,prompt_v2
+3714845,1,7,"The review provides personal, specific results regarding pore cleansing and pimple reduction after use, along with details about the buying experience and seller gift.",gemini-3.5-flash-lite,prompt_v2
+53455504937074,1,5,The review provides a specific detail about battery performance by mentioning a 3-hour charge time.,gemini-3.5-flash-lite,prompt_v2
+01269e3463e20943,1,3,"The review expresses strong praise for the book but lacks any specific details about the content, writing style, or reading experience.",gemini-3.5-flash-lite,prompt_v2
+3873281,1,4,"The review provides a specific personal impression comparing the product to normal rose water, but lacks deeper context or detailed explanation.",gemini-3.5-flash-lite,prompt_v2
+26860827310859,1,4,"The review mentions specific details about the seller's packaging and secure delivery, but provides no information about the product itself.",gemini-3.5-flash-lite,prompt_v2
+11894747,1,3,The review provides only generic praise and enthusiasm without any specific details about the product or purchase experience.,gemini-3.5-flash-lite,prompt_v2
+8ede33fd828ef6d9,1,4,"The review provides a personal recommendation and opinion on the book's target audience, but lacks specific details about the plot, characters, or writing style.",gemini-3.5-flash-lite,prompt_v2
+9604ef451aaeb0ef,1,5,The review provides a specific observation about the book's historical focus but lacks deeper explanation or personal context.,gemini-3.5-flash-lite,prompt_v2
+10577263410859,1,5,"The review mentions product quality and expiration date validity, but lacks deeper context or specific details.",gemini-3.5-flash-lite,prompt_v2
+10254270,1,7,"The review provides specific details about lathering, scent longevity, and seasonal suitability for summer use.",gemini-3.5-flash-lite,prompt_v2
+9520206,1,4,"The review mentions a specific funny side effect and price constraint, but lacks genuine details about the eye cream's quality or performance.",gemini-3.5-flash-lite,prompt_v2
+13612691816876,1,6,"The review provides specific delivery time, packaging condition, and product validity details based on a real purchase.",gemini-3.5-flash-lite,prompt_v2
+10937061,1,2,The review contains only generic emotional praise without any specific details about the product's performance or the buying experience.,gemini-3.5-flash-lite,prompt_v2
+17948060396608,1,4,"The review provides a specific price comparison with the offline market, but lacks details about the product itself.",gemini-3.5-flash-lite,prompt_v2
+58345016978920,1,3,The review provides generic comments on delivery and product quality without specific details.,gemini-3.5-flash-lite,prompt_v2
+13116624,1,7,"The review provides specific, personal experience about how the cleanser affects dry skin, detailing irritation and redness, making it useful for potential buyers.",gemini-3.5-flash-lite,prompt_v2
+11886664146885,1,3,"The review provides only generic praise and mentions the price ratio without offering any concrete details about the backpack's features, quality, or dimensions.",gemini-3.5-flash-lite,prompt_v2
+13871419996608,1,3,"The review provides only generic praise and calls the product original without offering any specific details about its performance, scent, or buying experience.",gemini-3.5-flash-lite,prompt_v2
+13425351,1,1,"This review is just a pre-purchase question about product authenticity and pricing, offering no information about the product or buying experience.",gemini-3.5-flash-lite,prompt_v2
+52849686537074,1,3,The review only provides generic praise without any specific details about the product or delivery.,gemini-3.5-flash-lite,prompt_v2
+6023772,1,1,This review is a question to the seller rather than an evaluation of the product or service.,gemini-3.5-flash-lite,prompt_v2
+3500488,1,7,"The review provides specific personal experience on skin type, breakout results over time, and usage duration.",gemini-3.5-flash-lite,prompt_v2
+10691787,1,6,"The review mentions specific initial and adjusted effects on the skin from using the sunscreen, providing a personal experience detail.",gemini-3.5-flash-lite,prompt_v2
+3ae284aa833d6179,1,6,"The review provides specific personal criticism of the translation and ending, but lacks overall depth on the book's core narrative.",gemini-3.5-flash-lite,prompt_v2
+fb9664390a613040,1,4,"The review retells the book's background and plot with quotes, but lacks the reviewer's own opinion or reading experience.",gemini-3.5-flash-lite,prompt_v2
+13257010016876,1,3,The review only provides generic praise about delivery and service without mentioning any specific details about the product itself.,gemini-3.5-flash-lite,prompt_v2
+13313033707784,1,5,"The review points out a specific missing component, but lacks sufficient context or detail about the product overall.",gemini-3.5-flash-lite,prompt_v2
+23370494860913,1,3,"The review indicates a repeat purchase due to good quality, but lacks specific details about the product or buying experience.",gemini-3.5-flash-lite,prompt_v2
+aaf35348669a2f2b,1,5,"The review shares personal reflections on reading the book and relates to its characters and themes, but lacks deep critical analysis or specific commentary on the book's edition.",gemini-3.5-flash-lite,prompt_v2
+23773897879291,1,3,"The review mentions receiving the correct color and expressing satisfaction, but lacks concrete details about the material, size, or quality of the prayer mat.",gemini-3.5-flash-lite,prompt_v2
+13409727,1,6,"The review provides specific useful details about the product's fragrance, longevity, and price, along with general praise for the service.",gemini-3.5-flash-lite,prompt_v2
+1002515,1,6,"The review provides specific personal experience on how the product feels on dry and sensitive skin, though it lacks deeper details.",gemini-3.5-flash-lite,prompt_v2
+14599661296608,1,4,"The review mentions fast delivery and confirms the product is original and from a trusted brand, but provides no specific details about the product's performance or use.",gemini-3.5-flash-lite,prompt_v2
+4274d70167daab28,1,6,"The review expresses strong personal engagement with the book's pacing and mystery, but lacks specific details about the plot or characters to score higher.",gemini-3.5-flash-lite,prompt_v2
+23863263779291,1,5,"The review provides a specific detail about the product being small while mentioning the price point, but lacks further depth.",gemini-3.5-flash-lite,prompt_v2
+35876300879291,1,3,"The review mentions the color received and expresses satisfaction, but provides very little specific detail about the product's quality, thickness, or size.",gemini-3.5-flash-lite,prompt_v2
+13382630,1,3,The review provides generic praise with no specific details about the product or purchase experience.,gemini-3.5-flash-lite,prompt_v2
+12645989,1,7,The review provides personal experience with specific product performance details such as being non-greasy and long-term usage of multiple tubes.,gemini-3.5-flash-lite,prompt_v2
+34888653279291,1,3,"The review provides generic praise stating it is good for the price, but lacks specific details about the product quality or buying experience.",gemini-3.5-flash-lite,prompt_v2
+6955bb1ece376f35,1,6,"The review provides personal reading impressions and specific delivery details, though it lacks deeper depth on the book's content.",gemini-3.5-flash-lite,prompt_v2
+19468278532307,1,6,"The review provides specific, personal details about the earphones' comfort and sound quality, though the explanation remains somewhat brief.",gemini-3.5-flash-lite,prompt_v2
+38066175879291,1,5,The review provides a specific critique about the print quality alongside a general positive remark.,gemini-3.5-flash-lite,prompt_v2
+57884130240477,1,3,The review provides generic praise about the sound quality and price without giving any specific or checkable details about the earbuds.,gemini-3.5-flash-lite,prompt_v2
+35180491060913,1,3,The review provides only generic praise about price and quality without any specific details.,gemini-3.5-flash-lite,prompt_v2
+1797853,1,3,"The review provides generic praise with a skin type recommendation, but lacks specific details about product performance.",gemini-3.5-flash-lite,prompt_v2
+46348156140412,1,3,The review only claims the product is authentic without providing any specific details about its use or performance.,gemini-3.5-flash-lite,prompt_v2
+31184022332348,1,3,The review provides generic praise without concrete details about the product's performance or specific delivery times.,gemini-3.5-flash-lite,prompt_v2
+56498833037074,1,5,"The review provides specific complaints about poor battery life and mismatched earbuds, but lacks depth and context.",gemini-3.5-flash-lite,prompt_v2
+8569942,1,1,"This review is a question to the seller about age suitability rather than a product evaluation, making it off-topic for a buyer.",gemini-3.5-flash-lite,prompt_v2
+23617638132307,1,7,"The review provides specific details about the seller's service and correct color fulfillment, alongside personal feedback on the earphone's sound quality and value for money.",gemini-3.5-flash-lite,prompt_v2
+57413586337074,1,6,"The review provides specific details about a defect in the left earbud and flashlight, giving useful information for potential buyers.",gemini-3.5-flash-lite,prompt_v2
+22715010332307,1,7,"The review provides specific details about the sound, bass adjustment with cushions, and the included box relative to the price.",gemini-3.5-flash-lite,prompt_v2
+28193883779291,1,4,"The review mentions a delivery issue and seller responsiveness, but provides no concrete details about the prayer mat itself.",gemini-3.5-flash-lite,prompt_v2
+19475619260913,1,5,"The review provides basic useful details confirming the product matches the pictures and offers good value for money, but lacks deeper specifics about quality or use.",gemini-3.5-flash-lite,prompt_v2
+7951278,1,3,"The review provides generic praise along with a comment on the price, offering virtually no specific details about the sunscreen itself.",gemini-3.5-flash-lite,prompt_v2
+5594834,1,4,"The review provides a specific and critical warning about the product being expired, though it lacks further detail.",gemini-3.5-flash-lite,prompt_v2
+35dacdbb3b3200f6,1,3,"The review praises the author and book with emotional language but lacks specific details about the plot, characters, or reading experience.",gemini-3.5-flash-lite,prompt_v2
+31636525948837,1,4,"The review expresses suspicion that the product is watered down, but provides very limited context or concrete details.",gemini-3.5-flash-lite,prompt_v2
+13376466,1,5,"The review provides a specific detail about the product's thickness and application amount, but lacks broader context or depth.",gemini-3.5-flash-lite,prompt_v2
+1c92ea79f4f1dcc4,1,6,"The review expresses genuine personal engagement with the character and reading experience, but lacks concrete details about the plot, themes, or book quality.",gemini-3.5-flash-lite,prompt_v2
+22362,1,6,"The review provides a few specific product features and uses, but lacks personal context or depth of experience.",gemini-3.5-flash-lite,prompt_v2
+25325057479291,1,6,"The review provides specific details about the fabric and poor print quality, exposing a discrepancy with the product description.",gemini-3.5-flash-lite,prompt_v2
+39555933240412,1,6,"The review provides specific, checkable details about the product's authenticity via the importer's logo and mentions delivery timing and weather conditions.",gemini-3.5-flash-lite,prompt_v2
+22370855660913,1,3,"The review contains only generic praise with no specific details about the mask's features, performance, or buying experience.",gemini-3.5-flash-lite,prompt_v2
+14233693796608,1,3,"The review only mentions delivery in good condition with a generic thank you, providing no specific details about the product itself.",gemini-3.5-flash-lite,prompt_v2
+605a2bae057fb33f,1,7,"The review provides personal impressions, emotional impact, and qualitative depth about the reading experience, though it lacks concrete structural details about the physical book or delivery.",gemini-3.5-flash-lite,prompt_v2
+10029053,1,5,"The review provides a specific personal result about the product working well on sensitive skin, but lacks deeper context or detail.",gemini-3.5-flash-lite,prompt_v2
+13257729,1,6,"The review provides specific delivery details and immediate product impressions, but lacks depth regarding the body wash's long-term performance.",gemini-3.5-flash-lite,prompt_v2
+14257276416517,1,5,"The review mentions receiving the new Aloe Vera variant and notes that the packaging was good, but provides very limited concrete detail about performance.",gemini-3.5-flash-lite,prompt_v2
+909f396fac4be92c,1,4,"The review provides brief praise for the book and its translation, but lacks specific details about the content or reading experience.",gemini-3.5-flash-lite,prompt_v2
+57834318137074,1,3,"The review provides no specific details about the product features, performance, or buying experience beyond repeating that it was bought multiple times.",gemini-3.5-flash-lite,prompt_v2
+31368412679291,1,5,"The review provides basic specific details about the fabric and a gift, but lacks depth or context regarding its use.",gemini-3.5-flash-lite,prompt_v2
+13399711,1,1,"The review is a question to the seller rather than an evaluation of the product, making it off-topic for a buyer.",gemini-3.5-flash-lite,prompt_v2
+13243834416876,1,3,The review complains about delivery logistics without providing any details about the product itself.,gemini-3.5-flash-lite,prompt_v2
+31699607056950,1,3,"The review provides generic positive remarks about description matching, packaging, and delivery without any specific details about the product itself.",gemini-3.5-flash-lite,prompt_v2
+58920152358117,1,3,"The review provides only generic praise and stock phrases without any specific, checkable details about the earbuds.",gemini-3.5-flash-lite,prompt_v2
+1e8369758e57ea78,1,2,"The review expresses anticipation for reading and praises delivery speed, but contains no actual information or opinion about the book itself.",gemini-3.5-flash-lite,prompt_v2
+12782897846885,1,6,"The review provides specific feedback about the bag's good quality and small size with dimensions noted, but lacks deeper context about its durability or usage.",gemini-3.5-flash-lite,prompt_v2
+23026838179291,1,5,"The review provides specific feedback about the wrong color being sent and asks for assistance, but lacks deeper product details.",gemini-3.5-flash-lite,prompt_v2
+23752809960913,1,3,The review provides only generic praise and encourages purchase without mentioning any specific product details.,gemini-3.5-flash-lite,prompt_v2
+21224453012818,1,3,"The review offers generic praise along with a brief mention of a gift, but lacks any specific details about the washing powder itself.",gemini-3.5-flash-lite,prompt_v2
+12791652,1,7,"The review provides specific personal experience and results regarding skin type, hydration, and brightening effects.",gemini-3.5-flash-lite,prompt_v2
+58669879740477,1,8,"The review provides specific, checkable details including the exact price, authenticity verification via QR code, sound quality assessment, and evaluation of the ANC and ENC performance relative to the cost.",gemini-3.5-flash-lite,prompt_v2
+23187230679291,1,3,The review provides generic praise for both the product and delivery without specific details.,gemini-3.5-flash-lite,prompt_v2
+3110786,1,7,"The review provides specific details about usage duration, skin type compatibility, and lack of side effects.",gemini-3.5-flash-lite,prompt_v2
+ea8017b4218477d1,1,5,The review provides a detailed plot summary but includes limited personal opinion and analysis of the book.,gemini-3.5-flash-lite,prompt_v2
+5313219,1,3,The review only contains generic praise without any specific details about the product or experience.,gemini-3.5-flash-lite,prompt_v2
+13685027196608,1,3,The review only contains generic praise about delivery and authenticity without providing any specific details about the product itself.,gemini-3.5-flash-lite,prompt_v2
+57193900378920,1,5,"The review provides a specific detail about a product defect upon delivery, but lacks context or depth.",gemini-3.5-flash-lite,prompt_v2
+13364110,1,8,"The review provides specific performance details such as blending, sweat control, skin type suitability, and white cast.",gemini-3.5-flash-lite,prompt_v2
+12681070132348,1,3,The review consists only of generic claims without providing concrete details about the product or delivery experience.,gemini-3.5-flash-lite,prompt_v2
+ca4f7fd76c052111,1,4,"The review offers an emotional reaction to the book's themes but lacks concrete details about the plot, characters, or reading experience.",gemini-3.5-flash-lite,prompt_v2
+10580857,1,3,The review provides generic praise with no specific details about the product or buying experience.,gemini-3.5-flash-lite,prompt_v2
+11419983,1,3,The review only provides generic praise without mentioning any concrete details about the product's performance or specific features.,gemini-3.5-flash-lite,prompt_v2
+4013467,1,7,"The review provides specific personal results regarding hyperpigmentation and oil control, confirming product authenticity.",gemini-3.5-flash-lite,prompt_v2
+724d7bf976e6844a,1,7,"The review provides specific opinions on the plot, character development, and pacing based on the reviewer's reading experience.",gemini-3.5-flash-lite,prompt_v2
+43269413640412,1,3,"The review provides minimal specific detail, only mentioning the presence of an original seal and a brief note on delivery.",gemini-3.5-flash-lite,prompt_v2
+23073867879291,1,3,The review consists only of generic praise with no specific details about the product or the buying experience.,gemini-3.5-flash-lite,prompt_v2
+026052cace206092,1,4,"The review offers a single opinion on a specific character's presence without providing plot details, reading experience, or depth.",gemini-3.5-flash-lite,prompt_v2
+21647694760913,1,3,The review contains only generic praise and the quantity bought without any useful details about the product or delivery.,gemini-3.5-flash-lite,prompt_v2
+14535259296608,1,3,The review provides only generic praise about shipping speed and authenticity without concrete details.,gemini-3.5-flash-lite,prompt_v2
+22602893860913,1,4,The review provides a specific delivery timeframe but only offers generic praise for the product without concrete details.,gemini-3.5-flash-lite,prompt_v2
+10334240,1,5,"The review provides a specific detail about the scent and the refreshing feeling after use, but lacks deeper context.",gemini-3.5-flash-lite,prompt_v2
+43965928410859,1,1,The review is off-topic as it complains about the platform's delivery logistics rather than providing any information about the product.,gemini-3.5-flash-lite,prompt_v2
+1501061,1,1,This review is an off-topic request to restock the product rather than a review of a purchase.,gemini-3.5-flash-lite,prompt_v2
+38138068056532,1,4,"The review provides specific feedback about packaging and collection point issues, but contains no information about the product itself.",gemini-3.5-flash-lite,prompt_v2
+25033021010859,1,4,The review mentions specific packaging details but lacks any information about the product itself.,gemini-3.5-flash-lite,prompt_v2
+14751697496608,1,5,"The review provides basic details about product quality and timely delivery, but lacks specific context or depth.",gemini-3.5-flash-lite,prompt_v2
+32847237312818,1,4,"The review points out a specific pricing discrepancy between the shop listing and the product packaging, but lacks further details about the product or delivery.",gemini-3.5-flash-lite,prompt_v2
+12616376,1,6,"The review provides specific delivery time, expiration date, and mentions a free gift, but lacks detail about the product's performance.",gemini-3.5-flash-lite,prompt_v2
+2702283,1,7,"The review provides specific details about skin type, duration of use, and visible results.",gemini-3.5-flash-lite,prompt_v2
+39892b8e2d5e778e,1,6,"The review expresses strong personal appreciation for the book's content, historical value, and literary merit, but lacks specific details about the plot, characters, or the physical book itself.",gemini-3.5-flash-lite,prompt_v2
+21830,1,7,"The review provides specific details about daily use, moisturization, fragrance, and the effect on dry lips.",gemini-3.5-flash-lite,prompt_v2
+13427183,1,5,"The review provides a specific detail about the sunscreen not leaving a white cast and notes its value for the budget, but lacks broader context about performance or use.",gemini-3.5-flash-lite,prompt_v2
+fffa8560892c0792,1,6,"The review shares engaging personal impressions of the book's emotional impact and structure, but lacks deeper critical analysis or specific details about the edition.",gemini-3.5-flash-lite,prompt_v2
+21719047560913,1,3,"The review mentions fast delivery and order size, but provides no specific details about the mask itself.",gemini-3.5-flash-lite,prompt_v2
+3480483,1,3,The review expresses personal preference but contains no specific details about the product or purchase experience.,gemini-3.5-flash-lite,prompt_v2
+96990cbe26880663,1,6,"The review provides specific opinions on the book's themes and content, but lacks broader context or deep analysis.",gemini-3.5-flash-lite,prompt_v2
+28872600178920,1,5,"The review provides specific, checkable details about the delivery time and undamaged packaging, but lacks any information about the product itself.",gemini-3.5-flash-lite,prompt_v2
+19803647616517,1,5,"The review mentions specific buying details such as a free bowl, lower price, and product freshness, but lacks information on product performance.",gemini-3.5-flash-lite,prompt_v2
+19190821556532,1,3,The review contains only generic praise and stock phrases without any specific details about the product or delivery.,gemini-3.5-flash-lite,prompt_v2
+58160202040477,1,5,The review provides basic personal feedback on battery life but lacks specific details about features or long-term use.,gemini-3.5-flash-lite,prompt_v2
+19909458960913,1,3,The review provides only generic praise and stock phrases without any specific details about the product or delivery.,gemini-3.5-flash-lite,prompt_v2
+26214616616517,1,2,The review only expresses a wish for a lower price and contains no specific details about the product or buying experience.,gemini-3.5-flash-lite,prompt_v2
+b4c45a4132ede4c5,1,9,"The review provides an exceptionally detailed, reasoned, and personal critique of the book's plot, character inconsistencies, and narrative flaws.",gemini-3.5-flash-lite,prompt_v2
+20143843060913,1,3,The review only contains generic praise without any specific details about the mask or the buying experience.,gemini-3.5-flash-lite,prompt_v2
+31202013132348,1,3,The review only contains generic praise without any specific details about the product or delivery experience.,gemini-3.5-flash-lite,prompt_v2
+17206830230244,1,6,"The review provides basic details about delivery time and packaging condition, but lacks specific information about the sanitizer's performance.",gemini-3.5-flash-lite,prompt_v2
+14336072648837,1,2,The review contains only generic praise and expresses affection for the platform without providing any specific details about the product or buying experience.,gemini-3.5-flash-lite,prompt_v2
+ca4a365c6bb644c3,1,3,"The review expresses appreciation for the book's emotional impact but lacks specific details about the content, writing style, or reading experience.",gemini-3.5-flash-lite,prompt_v2
+10579037710859,1,3,The review provides only generic praise without any specific details about the product's performance or the buying experience.,gemini-3.5-flash-lite,prompt_v2
+21315848948837,1,5,The review provides generic praise along with specific mentions of good packaging and a long expiration date.,gemini-3.5-flash-lite,prompt_v2
+58110440640477,1,3,The review only contains generic praise with no specific details about the earbuds or the buying experience.,gemini-3.5-flash-lite,prompt_v2
+12243531,1,6,The review provides two specific details about the product's scent and its softening effect on the skin.,gemini-3.5-flash-lite,prompt_v2
+21593446160913,1,4,"The review mentions the product quality and a specific issue with an expired item included in the package, but contains a contradiction regarding fried rice spice for a mask order.",gemini-3.5-flash-lite,prompt_v2
+15501819213245,1,5,"The review provides a specific technical problem encountered during use, though it lacks context or troubleshooting details.",gemini-3.5-flash-lite,prompt_v2
+53350049556532,1,6,"The review mentions specific details about both packaging and product quality, but lacks deeper context or explanation.",gemini-3.5-flash-lite,prompt_v2
+22438868332307,1,5,"The review provides a specific detail about the sound quality and its intended use, but lacks deeper context or explanation.",gemini-3.5-flash-lite,prompt_v2
+178ba2b5c9f4254e,1,4,"The review expresses appreciation for the book's themes and characters, but lacks specific details or personal reading experience.",gemini-3.5-flash-lite,prompt_v2
+53195246378920,1,6,"The review provides specific details about the damaged packaging, leaking product, and worn-out appearance of the item received.",gemini-3.5-flash-lite,prompt_v2
+7f027bac78171366,1,5,"The review provides a detailed plot summary and character analysis, but contains little of the reviewer's own opinion or reading experience.",gemini-3.5-flash-lite,prompt_v2
+36515438710859,1,3,The review provides generic praise without specific details about the product or delivery.,gemini-3.5-flash-lite,prompt_v2
+23256615230244,1,6,"The review provides specific, checkable details about the packaging and lack of leakage, but lacks information about the product itself.",gemini-3.5-flash-lite,prompt_v2
+10149480916876,1,6,"The review provides two specific, checkable details about the product condition and expiry date, but lacks broader context or depth.",gemini-3.5-flash-lite,prompt_v2
+1698157,1,5,"The review provides a specific negative result on skin type and a warning, but lacks broader context or detail.",gemini-3.5-flash-lite,prompt_v2
+068e2d6d478b6532,1,3,"The review offers generic praise about the book's beauty and information without providing specific details about the content, writing style, or reading experience.",gemini-3.5-flash-lite,prompt_v2
+10346165,1,5,"The review provides specific details about the scent and lather of the product, but lacks broader context or depth.",gemini-3.5-flash-lite,prompt_v2
+58373959340477,1,3,"The review provides generic praise with a brief mention of sound quality but lacks specific, checkable details about features, battery life, or the buying experience.",gemini-3.5-flash-lite,prompt_v2
+58868430140477,1,3,The review provides generic praise about the product and delivery without any specific details.,gemini-3.5-flash-lite,prompt_v2
+30667980712818,1,3,The review only states that the product matched the order without providing any specific details about the washing powder itself or the delivery experience.,gemini-3.5-flash-lite,prompt_v2
+4900194,1,1,This review is an off-topic request for a discount offer rather than feedback about the product or buying experience.,gemini-3.5-flash-lite,prompt_v2
+56875942137074,1,3,"The review provides a vague opinion that the quality matches the price, but offers no specific details about the product or buying experience.",gemini-3.5-flash-lite,prompt_v2
+13904665196608,1,3,The review only mentions generic delivery and packaging details without providing any information about the product itself.,gemini-3.5-flash-lite,prompt_v2
+22861254730244,1,2,The review expresses only a hope that the product will be good without providing any actual details about the product or purchase experience.,gemini-3.5-flash-lite,prompt_v2
+b1be04bdc8a23feb,1,4,The review mainly retells the plot of the book with little of the reviewer's own opinion or critique.,gemini-3.5-flash-lite,prompt_v2
+6446943,1,3,The review provides generic praise with only one basic benefit mentioned and no concrete details.,gemini-3.5-flash-lite,prompt_v2
+11930424,1,3,The review praises the scent and the seller but provides only a generic description without concrete details about the product's performance or specific purchase experience.,gemini-3.5-flash-lite,prompt_v2
+10669855710859,1,4,"The review provides a specific price and context about a cashback offer, but offers very little information about the product itself.",gemini-3.5-flash-lite,prompt_v2
+412557c81e0c8c57,1,3,The review offers only generic praise for the author without providing any specific information about the book itself or the buying experience.,gemini-3.5-flash-lite,prompt_v2
+11554640936344,1,5,"The review provides specific details about the price discrepancy and the scent, but lacks broader context or depth.",gemini-3.5-flash-lite,prompt_v2
+18582459410859,1,6,"The review mentions specific details about the product and packaging, but also raises a missing item issue without fully explaining the resolution.",gemini-3.5-flash-lite,prompt_v2
+14315850448837,1,6,"The review provides a specific detail about a product quality issue and a packaging problem, but lacks deeper context.",gemini-3.5-flash-lite,prompt_v2
+10564400710859,1,4,"The review provides generic acceptance of the product and a brief, specific complaint about delivery time.",gemini-3.5-flash-lite,prompt_v2
+7072694ab0ae834a,1,8,"The review provides personal and specific insights about the reader's emotional and practical engagement with the book's content, style, and author.",gemini-3.5-flash-lite,prompt_v2
+3844224,1,1,This review is an off-topic question about ordering issues rather than feedback on the product or buying experience.,gemini-3.5-flash-lite,prompt_v2
+32148313756532,1,3,The review provides generic praise and delivery confirmation without specific details about the product's performance.,gemini-3.5-flash-lite,prompt_v2
+76f8cd6c30528052,1,3,"The review expresses personal preference for the book and confirms receipt, but lacks specific details about the reading experience or physical condition.",gemini-3.5-flash-lite,prompt_v2
+24672215060913,1,3,"The review provides negative feedback stating poor quality and a mismatch with pictures, but lacks specific details.",gemini-3.5-flash-lite,prompt_v2
+238feee947923751,1,4,"The review expresses genuine enthusiasm and explains that the book sparked a love for the series, but it lacks specific details about the plot, characters, or reading experience.",gemini-3.5-flash-lite,prompt_v2
+6259544,1,4,"The review mentions a specific delivery issue and product smell, but the reviewer received the wrong item entirely.",gemini-3.5-flash-lite,prompt_v2
+23238858579291,1,7,"The review provides specific, actionable details about a discrepancy between the described size and the actual size received, along with personal context.",gemini-3.5-flash-lite,prompt_v2
+13387623,1,1,This review is a question directed to the seller about product usage rather than a review of the product.,gemini-3.5-flash-lite,prompt_v2
+34777366448837,1,6,"The review mentions product appearance matching the picture, good quality, and repeat purchases, but lacks deep specific details.",gemini-3.5-flash-lite,prompt_v2
+39696,1,7,"The review provides specific, personal details about curing severe lip dryness and making lips soft, backed by the reviewer's own experience.",gemini-3.5-flash-lite,prompt_v2
+0418b270f42ec265,1,6,The review provides specific details about the book's binding and the remarkably fast delivery service.,gemini-3.5-flash-lite,prompt_v2
+35851574879291,1,3,The review only contains generic praise without any specific details about the product or delivery.,gemini-3.5-flash-lite,prompt_v2
+27894829360913,1,5,"The review mentions specific seller service details like free shampoo packets and active chat response, but provides minimal concrete detail about the mask itself.",gemini-3.5-flash-lite,prompt_v2
+25257054312818,1,3,The review provides only generic praise for multiple products without giving any specific details about the Surf Excel washing powder itself.,gemini-3.5-flash-lite,prompt_v2
+30565411412818,1,3,The review only mentions generic delivery and packaging details without providing any information about the product itself.,gemini-3.5-flash-lite,prompt_v2
+16954871296608,1,4,The review confirms receipt and initial satisfaction but lacks concrete details about the product's performance.,gemini-3.5-flash-lite,prompt_v2
+59076076237074,1,3,The review provides generic praise with no specific details about the product or delivery.,gemini-3.5-flash-lite,prompt_v2
+7d5f45c60f00c616,1,3,"The review states it is one of the best novels the reviewer has read, but lacks any specific details about the plot, characters, or writing style.",gemini-3.5-flash-lite,prompt_v2
+21946861960913,1,3,"The review mentions receiving a gift and expresses happiness, but lacks specific details about the mask's quality, fit, or performance.",gemini-3.5-flash-lite,prompt_v2
+25315217112818,1,3,The review provides only generic praise and mentions price without any specific details about the product's performance.,gemini-3.5-flash-lite,prompt_v2
+35583751279291,1,5,"The review provides a specific detail about the print quality being faint, but lacks sufficient context and explanation.",gemini-3.5-flash-lite,prompt_v2
+fcaa2b58aabd33de,1,8,"The review provides specific, reasoned criticism of the book's translation quality and page length based on the reviewer's personal reading experience.",gemini-3.5-flash-lite,prompt_v2
+458f2e9754f7eb0f,1,6,"The review provides personal insight into the book's impact and theme, but lacks specific details about the content, characters, or reading experience.",gemini-3.5-flash-lite,prompt_v2
+4625505,1,3,"The review points out a pricing discrepancy after a discount, but provides no useful information about the product itself or the overall buying and delivery experience.",gemini-3.5-flash-lite,prompt_v2
+20312482712818,1,3,The review only provides generic praise without any specific details about the product or delivery.,gemini-3.5-flash-lite,prompt_v2
+21050222616517,1,5,"The review provides a specific detail about the product arriving damaged and unusable, but lacks further context.",gemini-3.5-flash-lite,prompt_v2
+22429484960913,1,3,The review consists only of generic praise with no specific details about the product or delivery.,gemini-3.5-flash-lite,prompt_v2
+51197310137074,1,3,The review provides only generic praise and a mention of the price without any specific details about the product features or buying experience.,gemini-3.5-flash-lite,prompt_v2
+55959746137074,1,6,"The review provides specific feedback about the product's battery and pricing, along with context about the delivery experience, but lacks deeper detail.",gemini-3.5-flash-lite,prompt_v2
+31527353712818,1,3,The review only contains generic praise about receiving the product correctly without providing any specific details.,gemini-3.5-flash-lite,prompt_v2
+1983198,1,5,"The review provides a couple of specific uses for the product and its effect, but lacks broader context or detailed experience.",gemini-3.5-flash-lite,prompt_v2
+50674099996608,1,3,"The review mentions a gift and thanks the seller, but provides no useful information about the disinfectant spray itself.",gemini-3.5-flash-lite,prompt_v2
+26002820378920,1,6,"The review provides specific, checkable details about the damaged packaging and poor handling, which is useful for buyers evaluating the seller's service.",gemini-3.5-flash-lite,prompt_v2
+19730865232307,1,6,"The review provides specific, actionable information comparing the authenticity of two different color variants purchased from the seller.",gemini-3.5-flash-lite,prompt_v2
+7376a34ecd1ddb18,1,7,"The review shares genuine personal appreciation for the novel's characters and plot twists, supported by relevant quoted excerpts.",gemini-3.5-flash-lite,prompt_v2
+11253648,1,5,"The review provides a specific detail about how well the sunscreen blends into the skin, but lacks broader context or depth.",gemini-3.5-flash-lite,prompt_v2
