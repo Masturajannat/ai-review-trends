@@ -26,14 +26,19 @@ for stage, fname in SAMPLE_FILES.items():
     if not glob.glob(os.path.join(res_dir, "scores_raw*.csv")):
         print(f"{stage}: no scores yet, skipped")
         continue
-    raw = read_scores(res_dir).drop_duplicates(["review_id", "run", "prompt_version"])
+    raw = read_scores(res_dir)
+    # a review scored twice for the same run (e.g. once before the checks were added, or by two
+    # terminals at once): keep the answer that has the checks and feedback, else the first one
+    ccols = [f"check_{n}" for n in CHECKS]
+    raw["_full"] = raw[ccols].notna().all(axis=1) if all(c in raw for c in ccols) else False
+    raw = (raw.sort_values("_full", ascending=False, kind="stable")
+              .drop_duplicates(["review_id", "run", "prompt_version"]).drop(columns="_full"))
     raw = raw[raw["prompt_version"] == VERSION]
     sample = pd.read_csv(os.path.join(folder(stage), "data", fname), dtype={"review_id": str})
     g = raw.sort_values("run").groupby("review_id")
     s = pd.DataFrame({"score": g["overall"].mean().round(2), "runs": g["overall"].size(),
                       "reason": g["reason"].first(), "model": g["model"].first()}).reset_index()
     s = sample.merge(s, on="review_id", how="inner").assign(stage=stage)
-    ccols = [f"check_{n}" for n in CHECKS]
     if all(c in raw for c in ccols):          # checks from the first run that has them
         ck = raw.dropna(subset=ccols).sort_values("run").drop_duplicates("review_id")
         s = s.merge(ck[["review_id"] + ccols], on="review_id", how="left")
