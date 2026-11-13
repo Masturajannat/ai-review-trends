@@ -11,6 +11,8 @@ anything already done.
   set GEMINI_API_KEY (environment variable, never commit it)
   python scripts/13_check_feedback_prompt.py                                   # prompt_v2_checks, 40 calls
   python scripts/13_check_feedback_prompt.py --prompt prompt_v2_feedback.txt   # the older prompt
+  python scripts/13_check_feedback_prompt.py --model gpt-6-luna                # would another model
+                                                    # give the same scores? (own files, _<model>)
 
 Writes main/results/check_<prompt>.csv and check_<prompt>_summary.txt (kept apart from
 scores_raw*.csv, so the main-run results do not change); for prompt_v2_feedback the names
@@ -19,7 +21,7 @@ are feedback_check.csv and feedback_check_summary.txt, as before.
 import argparse, json, os, time
 import numpy as np
 import pandas as pd
-from common import ROOT, folder, parse_feedback, parse_checks, append_row, CHECKS
+from common import ROOT, folder, parse_feedback, parse_checks, append_row, CHECKS, LLM
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--n", type=int, default=40)
@@ -31,6 +33,9 @@ a = ap.parse_args()
 res = os.path.join(folder("main"), "results")
 pname = os.path.splitext(a.prompt)[0]
 tag = "feedback_check" if pname == "prompt_v2_feedback" else f"check_{pname}"
+DEFAULT_MODEL = "gemini-3.5-flash-lite"      # the model all earlier scores come from
+if a.model != DEFAULT_MODEL:                 # checking another model: keep its results apart
+    tag += "_" + a.model
 out = os.path.join(res, f"{tag}.csv")
 summary_file = os.path.join(res, f"{tag}_summary.txt")
 template = open(os.path.join(ROOT, "prompts", a.prompt), encoding="utf-8").read()
@@ -48,9 +53,7 @@ pick = pd.concat([pick, w.drop(pick.index).sample(max(0, a.n - len(pick)), rando
 def ask(client, prompt):
     for i in range(5):
         try:
-            r = client.models.generate_content(model=a.model, contents=prompt,
-                                               config={"temperature": 0, "response_mime_type": "application/json"})
-            j = json.loads(r.text)
+            j = json.loads(client(prompt))
             overall = int(j["overall"])
             if not 1 <= overall <= 10:
                 raise ValueError("overall out of range")
@@ -62,8 +65,7 @@ def ask(client, prompt):
 
 
 def main():
-    from google import genai
-    client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+    client = LLM(a.model)
     done = set(pd.read_csv(out, dtype={"review_id": str})["review_id"]) if os.path.exists(out) else set()
     fails = 0
     for k, r in enumerate(pick.itertuples(), 1):
@@ -102,6 +104,7 @@ def report():
              f"rank correlation: {rho:.2f}",
              "(two prompt_v2 runs: same score 78%, within 1 point 99%, rank correlation 0.96)",
              "",
+             f"model: {a.model}" + ("" if a.model == DEFAULT_MODEL else f" (compared with {DEFAULT_MODEL} scores)"),
              "verdict: " + (f"scores unchanged; use {pname} for the remaining reviews"
                             if within1 >= 0.95 and abs(d.mean()) < 0.3 else
                             "scores shifted; check before using the new prompt"),
