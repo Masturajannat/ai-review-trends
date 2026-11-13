@@ -1,0 +1,26 @@
+prompt version: prompt_v2
+runs: 2
+reviews in sample: 6822, scored in every run: 5174
+missing scores: 1648
+
+STABILITY
+same score in all runs:        75%
+within 1 point (spread <= 1):  98%
+differ by 2+ points:           2%
+rank correlation run1 vs run2: 0.94
+
+SCORE SPREAD (mean of runs, rounded)
+distinct scores used: 9
+share per band: 1-2: 12%, 3-4: 47%, 5-6: 34%, 7-8: 8%, 9-10: 0%
+
+MEAN SCORE BY LANGUAGE
+  bangla: 4.48 (n=2275)
+  banglish: 4.17 (n=1236)
+  english: 4.10 (n=1663)
+
+MEAN SCORE BY LENGTH (words)
+  6-9: 3.24
+  10-19: 4.17
+  20-49: 5.36
+  50+: 5.94
+  rank correlation of score with word count: 0.60
