@@ -20,7 +20,7 @@ trained on. Later, the trained model can replace Gemini as the judge without cha
 python -m pip install -r review_coach\requirements.txt
 cd review_coach
 $env:GEMINI_API_KEY = "<your key>"       # skip this to use only the mock judge
-streamlit run app.py
+python -m streamlit run app.py --server.headless true
 ```
 
 The app opens in the browser at http://localhost:8501. Stop it with Ctrl+C in the terminal.
