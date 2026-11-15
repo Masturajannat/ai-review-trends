@@ -1,4 +1,4 @@
-"""Review Coach: write a product review, check it, see what to improve, check again.
+"""Review Coach: write a product review, see its score, and ask for suggestions if you want them.
 
     cd review_coach
     $env:GEMINI_API_KEY = "<your key>"      # optional; without it, use the mock judge
@@ -8,40 +8,46 @@ import html, os
 import streamlit as st
 
 import db
-from evaluator import evaluate, CHECK_LABELS, CHECK_GROUPS, CRITERIA
+from evaluator import evaluate, suggest
 
 st.set_page_config(page_title="Review Coach", layout="wide")
 
-# colours: navy for what is present, coral for what is missing; a light and a dark version
+# colours: navy and coral; a light and a dark version
 THEMES = {
     "light": dict(ok="#1E3A8A", miss="#E11D48", miss_text="#BE123C", tip="#FFF0F3", bg="#F3F6FB", card="#FFFFFF",
-                  ink="#0F172A", muted="#52607A", line="#DCE3EE", pill="#E9EEF7", on_ok="#FFFFFF"),
+                  ink="#0F172A", muted="#52607A", line="#DCE3EE", pill="#E9EEF7", on_ok="#FFFFFF",
+                  mark="#FFE1E7", soft="#F3F6FB"),
     "dark": dict(ok="#8FB0FF", miss="#FB7185", miss_text="#FDA4AF", tip="#2C1A24", bg="#0D1220", card="#161D2E",
-                 ink="#EEF2F8", muted="#A3AEC4", line="#2B354B", pill="#222C42", on_ok="#0B1220"),
+                 ink="#EEF2F8", muted="#A3AEC4", line="#2B354B", pill="#222C42", on_ok="#0B1220",
+                 mark="#5A2233", soft="#1D2538"),
 }
 
 ss = st.session_state
-for k, v in dict(sid=None, result=None, eval_id=None, rated=set(), dark=False).items():
+for k, v in dict(sid=None, result=None, sug=None, sug_id=None, sug_text="", rated=set(), dark=False).items():
     ss.setdefault(k, v)
 T = THEMES["dark" if ss.dark else "light"]
 
 CSS = f"""
 <style>
 .rc-card {{ background:{T['card']}; border:1px solid {T['line']}; border-radius:14px; padding:20px 22px; margin-bottom:14px; color:{T['ink']}; }}
+.rc-title {{ font-weight:600; margin-bottom:10px; }}
 .rc-score {{ display:flex; flex-wrap:wrap; gap:22px; align-items:center; }}
 .rc-big {{ font-size:60px; font-weight:700; line-height:1; }}
 .rc-bar {{ display:grid; grid-template-columns:repeat(10,minmax(0,1fr)); gap:4px; margin-bottom:8px; }}
 .rc-bar span {{ height:8px; border-radius:4px; background:{T['line']}; }}
-.rc-grid {{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px 24px; }}
-@media (max-width: 640px) {{ .rc-grid {{ grid-template-columns:1fr; }} }}
-.rc-group h4 {{ margin:0 0 6px; font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:{T['muted']}; }}
-.rc-check {{ display:flex; gap:8px; align-items:center; margin:4px 0; }}
-.rc-dot {{ width:16px; height:16px; border-radius:50%; flex:none; box-sizing:border-box; }}
-.rc-tip {{ background:{T['tip']}; border-radius:10px; padding:12px 14px; margin:8px 0; }}
-.rc-tip b {{ color:{T['miss_text']}; font-size:13px; text-transform:capitalize; }}
+.rc-muted {{ color:{T['muted']}; font-size:13px; }}
+.rc-draft {{ background:{T['soft']}; border-radius:10px; padding:12px 14px; line-height:1.7; white-space:pre-wrap; margin-bottom:6px; }}
+.rc-draft mark {{ background:{T['mark']}; color:{T['ink']}; border-bottom:2px solid {T['miss']}; border-radius:3px; padding:1px 2px; }}
+.rc-draft sup {{ color:{T['miss_text']}; font-weight:700; margin-left:1px; }}
+.rc-sug {{ display:flex; gap:12px; background:{T['tip']}; border-radius:10px; padding:12px 14px; margin:10px 0 0; }}
+.rc-num {{ flex:none; width:24px; height:24px; border-radius:50%; background:{T['miss']}; color:{T['on_ok']};
+           display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; }}
+.rc-sug q {{ color:{T['miss_text']}; font-size:13px; font-weight:600; }}
+.rc-sug p {{ margin:2px 0 0 !important; line-height:1.5; }}
+.rc-eg {{ display:inline-block; margin-top:8px; padding:4px 10px; border-radius:8px; background:{T['card']};
+          border:1px dashed {T['line']}; font-size:14px; }}
 .rc-hist {{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }}
 .rc-pill {{ padding:6px 12px; border-radius:999px; background:{T['pill']}; font-size:14px; }}
-.rc-muted {{ color:{T['muted']}; font-size:13px; }}
 </style>"""
 DARK_CSS = f"""
 <style>
@@ -60,7 +66,8 @@ div[data-baseweb="input"], div[data-baseweb="base-input"], div[data-baseweb="tex
 .stButton > button[kind="primary"], .stButton > button[kind="primary"] * {{
   background:{T['ok']}; color:{T['on_ok']}; border-color:{T['ok']}; }}
 .stApp .rc-muted, .stApp .rc-muted * {{ color:{T['muted']}; }}
-.stApp .rc-tip b {{ color:{T['miss_text']}; }}
+.stApp .rc-sug q, .stApp .rc-draft sup {{ color:{T['miss_text']}; }}
+.stApp .rc-num {{ color:{T['on_ok']}; }}
 [data-testid="stAlert"] {{ background:{T['pill']}; }}
 </style>"""
 # blank lines would end the HTML block and show the CSS as text
@@ -78,7 +85,30 @@ esc = html.escape
 
 
 def new_review():
-    ss.sid = ss.result = ss.eval_id = None
+    ss.sid = ss.result = ss.sug = ss.sug_id = None
+    ss.sug_text = ""
+
+
+def session(product):
+    if ss.sid is None:
+        ss.sid = db.new_session(con, product)
+    else:
+        db.update_session(con, ss.sid, product)
+    return ss.sid
+
+
+def highlight(text, quotes):
+    """The draft with each quoted phrase marked and numbered, safely escaped."""
+    spans = []
+    for n, q in enumerate(quotes, 1):
+        i = text.find(q) if q else -1
+        if i >= 0 and all(i >= e or i + len(q) <= s for s, e, _ in spans):
+            spans.append((i, i + len(q), n))
+    out, pos = [], 0
+    for s, e, n in sorted(spans):
+        out.append(esc(text[pos:s]) + f"<mark>{esc(text[s:e])}</mark><sup>{n}</sup>")
+        pos = e
+    return "".join(out) + esc(text[pos:])
 
 
 # ---------------------------------------------------------------- sidebar
@@ -87,111 +117,117 @@ with st.sidebar:
     st.toggle("Dark theme", key="dark")
     has_key = bool(os.environ.get("GEMINI_API_KEY"))
     judge = st.radio("Judge", ["gemini", "mock"], index=0 if has_key else 1,
-                     format_func=lambda j: {"gemini": "Gemini (real score)",
+                     format_func=lambda j: {"gemini": "Gemini (real score and suggestions)",
                                             "mock": "Mock (no API, for testing)"}[j])
     if judge == "gemini" and not has_key:
         st.warning("GEMINI_API_KEY is not set in the terminal that started the app.")
     st.button("Start a new review", on_click=new_review)
-    st.caption("Your review text is sent to Google's Gemini model to be checked when the Gemini judge is "
-               "on. Nothing is posted anywhere. No names or emails are stored.")
+    st.caption("Your review text is sent to Google's Gemini model when the Gemini judge is on. "
+               "Nothing is posted anywhere. No names or emails are stored.")
 
 st.markdown("<h1 style='margin-bottom:0'>Review Coach</h1>"
-            "<p class='rc-muted'>Write in Bangla, Banglish or English. Check your review, follow the tips, "
-            "and check again.</p>", unsafe_allow_html=True)
+            "<p class='rc-muted'>Write your review your own way, in Bangla, Banglish or English. "
+            "See how useful it is to other buyers, and ask for suggestions if you want them.</p>",
+            unsafe_allow_html=True)
 
 left, right = st.columns([5, 6], gap="large")
 
 # ---------------------------------------------------------------- input
 with left:
     st.subheader("Write your review")
-    product = st.text_input("Product", placeholder="e.g. Foaming Facial Cleanser 236 ml")
-    category = st.radio("Type", ["book", "skincare", "product"], index=2, horizontal=True,
-                        format_func=lambda c: {"book": "Book", "skincare": "Skincare",
-                                               "product": "Other product"}[c])
-    review = st.text_area("Your review", height=220,
-                          placeholder="What did you buy, how long have you used it, what was good or bad?")
+    product = st.text_input("Product (optional)", placeholder="e.g. Foaming Facial Cleanser 236 ml")
+    review = st.text_area("Your review", height=240, placeholder="Share your experience with what you bought.")
     st.caption(f"{len(review.split())} words")
-    go = st.button("Check my review", type="primary")
+    c1, c2 = st.columns(2)
+    go = c1.button("Check my review", type="primary", use_container_width=True)
+    ask = c2.button("Suggest improvements", use_container_width=True)
 
-    if go:
-        if not review.strip():
-            st.error("Write a review first.")
-        else:
-            if ss.sid is None:
-                ss.sid = db.new_session(con, product, category)
-            else:
-                db.update_session(con, ss.sid, product, category)
-            key = db.cache_key(judge, product, review)
-            hit = db.cached(con, key)
-            try:
-                with st.spinner("Checking your review..."):
-                    r = hit or evaluate(product, review, judge=judge)
-                ss.eval_id, _ = db.save(con, ss.sid, review, r, key, from_cache=hit is not None)
-                ss.result = r
-            except Exception as e:
-                st.error(str(e))
+    if (go or ask) and not review.strip():
+        st.error("Write a review first.")
+    elif go:
+        sid = session(product)
+        key = db.cache_key("score", judge, product, review)
+        hit = db.cached_score(con, key)
+        try:
+            with st.spinner("Reading your review..."):
+                r = hit or evaluate(product, review, judge=judge)
+            db.save_score(con, sid, review, r, key, from_cache=hit is not None)
+            ss.result = r
+            if ss.sug_text != review:          # suggestions for an older draft: hide them
+                ss.sug = ss.sug_id = None
+        except Exception as e:
+            st.error(str(e))
+    elif ask:
+        sid = session(product)
+        key = db.cache_key("suggest", judge, product, review)
+        hit = db.cached_suggestions(con, key)
+        try:
+            with st.spinner("Thinking about what a buyer would ask..."):
+                s = hit or suggest(product, review, judge=judge)
+            ss.sug_id = db.save_suggestions(con, sid, review, s, key, from_cache=hit is not None)
+            ss.sug, ss.sug_text = s, review
+        except Exception as e:
+            st.error(str(e))
 
 # ---------------------------------------------------------------- results
 with right:
-    r = ss.result
-    if r is None:
-        st.markdown("<div class='rc-card rc-muted'>Your score, a checklist of what a useful review contains, "
-                    "and tips for this review will appear here.</div>", unsafe_allow_html=True)
-    else:
+    r, s = ss.result, ss.sug
+    if r is None and s is None:
+        st.markdown("<div class='rc-card'><div class='rc-title'>How it works</div>"
+                    "<p><b>Check my review</b> gives your review a score from 1 to 10 for how useful it is to "
+                    "someone deciding whether to buy.</p>"
+                    "<p style='margin-bottom:0'><b>Suggest improvements</b> reads your review and points at "
+                    "places where a buyer would want to know a little more. It never changes your opinion and "
+                    "never writes the review for you.</p></div>", unsafe_allow_html=True)
+
+    if r is not None:
         color = T["ok"] if r["score"] >= 7 else T["miss"]
         bar = "".join(f"<span style='background:{color if i < r['score'] else T['line']}'></span>"
                       for i in range(10))
-        nxt = f"Next level ({esc(r['next_level'])})" if r["next_level"] else "Top level reached."
         st.markdown(f"""
 <div class='rc-card rc-score'>
   <div><span class='rc-big' style='color:{color}'>{r['score']}</span><span class='rc-muted'> /10</span></div>
   <div style='flex:1 1 260px; min-width:0'>
     <div class='rc-bar'>{bar}</div>
     <div style='font-weight:600'>{esc(r['level_meaning'][:1].upper() + r['level_meaning'][1:])}</div>
-    <div class='rc-muted'>{nxt}</div>
+    <div class='rc-muted'>{esc(r['reason'])}</div>
   </div>
 </div>""", unsafe_allow_html=True)
+        if s is None:
+            st.caption("Want ideas for making it more helpful? Press Suggest improvements.")
 
-        groups = []
-        for c in CRITERIA:
-            rows = []
-            for k in CHECK_GROUPS[c]:
-                ok = r["checks"][k] == 1
-                dot = (f"<span class='rc-dot' style='background:{T['ok']}'></span>" if ok else
-                       f"<span class='rc-dot' style='border:2px solid {T['miss']}'></span>")
-                miss = "" if ok else " <span class='rc-muted'>(missing)</span>"
-                rows.append(f"<div class='rc-check'>{dot}<span>{CHECK_LABELS[k]}{miss}</span></div>")
-            groups.append(f"<div class='rc-group'><h4>{c}</h4>{''.join(rows)}</div>")
-        st.markdown(f"<div class='rc-card'><div style='font-weight:600; margin-bottom:10px'>"
-                    f"Checklist — {r['checks_met']} of 10</div><div class='rc-grid'>{''.join(groups)}</div></div>",
-                    unsafe_allow_html=True)
-
-        if r["how_to_improve"]:
-            tips = "".join(f"<div class='rc-tip'><b>{esc(c)}</b><br>{esc(t)}</div>"
-                           for c, t in r["how_to_improve"].items())
-            st.markdown(f"<div class='rc-card'><div style='font-weight:600'>How to improve</div>{tips}</div>",
-                        unsafe_allow_html=True)
+    if s is not None:
+        items = s["suggestions"]
+        body = f"<div class='rc-title'>Suggestions for your review</div>"
+        if s["summary"]:
+            body += f"<p>{esc(s['summary'])}</p>"
+        if items:
+            body += f"<div class='rc-draft'>{highlight(ss.sug_text, [i['quote'] for i in items])}</div>"
+            for n, i in enumerate(items, 1):
+                quote = f"<q>{esc(i['quote'])}</q>" if i["quote"] else ""
+                eg = f"<span class='rc-eg'>{esc(i['example'])}</span>" if i["example"] else ""
+                body += (f"<div class='rc-sug'><div class='rc-num'>{n}</div><div>{quote}"
+                         f"<p>{esc(i['suggestion'])}</p>{eg}</div></div>")
+            body += ("<p class='rc-muted' style='margin:12px 0 0'>These are only ideas. Use the ones that fit "
+                     "your experience, then check your review again.</p>")
         else:
-            st.success("Nothing important is missing. This review is very useful to a buyer.")
+            body += "<p class='rc-muted'>Nothing to add. Your review already tells a buyer what they need.</p>"
+        st.markdown(f"<div class='rc-card'>{body}</div>", unsafe_allow_html=True)
 
-        st.markdown(f"<div class='rc-muted'>Why this score: {esc(r['reason'])} "
-                    f"· judge: {esc(r['judge'])} · {esc(r['language'])} · {r['latency_ms']} ms</div>",
-                    unsafe_allow_html=True)
-
-        if ss.eval_id not in ss.rated:
+        if ss.sug_id not in ss.rated:
             a, b, _ = st.columns([2, 2, 1])
-            if a.button("Tips helped"):
-                db.rate(con, ss.eval_id, 1); ss.rated.add(ss.eval_id); st.rerun()
+            if a.button("Suggestions helped"):
+                db.rate(con, ss.sug_id, 1); ss.rated.add(ss.sug_id); st.rerun()
             if b.button("Not helpful"):
-                db.rate(con, ss.eval_id, 0); ss.rated.add(ss.eval_id); st.rerun()
+                db.rate(con, ss.sug_id, 0); ss.rated.add(ss.sug_id); st.rerun()
         else:
             st.caption("Thanks for the feedback.")
 
-        hist = db.history(con, ss.sid)
-        if len(hist) > 1:
-            pills = " <span class='rc-muted'>→</span> ".join(
-                f"<span class='rc-pill'>Draft {h['draft_no']}: <b>{h['score']}</b></span>" for h in hist)
-            change = hist[-1]["score"] - hist[0]["score"]
-            st.markdown(f"<div class='rc-card'><div style='font-weight:600; margin-bottom:8px'>Your drafts "
-                        f"({'+' if change >= 0 else ''}{change} since the first)</div>"
-                        f"<div class='rc-hist'>{pills}</div></div>", unsafe_allow_html=True)
+    hist = db.history(con, ss.sid) if ss.sid else []
+    if len(hist) > 1:
+        pills = " <span class='rc-muted'>→</span> ".join(
+            f"<span class='rc-pill'>Draft {h['draft_no']}: <b>{h['score']}</b></span>" for h in hist)
+        change = hist[-1]["score"] - hist[0]["score"]
+        st.markdown(f"<div class='rc-card'><div class='rc-title'>Your drafts "
+                    f"({'+' if change >= 0 else ''}{change} since the first)</div>"
+                    f"<div class='rc-hist'>{pills}</div></div>", unsafe_allow_html=True)
