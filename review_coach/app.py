@@ -1,4 +1,4 @@
-"""Review Coach: write a product review, see its score, and ask for suggestions if you want them.
+"""Review Coach: write a product review, get it rated, and ask for suggestions if you want them.
 
     cd review_coach
     $env:GEMINI_API_KEY = "<your key>"      # optional; without it, use the mock judge
@@ -36,6 +36,8 @@ CSS = f"""
 .rc-bar {{ display:grid; grid-template-columns:repeat(10,minmax(0,1fr)); gap:4px; margin-bottom:8px; }}
 .rc-bar span {{ height:8px; border-radius:4px; background:{T['line']}; }}
 .rc-muted {{ color:{T['muted']}; font-size:13px; }}
+.rc-dot {{ width:14px; height:14px; border-radius:50%; flex:none; box-sizing:border-box; margin-top:5px; }}
+.rc-why {{ display:flex; gap:10px; align-items:flex-start; margin:8px 0; line-height:1.5; }}
 .rc-draft {{ background:{T['soft']}; border-radius:10px; padding:12px 14px; line-height:1.7; white-space:pre-wrap; margin-bottom:6px; }}
 .rc-draft mark {{ background:{T['mark']}; color:{T['ink']}; border-bottom:2px solid {T['miss']}; border-radius:3px; padding:1px 2px; }}
 .rc-draft sup {{ color:{T['miss_text']}; font-weight:700; margin-left:1px; }}
@@ -139,7 +141,7 @@ with left:
     review = st.text_area("Your review", height=240, placeholder="Share your experience with what you bought.")
     st.caption(f"{len(review.split())} words")
     c1, c2 = st.columns(2)
-    go = c1.button("Check my review", type="primary", use_container_width=True)
+    go = c1.button("Rate my review", type="primary", use_container_width=True)
     ask = c2.button("Suggest improvements", use_container_width=True)
 
     if (go or ask) and not review.strip():
@@ -149,7 +151,7 @@ with left:
         key = db.cache_key("score", judge, product, review)
         hit = db.cached_score(con, key)
         try:
-            with st.spinner("Reading your review..."):
+            with st.spinner("Rating your review..."):
                 r = hit or evaluate(product, review, judge=judge)
             db.save_score(con, sid, review, r, key, from_cache=hit is not None)
             ss.result = r
@@ -174,8 +176,8 @@ with right:
     r, s = ss.result, ss.sug
     if r is None and s is None:
         st.markdown("<div class='rc-card'><div class='rc-title'>How it works</div>"
-                    "<p><b>Check my review</b> gives your review a score from 1 to 10 for how useful it is to "
-                    "someone deciding whether to buy.</p>"
+                    "<p><b>Rate my review</b> gives your review a score from 1 to 10 for how useful it is to "
+                    "someone deciding whether to buy, with the reasons for it.</p>"
                     "<p style='margin-bottom:0'><b>Suggest improvements</b> reads your review and points at "
                     "places where a buyer would want to know a little more. It never changes your opinion and "
                     "never writes the review for you.</p></div>", unsafe_allow_html=True)
@@ -190,9 +192,20 @@ with right:
   <div style='flex:1 1 260px; min-width:0'>
     <div class='rc-bar'>{bar}</div>
     <div style='font-weight:600'>{esc(r['level_meaning'][:1].upper() + r['level_meaning'][1:])}</div>
-    <div class='rc-muted'>{esc(r['reason'])}</div>
   </div>
 </div>""", unsafe_allow_html=True)
+        why = "".join(f"<div class='rc-why'><span class='rc-dot' style='background:{T['ok']}'></span>"
+                      f"<span>{esc(x)}</span></div>" for x in r["strengths"])
+        why += "".join(f"<div class='rc-why'><span class='rc-dot' style='border:2px solid {T['miss']}'></span>"
+                       f"<span>{esc(x)}</span></div>" for x in r["holding_back"])
+        if not why:
+            why = f"<div class='rc-why'><span>{esc(r['reason'])}</span></div>"
+        st.markdown(f"<div class='rc-card'><div class='rc-title'>Why this score</div>{why}"
+                    f"<p class='rc-muted' style='margin:12px 0 0'><span class='rc-dot' style='background:{T['ok']}; "
+                    f"display:inline-block; vertical-align:-2px'></span> what your review tells a buyer &nbsp; "
+                    f"<span class='rc-dot' style='border:2px solid {T['miss']}; display:inline-block; "
+                    f"vertical-align:-2px'></span> what keeps the score from being higher</p></div>",
+                    unsafe_allow_html=True)
         if s is None:
             st.caption("Want ideas for making it more helpful? Press Suggest improvements.")
 
@@ -209,7 +222,7 @@ with right:
                 body += (f"<div class='rc-sug'><div class='rc-num'>{n}</div><div>{quote}"
                          f"<p>{esc(i['suggestion'])}</p>{eg}</div></div>")
             body += ("<p class='rc-muted' style='margin:12px 0 0'>These are only ideas. Use the ones that fit "
-                     "your experience, then check your review again.</p>")
+                     "your experience, then rate your review again.</p>")
         else:
             body += "<p class='rc-muted'>Nothing to add. Your review already tells a buyer what they need.</p>"
         st.markdown(f"<div class='rc-card'>{body}</div>", unsafe_allow_html=True)

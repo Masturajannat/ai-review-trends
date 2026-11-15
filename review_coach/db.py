@@ -2,7 +2,7 @@
 
 Tables
   sessions     one review being written: product, when, finished or not
-  evaluations  one row per click on "Check my review": the draft, its score and reason,
+  evaluations  one row per click on "Rate my review": the draft, its score and reasons,
                which judge gave it, how long it took
   suggestions  one row per click on "Suggest improvements": the draft and the suggestions given
   ratings      whether the user found the suggestions helpful
@@ -41,6 +41,8 @@ def connect(path=DB_PATH):
         score          INTEGER,
         level          INTEGER,
         reason         TEXT,
+        strengths      TEXT,
+        holding_back   TEXT,
         judge          TEXT,
         model          TEXT,
         prompt_version TEXT,
@@ -74,6 +76,11 @@ def connect(path=DB_PATH):
         created_at TEXT
     );
     """)
+    have = {r[1] for r in con.execute("PRAGMA table_info(evaluations)")}
+    for col in ("strengths", "holding_back"):          # a database made by an earlier version
+        if col not in have:
+            con.execute(f"ALTER TABLE evaluations ADD COLUMN {col} TEXT")
+    con.commit()
     return con
 
 
@@ -108,7 +115,10 @@ def cached_score(con, key):
         return None
     from evaluator import explain_level
     lvl, meaning = explain_level(row["score"])
+    if row["strengths"] is None:          # scored before the reasons were added: score it again
+        return None
     return {"score": row["score"], "level": lvl, "level_meaning": meaning, "reason": row["reason"],
+            "strengths": json.loads(row["strengths"]), "holding_back": json.loads(row["holding_back"] or "[]"),
             "judge": row["judge"], "model": row["model"], "prompt_version": row["prompt_version"],
             "latency_ms": 0, "language": row["language"], "word_count": row["word_count"]}
 
@@ -117,7 +127,9 @@ def save_score(con, sid, review, r, key, from_cache=False):
     n = con.execute("SELECT COUNT(*) FROM evaluations WHERE session_id=?", (sid,)).fetchone()[0] + 1
     eid = _insert(con, "evaluations", dict(
         session_id=sid, draft_no=n, review_text=review, language=r["language"], word_count=r["word_count"],
-        score=r["score"], level=r["level"], reason=r["reason"], judge=r["judge"], model=r["model"],
+        score=r["score"], level=r["level"], reason=r["reason"],
+        strengths=json.dumps(r["strengths"], ensure_ascii=False),
+        holding_back=json.dumps(r["holding_back"], ensure_ascii=False), judge=r["judge"], model=r["model"],
         prompt_version=r["prompt_version"], latency_ms=0 if from_cache else r["latency_ms"],
         cache_key=key, from_cache=int(from_cache), created_at=now()))
     return eid, n

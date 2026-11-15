@@ -2,7 +2,7 @@
 
     from evaluator import evaluate, suggest
     r = evaluate("Foaming Facial Cleanser", "Product ta valo, delivery fast chilo.", judge="gemini")
-    r["score"], r["level_meaning"], r["reason"]
+    r["score"], r["level_meaning"], r["strengths"], r["holding_back"]
     s = suggest("Foaming Facial Cleanser", "Product ta valo, delivery fast chilo.", judge="gemini")
     s["summary"], s["suggestions"]          # [{"quote", "suggestion", "example"}, ...]
 
@@ -10,7 +10,8 @@ The app only calls these two functions, and each always returns the same keys, s
 behind them can be swapped.
 
 evaluate(): the score
-  "gemini"  the scoring prompt of the dataset (prompt_v2) and the same model; needs GEMINI_API_KEY
+  "gemini"  the scoring instructions of the dataset (prompt_v2) and the same model; after the score
+            it also lists what the review does well and what holds it back; needs GEMINI_API_KEY
   "mock"    simple rules, no API calls; for building and testing the page only
   Later, our own model trained on the dataset is added here as a third judge.
 
@@ -37,9 +38,24 @@ MAX_SUGGESTIONS = 3
 _templates, _llm = {}, {}
 
 
+# What the app asks for after the score. The scoring instructions above it are prompt_v2 word for
+# word, and "reason" and "overall" come first as in the dataset, so the score is made the same way.
+SCORE_OUTPUT = """OUTPUT
+Reply with JSON only, with these keys in this order:
+1. "reason": one short sentence in English explaining the score.
+2. "overall": the score, an integer from 1 to 10.
+3. "strengths": a list of 0 to 2 short sentences, each naming something THIS review tells a buyer. Refer to what the review actually says. Leave the list empty if the review tells a buyer nothing.
+4. "holding_back": a list of 0 to 2 short sentences, each naming something about THIS review that keeps the score from being higher. Refer to what the review actually says or leaves out. Leave the list empty for a score of 9 or 10.
+Write "strengths" and "holding_back" for the reviewer, in the same language and script as the review (Bangla script for a Bangla review, Banglish for a Banglish review, English for an English review). Do not invent facts about the product.
+"""
+
+
 def _fill(path, product, review):
     if path not in _templates:
-        _templates[path] = open(path, encoding="utf-8").read()
+        t = open(path, encoding="utf-8").read()
+        if path == SCORE_PROMPT:
+            t = t[:t.index("\nOUTPUT\n") + 1] + SCORE_OUTPUT
+        _templates[path] = t
     return _templates[path].replace("{product_name}", product or "(not given)").replace("{review_text}", review)
 
 
@@ -90,9 +106,10 @@ def count_words(text):
 
 
 # ---------------------------------------------------------------- score
-def _score_result(score, reason, judge, model, version, t0):
+def _score_result(score, reason, strengths, holding_back, judge, model, version, t0):
     lvl, meaning = explain_level(score)
     return {"score": score, "level": lvl, "level_meaning": meaning, "reason": reason,
+            "strengths": strengths, "holding_back": holding_back,
             "judge": judge, "model": model, "prompt_version": version,
             "latency_ms": int((time.time() - t0) * 1000)}
 
@@ -101,7 +118,9 @@ def _parse_score(j):
     score = int(j["overall"])
     if not 1 <= score <= 10:
         raise ValueError("score out of range")
-    return score, str(j.get("reason", ""))
+    points = lambda k: [str(x).strip() for x in (j.get(k) or []) if str(x).strip()][:2] \
+        if isinstance(j.get(k), list) else []
+    return score, str(j.get("reason", "")), points("strengths"), points("holding_back")
 
 
 _NUM = re.compile(r"\d|[০-৯]")
@@ -132,10 +151,13 @@ def evaluate(product, review, judge="gemini"):
         raise ValueError("Write a review first.")
     t0 = time.time()
     if judge == "gemini":
-        score, reason = _ask_gemini(_fill(SCORE_PROMPT, product, review), _parse_score)
-        r = _score_result(score, reason, "gemini", GEMINI_MODEL, SCORE_VERSION, t0)
+        score, reason, good, back = _ask_gemini(_fill(SCORE_PROMPT, product, review), _parse_score)
+        r = _score_result(score, reason, good, back, "gemini", GEMINI_MODEL, SCORE_VERSION, t0)
     else:
-        r = _score_result(_mock_score(review), "Mock judge: rough rules for testing the app, not a real score.",
+        score = _mock_score(review)
+        r = _score_result(score, "Mock judge: rough rules for testing the app, not a real score.",
+                          ["(Mock) Something the review tells a buyer would be listed here."] if score > 3 else [],
+                          ["(Mock) What keeps the score from being higher would be listed here."] if score < 9 else [],
                           "mock", "rules", "mock", t0)
     r["language"] = detect_language(review)
     r["word_count"] = count_words(review)

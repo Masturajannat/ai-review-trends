@@ -5,7 +5,7 @@ os.environ["REVIEW_COACH_DB"] = os.path.join(tempfile.mkdtemp(), "test.db")
 import db
 from evaluator import evaluate, suggest, clean_suggestions, detect_language, explain_level, SUGGEST_PROMPT
 
-SCORE_KEYS = {"score", "level", "level_meaning", "reason", "judge", "model", "prompt_version", "latency_ms",
+SCORE_KEYS = {"score", "level", "level_meaning", "reason", "strengths", "holding_back", "judge", "model", "prompt_version", "latency_ms",
               "language", "word_count"}
 
 
@@ -31,6 +31,22 @@ def test_language():
     assert detect_language("বইটি খুব ভালো লেগেছে") == "bangla"
     assert detect_language("Product ta khub valo, delivery fast chilo") == "banglish"
     assert detect_language("The battery lasts five hours") == "english"
+
+
+def test_score_prompt_keeps_dataset_scoring():
+    import evaluator
+    full = evaluator._fill(evaluator.SCORE_PROMPT, "P", "R")
+    orig = open(evaluator.SCORE_PROMPT, encoding="utf-8").read()
+    head = orig[:orig.index("\nOUTPUT\n")].replace("{product_name}", "P").replace("{review_text}", "R")
+    assert full.startswith(head)                                  # scoring instructions unchanged
+    out = full[len(head):]
+    assert out.index('"reason"') < out.index('"overall"') < out.index('"strengths"') < out.index('"holding_back"')
+
+
+def test_parse_score_reasons():
+    import evaluator
+    s = evaluator._parse_score({"reason": "r", "overall": 6, "strengths": ["a", " ", "b", "c"], "holding_back": "x"})
+    assert s == (6, "r", ["a", "b"], [])
 
 
 def test_levels():
@@ -81,6 +97,7 @@ def test_database_round_trip():
     key = db.cache_key("score", "mock", "Earbuds", text)
     _, n = db.save_score(con, sid, text, r, key)
     assert n == 1 and db.cached_score(con, key)["score"] == r["score"]
+    assert db.cached_score(con, key)["holding_back"] == r["holding_back"]
     _, n2 = db.save_score(con, sid, text, db.cached_score(con, key), key, from_cache=True)
     assert n2 == 2 and [h["draft_no"] for h in db.history(con, sid)] == [1, 2]
     s = suggest("Earbuds", text, judge="mock")
