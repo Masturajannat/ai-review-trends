@@ -44,4 +44,28 @@ It takes a few minutes and writes:
   reviews scored 7.5 and above about 0.8 too little.
 - All three languages work; Banglish is best (73% within 1 point), Bangla lowest (59%).
 
+## Step 2: can another classical model do better?
+
+```powershell
+python scripts\02_compare_models.py        # about 10 minutes, no GPU
+```
+
+Same split. The model is chosen by cross-validation on the training reviews, not on the test set.
+
+| Model | Test MAE | Test within 1 point | Rank correlation |
+|---|---|---|---|
+| Ridge (step-1 baseline) | 0.84 | 66% | 0.80 |
+| Ridge + signal features (digits, time words, "but", "because", ...) | 0.85 | 67% | 0.81 |
+| Linear SVR | 0.87 | 68% | 0.79 |
+| Logistic regression over score levels | 0.85 | 68% | 0.77 |
+| Gradient-boosted trees (SVD features) | 0.94 | 60% | 0.77 |
+| Blend of ridge, SVR and trees | 0.86 | 66% | 0.81 |
+| Blend + straight-line correction | 0.84 | 68% | 0.81 |
+
+All of them land in the same place: MAE about 0.85 and 66 to 68% within 1 point. Extra features,
+other learners, blending and a correction for the pull towards the middle each move the result
+by a point or two at most, which is within the noise of a 400-review test set. Models that only
+see which characters and words occur have reached their limit here; what separates a 3 from a 6 is
+what the review says, and that needs a model that reads the text in context.
+
 Next: fine-tune a multilingual transformer (XLM-R, BanglaBERT) on the same split and compare.
