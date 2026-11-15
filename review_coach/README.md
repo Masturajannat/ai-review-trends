@@ -4,8 +4,9 @@ A small web app that helps a buyer write a more useful product review, in Bangla
 English. The reviewer writes freely; the app does two things, each only when asked:
 
 - **Rate my review**: a score from 1 to 10 for how useful the review is to someone deciding
-  whether to buy, with what the level means and the reasons: what the review tells a buyer
-  and what keeps the score from being higher, written about this review in its own language.
+  whether to buy, with what the level means and a short paragraph explaining the score:
+  what the review tells a buyer and what keeps the score from being higher, written about this
+  review in its own language.
 - **Suggest improvements**: reads this one review and gives at most three suggestions. Each
   points at a phrase the reviewer wrote, asks what a buyer would still want to know there, and
   offers a sentence starter with blanks (`Battery ___ ghonta chole`). It never changes the

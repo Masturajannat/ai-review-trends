@@ -194,17 +194,8 @@ with right:
     <div style='font-weight:600'>{esc(r['level_meaning'][:1].upper() + r['level_meaning'][1:])}</div>
   </div>
 </div>""", unsafe_allow_html=True)
-        why = "".join(f"<div class='rc-why'><span class='rc-dot' style='background:{T['ok']}'></span>"
-                      f"<span>{esc(x)}</span></div>" for x in r["strengths"])
-        why += "".join(f"<div class='rc-why'><span class='rc-dot' style='border:2px solid {T['miss']}'></span>"
-                       f"<span>{esc(x)}</span></div>" for x in r["holding_back"])
-        if not why:
-            why = f"<div class='rc-why'><span>{esc(r['reason'])}</span></div>"
-        st.markdown(f"<div class='rc-card'><div class='rc-title'>Why this score</div>{why}"
-                    f"<p class='rc-muted' style='margin:12px 0 0'><span class='rc-dot' style='background:{T['ok']}; "
-                    f"display:inline-block; vertical-align:-2px'></span> what your review tells a buyer &nbsp; "
-                    f"<span class='rc-dot' style='border:2px solid {T['miss']}; display:inline-block; "
-                    f"vertical-align:-2px'></span> what keeps the score from being higher</p></div>",
+        st.markdown(f"<div class='rc-card'><div class='rc-title'>Why this score</div>"
+                    f"<p style='margin:0; line-height:1.6'>{esc(r['explanation'])}</p></div>",
                     unsafe_allow_html=True)
         if s is None:
             st.caption("Want ideas for making it more helpful? Press Suggest improvements.")

@@ -41,8 +41,7 @@ def connect(path=DB_PATH):
         score          INTEGER,
         level          INTEGER,
         reason         TEXT,
-        strengths      TEXT,
-        holding_back   TEXT,
+        explanation    TEXT,
         judge          TEXT,
         model          TEXT,
         prompt_version TEXT,
@@ -77,7 +76,7 @@ def connect(path=DB_PATH):
     );
     """)
     have = {r[1] for r in con.execute("PRAGMA table_info(evaluations)")}
-    for col in ("strengths", "holding_back"):          # a database made by an earlier version
+    for col in ("explanation",):                        # a database made by an earlier version
         if col not in have:
             con.execute(f"ALTER TABLE evaluations ADD COLUMN {col} TEXT")
     con.commit()
@@ -115,10 +114,10 @@ def cached_score(con, key):
         return None
     from evaluator import explain_level
     lvl, meaning = explain_level(row["score"])
-    if row["strengths"] is None:          # scored before the reasons were added: score it again
+    if row["explanation"] is None:        # scored before the explanation was added: score it again
         return None
     return {"score": row["score"], "level": lvl, "level_meaning": meaning, "reason": row["reason"],
-            "strengths": json.loads(row["strengths"]), "holding_back": json.loads(row["holding_back"] or "[]"),
+            "explanation": row["explanation"],
             "judge": row["judge"], "model": row["model"], "prompt_version": row["prompt_version"],
             "latency_ms": 0, "language": row["language"], "word_count": row["word_count"]}
 
@@ -128,8 +127,7 @@ def save_score(con, sid, review, r, key, from_cache=False):
     eid = _insert(con, "evaluations", dict(
         session_id=sid, draft_no=n, review_text=review, language=r["language"], word_count=r["word_count"],
         score=r["score"], level=r["level"], reason=r["reason"],
-        strengths=json.dumps(r["strengths"], ensure_ascii=False),
-        holding_back=json.dumps(r["holding_back"], ensure_ascii=False), judge=r["judge"], model=r["model"],
+        explanation=r["explanation"], judge=r["judge"], model=r["model"],
         prompt_version=r["prompt_version"], latency_ms=0 if from_cache else r["latency_ms"],
         cache_key=key, from_cache=int(from_cache), created_at=now()))
     return eid, n

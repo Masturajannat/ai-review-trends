@@ -5,7 +5,7 @@ os.environ["REVIEW_COACH_DB"] = os.path.join(tempfile.mkdtemp(), "test.db")
 import db
 from evaluator import evaluate, suggest, clean_suggestions, detect_language, explain_level, SUGGEST_PROMPT
 
-SCORE_KEYS = {"score", "level", "level_meaning", "reason", "strengths", "holding_back", "judge", "model", "prompt_version", "latency_ms",
+SCORE_KEYS = {"score", "level", "level_meaning", "reason", "explanation", "judge", "model", "prompt_version", "latency_ms",
               "language", "word_count"}
 
 
@@ -40,13 +40,13 @@ def test_score_prompt_keeps_dataset_scoring():
     head = orig[:orig.index("\nOUTPUT\n")].replace("{product_name}", "P").replace("{review_text}", "R")
     assert full.startswith(head)                                  # scoring instructions unchanged
     out = full[len(head):]
-    assert out.index('"reason"') < out.index('"overall"') < out.index('"strengths"') < out.index('"holding_back"')
+    assert out.index('"reason"') < out.index('"overall"') < out.index('"explanation"')
 
 
 def test_parse_score_reasons():
     import evaluator
-    s = evaluator._parse_score({"reason": "r", "overall": 6, "strengths": ["a", " ", "b", "c"], "holding_back": "x"})
-    assert s == (6, "r", ["a", "b"], [])
+    s = evaluator._parse_score({"reason": "r", "overall": 6, "explanation": " You said \n how long.  "})
+    assert s == (6, "r", "You said how long.") and evaluator._parse_score({"overall": 3})[2] == ""
 
 
 def test_levels():
@@ -97,7 +97,7 @@ def test_database_round_trip():
     key = db.cache_key("score", "mock", "Earbuds", text)
     _, n = db.save_score(con, sid, text, r, key)
     assert n == 1 and db.cached_score(con, key)["score"] == r["score"]
-    assert db.cached_score(con, key)["holding_back"] == r["holding_back"]
+    assert db.cached_score(con, key)["explanation"] == r["explanation"]
     _, n2 = db.save_score(con, sid, text, db.cached_score(con, key), key, from_cache=True)
     assert n2 == 2 and [h["draft_no"] for h in db.history(con, sid)] == [1, 2]
     s = suggest("Earbuds", text, judge="mock")
