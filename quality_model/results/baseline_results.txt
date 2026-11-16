@@ -1,0 +1,33 @@
+BASELINE MODELS FOR THE REVIEW-QUALITY SCORE
+train: 6922 reviews (full + pilot)   test: 400 reviews (main run, never trained on)
+label: mean of two Gemini runs, 1 to 10
+
+CROSS-VALIDATION ON THE TRAINING REVIEWS (5 folds)
+  mean       n=6922  MAE 1.39  RMSE 1.64  within 1 point 33%  within 0.5 17%  rank corr. -0.02
+  length     n=6922  MAE 1.10  RMSE 1.34  within 1 point 52%  within 0.5 25%  rank corr. 0.61   (ridge alpha 1)
+  tfidf      n=6922  MAE 0.74  RMSE 0.96  within 1 point 73%  within 0.5 43%  rank corr. 0.81   (ridge alpha 0.3)
+  tfidf+len  n=6922  MAE 0.73  RMSE 0.94  within 1 point 73%  within 0.5 43%  rank corr. 0.82   (ridge alpha 1)
+
+TEST: THE 400 MAIN-RUN REVIEWS
+  mean       n= 400  MAE 1.65  RMSE 1.94  within 1 point 27%  within 0.5 11%  rank corr. nan
+  length     n= 400  MAE 1.25  RMSE 1.54  within 1 point 47%  within 0.5 24%  rank corr. 0.63
+  tfidf      n= 400  MAE 0.86  RMSE 1.13  within 1 point 66%  within 0.5 39%  rank corr. 0.80
+  tfidf+len  n= 400  MAE 0.84  RMSE 1.13  within 1 point 65%  within 0.5 41%  rank corr. 0.80
+
+YARDSTICK ON THE SAME 400 REVIEWS
+  Gemini run 1 vs run 2 (one run against the other)   n= 400  MAE 0.23  RMSE 0.49  within 1 point 99%  within 0.5 78%  rank corr. 0.96
+  A model cannot be expected to agree with the labels better than the labeller agrees with itself.
+
+BY LANGUAGE AND PLATFORM (tfidf+len, test set)
+  bangla    n= 140  MAE 0.93  RMSE 1.20  within 1 point 59%  within 0.5 34%  rank corr. 0.79   mean error +0.08
+  banglish  n= 124  MAE 0.74  RMSE 1.01  within 1 point 73%  within 0.5 52%  rank corr. 0.83   mean error +0.15
+  english   n= 136  MAE 0.85  RMSE 1.17  within 1 point 67%  within 0.5 40%  rank corr. 0.78   mean error +0.07
+  Daraz     n= 132  MAE 0.79  RMSE 1.00  within 1 point 70%  within 0.5 42%  rank corr. 0.83   mean error -0.19
+  Rokomari  n= 130  MAE 0.83  RMSE 1.12  within 1 point 66%  within 0.5 42%  rank corr. 0.67   mean error +0.21
+  Shajgoj   n= 138  MAE 0.91  RMSE 1.26  within 1 point 61%  within 0.5 42%  rank corr. 0.86   mean error +0.27
+
+BY SCORE BAND (tfidf+len, test set): mean error shows where the model is too high (+) or too low (-)
+  label 1-3     n= 149  MAE 0.98  RMSE 1.38  within 1 point 63%  within 0.5 42%  rank corr. 0.14   mean error +0.84
+  label 3.5-5   n= 108  MAE 0.67  RMSE 0.87  within 1 point 76%  within 0.5 45%  rank corr. 0.41   mean error +0.11
+  label 5.5-7   n= 111  MAE 0.82  RMSE 1.01  within 1 point 63%  within 0.5 39%  rank corr. 0.49   mean error -0.64
+  label 7.5-10  n=  32  MAE 0.87  RMSE 1.05  within 1 point 53%  within 0.5 38%  rank corr. 0.44   mean error -0.83
