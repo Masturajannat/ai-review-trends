@@ -68,4 +68,32 @@ by a point or two at most, which is within the noise of a 400-review test set. M
 see which characters and words occur have reached their limit here; what separates a 3 from a 6 is
 what the review says, and that needs a model that reads the text in context.
 
-Next: fine-tune a multilingual transformer (XLM-R, BanglaBERT) on the same split and compare.
+## Step 3: fine-tune a transformer (needs a GPU)
+
+`scripts/03_train_transformer.py` fine-tunes a pretrained multilingual model on the same split
+(the training reviews are divided 90/10 into train and validation; the best epoch on validation is
+kept; the main 400 are tested once at the end).
+
+**On Google Colab (free GPU, no installation):** open
+[`train_transformer_colab.ipynb`](https://colab.research.google.com/github/Masturajannat/ai-review-trends/blob/Mastura/quality_model/train_transformer_colab.ipynb),
+choose **Runtime > Change runtime type > T4 GPU**, then **Runtime > Run all**. It trains
+XLM-RoBERTa, MuRIL and BanglaBERT (about 10 minutes each), shows them side by side with the
+baseline, and downloads `transformer_results.zip`. Unzip that into `quality_model/results`,
+then commit and push.
+
+**On a laptop with an NVIDIA GPU:**
+
+```powershell
+python -m pip install torch --index-url https://download.pytorch.org/whl/cu121
+python -m pip install transformers sentencepiece scipy pandas
+cd quality_model
+python scripts\03_train_transformer.py --model xlm-roberta-base            # add --batch 8 if the GPU runs out of memory
+python scripts\03_train_transformer.py --model google/muril-base-cased
+python scripts\03_train_transformer.py --model csebuetnlp/banglabert
+```
+
+`python scripts\03_train_transformer.py --test-run` checks the whole pipeline in a minute with a
+tiny untrained model (no GPU, no download; its numbers mean nothing).
+
+The fine-tuned models are saved under `models/<name>/` (about 1 GB each) and are not committed.
+Results of each run go to `results/transformer_<name>_results.txt` and `results/model_comparison.csv`.
