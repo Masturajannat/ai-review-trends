@@ -69,4 +69,4 @@ Lower MAE is better. Higher within-1-point and Spearman are better.
 
 - Tables and test results from this local run: `quality_model/results_local/` (`model_comparison.csv` holds all models). They were moved out of `results/` so they do not clash with the Colab results when the branches are merged.
 -Saved transformer models: `quality_model/models/` (xlm-roberta-base, google_muril-base-cased, csebuetnlp_banglabert). They are large, so they are git-ignored and not pushed. Rerun the script to regenerate them.
-- Comparison with the Colab run: not done yet, because the Colab run has not been done at the time of writing.
+See [comparison.md](comparison.md) for the Colab run and how it compares with this one.
