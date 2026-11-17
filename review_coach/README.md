@@ -1,17 +1,27 @@
-# Review Coach (MVP)
+# Review Coach
 
-A small web app that helps a buyer write a more useful product review. You type the product and
-your review (Bangla, Banglish or English), press **Check my review**, and see:
+A small web app that helps a buyer write a more useful product review, in Bangla, Banglish or
+English. The reviewer writes freely; the app does two things, each only when asked:
 
-- **Score 1 to 10** with what the level means and what the next level needs
-- **Checklist of 10 yes/no checks**, grouped under the four criteria of a good review
-  (specific, personal, reasoned, relevant)
-- **How to improve**: one concrete tip per weak criterion, for this review and this product
-- **Your drafts**: the score of each version you checked (e.g. 2 → 6 → 8)
+- **Rate my review**: a score from 1 to 10 for how useful the review is to someone deciding
+  whether to buy, with what the level means and a short paragraph explaining the score:
+  what the review tells a buyer and what keeps the score from being higher, written about this
+  review in its own language.
+- **Suggest improvements**: reads this one review and gives at most three suggestions. Each
+  points at a phrase the reviewer wrote, asks what a buyer would still want to know there, and
+  offers a sentence starter with blanks (`Battery ___ ghonta chole`). It never changes the
+  reviewer's opinion, never invents facts, and answers in the review's own language.
 
-The judging is the same as in our scored dataset: prompt `quality_eval/prompts/prompt_v2_checks.txt`
-and model `gemini-3.5-flash-lite`. So what the app says matches the labels our own model will be
-trained on. Later, the trained model can replace Gemini as the judge without changing the app.
+There is no checklist and no product type to choose: a review does not have to follow a fixed
+list of points to be useful, and the app works out what kind of product it is from the text.
+The product name is optional.
+
+## How the two parts are produced
+
+| Part | Now | Later |
+|---|---|---|
+| Score | Gemini with the dataset's scoring prompt (`quality_eval/prompts/prompt_v2.txt`, `gemini-3.5-flash-lite`) | our own model trained on the scored dataset, no API |
+| Suggestions | Gemini with `prompts/suggest_v1.txt`, a separate prompt that has nothing to do with scoring | stays an API call, because suggestions must be written for each review |
 
 ## Run it (VS Code terminal, PowerShell, from the repository folder `ai-review-trends`)
 
@@ -23,41 +33,36 @@ $env:GEMINI_API_KEY = "<your key>"       # skip this to use only the mock judge
 python -m streamlit run app.py --server.headless true
 ```
 
-The app opens in the browser at http://localhost:8501. Stop it with Ctrl+C in the terminal.
+Open http://localhost:8501. Stop the app with Ctrl+C in the terminal.
 
-## Judges (left sidebar)
+## Settings (left sidebar)
 
-| Judge | What it does | API calls |
-|---|---|---|
-| Gemini (real score) | same prompt and model as the dataset | 1 per check |
-| Mock (for testing) | simple rules (numbers, time words, "but/kintu", ...); not a real score | none |
+| Setting | What it does |
+|---|---|
+| Dark theme | switches the page colours |
+| Judge: Gemini | real score and real suggestions; one API call per button press |
+| Judge: Mock | rough rules and a placeholder suggestion, no API calls; only for testing the page |
 
-Use the mock judge while changing the layout, so the daily quota is not used up. Checking exactly
-the same product and text again reuses the earlier answer (no new API call).
+Pressing a button again for exactly the same text reuses the earlier answer (no new API call).
 
 ## Files
 
 | File | Purpose |
 |---|---|
-| `evaluator.py` | `evaluate(product, review, judge)`: the only function the app calls; always returns the same keys |
-| `db.py` | SQLite database `review_coach.db` (created automatically, not committed) |
 | `app.py` | the Streamlit page |
-| `.streamlit/config.toml` | colours |
+| `evaluator.py` | `evaluate(product, review, judge)` for the score and `suggest(product, review, judge)` for the suggestions; the page calls only these |
+| `prompts/suggest_v1.txt` | the suggestion prompt |
+| `db.py` | SQLite database `review_coach.db` (created automatically, not committed) |
 | `tests/test_evaluator.py` | checks that need no API key: `python -m pytest tests` (from `review_coach`) |
 
 ## Database (`review_coach.db`)
 
 | Table | One row per | Main fields |
 |---|---|---|
-| `sessions` | review being written | product_name, category, created_at, finished |
-| `evaluations` | click on "Check my review" | draft_no, review_text, language, word_count, score, level, reason, check_product_detail ... check_on_topic, weak_criteria, how_to_improve, judge, model, prompt_version, latency_ms, cache_key, from_cache |
-| `ratings` | "Tips helped" / "Not helpful" click | eval_id, helpful, comment |
+| `sessions` | review being written | product_name, created_at, finished |
+| `evaluations` | click on "Rate my review" | draft_no, review_text, language, word_count, score, level, reason, judge, model, prompt_version, latency_ms |
+| `suggestions` | click on "Suggest improvements" | review_text, summary, suggestions (JSON), n_suggestions, judge, model, prompt_version, latency_ms |
+| `ratings` | "Suggestions helped" / "Not helpful" click | suggestion id, helpful |
 
-No names, emails or API keys are stored. With the Gemini judge, the review text is sent to Google
-to be checked; the app says so in the sidebar.
-
-## Next steps
-
-1. Try about 10 real reviews in all three languages with the Gemini judge.
-2. Add an `own_model` judge in `evaluator.py` once our model is trained.
-3. Optional: guided questions for each missing check (the user's own answers only).
+No names, emails or API keys are stored. With the Gemini judge the review text is sent to Google;
+the page says so in the sidebar.

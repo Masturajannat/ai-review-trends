@@ -1,0 +1,34 @@
+reviews compared: 40
+new score equals one of the two prompt_v2 scores: 62%
+within 1 point of the prompt_v2 mean: 85%
+mean difference (new minus prompt_v2): -0.42
+rank correlation: 0.93
+(two prompt_v2 runs: same score 78%, within 1 point 99%, rank correlation 0.96)
+
+verdict: scores shifted; check before using the new prompt
+
+EXAMPLES
+- score 1 | 'Ata ki korean product? R akta use kore kaj hobe?'
+    specific: State your actual experience with the product's performance or ingredients.
+    personal: Explain whether you have used this eye cream yourself and what results you saw.
+    relevant: Provide feedback on the product or your purchase experience instead of asking questions.
+- score 2 | 'best bhai best🥵\r\netar upore kono kotha nai❤️'
+    specific: Mention concrete aspects of the essence such as its texture, absorption rate, or the results you noticed on your skin.
+    personal: Describe how long you used the product and your skin type.
+    reasoned: Explain why you like the product by giving specific pros and cons.
+    relevant: Provide details that would actually help another buyer decide whether to purchase this skincare item from this shop.
+- score 4 | 'porduct tar quality onak valo.\r\n1 ta niacilam, babohar kore falaci ti photo dite parlam na'
+    specific: Mention specific details about the mask's thickness, the fit of the steel nose clip, or the breathability of the 5 layers.
+    personal: Describe how long the mask lasted during daily use or how comfortable it felt over hours of wearing.
+    reasoned: Explain why you found the quality very good by mentioning specific pros and cons compared to other masks.
+- score 4 | 'প্রডাক্ট টা হাতে পেতে যদিও বা একটু সময় লেগেছে! তবে জীবনে প্রথম মনে হচ্ছে, ভালো একটা প্রডাক'
+    specific: Mention specific skin results such as how it reduced acne or oiliness.
+    reasoned: Explain why you are satisfied by describing how your skin felt after using the cleanser.
+- score 6 | 'Apndr kache manus blv kore product ney r apnra expired date er product den...ata kmn kotha'
+    specific: Mention specific details about the packaging or condition in which the expired eye cream arrived.
+    reasoned: Explain how the product was tested or how you discovered the expiration date.
+- score 7 | 'Ager barer moto in-take packet na....\r\nUpdate: প্রথমবার অর্ডার করে খুব ভালো লেগেছিল তাই এব'
+    (nothing to improve)
+- score 4 | 'একদা একসময়, আমার সাধারণ একজোড়া চোখ ছিলো। যেখানে সাদা থাকার কথা সেখানে সাদা, যেখানে কালো থা'
+    specific: Describe actual, checkable results you observed on your hair or eyelashes after using the castor oil.
+    personal: State how long you used the product and in what routine for your hair or eyelashes.
