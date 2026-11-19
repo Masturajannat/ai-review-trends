@@ -97,3 +97,9 @@ tiny untrained model (no GPU, no download; its numbers mean nothing).
 
 The fine-tuned models are saved under `models/<name>/` (about 1 GB each) and are not committed.
 Results of each run go to `results/transformer_<name>_results.txt` and `results/model_comparison.csv`.
+
+## Step 4: "Read More" strip and head+tail (19 Nov 2026)
+
+Two follow-up runs on xlm-roberta-base, from the Rokomari investigation. Neither improved the
+model clearly; the plain stripped model (`RUN_TAG=noreadmore`) is the one to use. Exact commands,
+code changes, a comparison table and the decision are in [`noreadmore_headtail.md`](noreadmore_headtail.md).
