@@ -104,43 +104,69 @@ Two follow-up runs on xlm-roberta-base, from the Rokomari investigation. Neither
 model clearly; the plain stripped model (`RUN_TAG=noreadmore`) is the one to use. Exact commands,
 code changes, a comparison table and the decision are in [`noreadmore_headtail.md`](noreadmore_headtail.md).
 
-## Step 5: finishing the model (from 19 Nov 2026)
+## Step 5: finishing the model (plan from 19 Nov 2026)
 
-What the runs so far show (`comparison.md`, `rokomari_check/rokomari.md`, `noreadmore_headtail.md`):
-xlm-roberta-base is the best model so far (test MAE 0.65 to 0.68, 75 to 78% within 1 point,
-rank correlation 0.86 to 0.87), BanglaBERT is level with it, and the same model trained twice
-differs by up to 0.03 MAE. The chosen setting is "Read More" stripped, first 256 tokens.
+Where we are (`comparison.md`, `rokomari_check/rokomari.md`, `noreadmore_headtail.md`):
+xlm-roberta-base with "Read More" stripped is the best model so far (test MAE 0.67, 77.5% within
+1 point, rank correlation 0.86), BanglaBERT is level with it, and the same run repeated differs by
+up to 0.03 MAE. Rokomari is the weak platform (MAE 0.82 against 0.55 to 0.63); its worst misses are
+short texts the model cannot place (thanks messages, lyrics, excerpts, generic praise).
 
-Two things are still open before the numbers are final:
+Three open questions, answered with as few GPU runs as possible. All runs use `RUN_TAG=noreadmore`.
 
-1. **Is the result stable?** Every model was trained with one seed. Train xlm-roberta-base with
-   two more seeds and report the mean and spread; averaging the seeds' predictions may also help a little.
-2. **Does a bigger model help?** `xlm-roberta-large` (three times bigger) is the most likely real
-   improvement. It needs about 12 GB of GPU memory, so it runs on Colab, not on an 8 GB laptop.
+### Round 1 (laptop GPU, Tazrian, about 40 minutes): does the product name help?
 
-New options in `03_train_transformer.py`: `--grad-accum N` (add up N batches per update),
-`--grad-ckpt` (gradient checkpointing, much less memory), `--warmup`. A seed other than 299 also
-changes the train/validation split and writes its own files (`..._seed1_...`), so runs do not
-overwrite each other. `05_seeds.py` summarises the seeds of a model.
-
-**Laptop GPU (seeds of the base model, about 7 minutes each):**
+Gemini saw the product name when it scored each review; the model so far sees only the review.
+`--with-product` gives the model `(product name, review)`, and hides the name in 30% of training
+examples so it still works when a user leaves the name empty (the result file also reports that case).
+Five runs of about 7 minutes:
 
 ```powershell
 $env:RUN_TAG = "noreadmore"
 python scripts\03_train_transformer.py --model xlm-roberta-base --seed 1 --no-save
 python scripts\03_train_transformer.py --model xlm-roberta-base --seed 2 --no-save
-python scripts\05_seeds.py --model xlm-roberta-base
+python scripts\03_train_transformer.py --model xlm-roberta-base --with-product
+python scripts\03_train_transformer.py --model xlm-roberta-base --with-product --seed 1 --no-save
+python scripts\03_train_transformer.py --model xlm-roberta-base --with-product --seed 2 --no-save
+python scripts\05_seeds.py --model xlm-roberta-base --model xlm-roberta-base_product
 ```
 
-**Colab (xlm-roberta-large, about 1 hour on a T4):** open
-[`train_transformer_colab.ipynb`](https://colab.research.google.com/github/Masturajannat/ai-review-trends/blob/Mastura/quality_model/train_transformer_colab.ipynb)
-and run part A. The command it runs:
+(Seed 299 of the plain model already exists in `results_noreadmore/`.)
 
-```
-python scripts/03_train_transformer.py --model xlm-roberta-large --lr 1e-5 --batch 8 --grad-accum 2 --grad-ckpt --warmup 0.1
-```
+**Decision:** keep the product name if its mean MAE over the 3 seeds is lower than the plain model's
+by more than the larger of the two spreads, and its Rokomari MAE is lower too. Also check the
+"product name empty" line: it must not be worse than the plain model, or the app would suffer
+when users leave the name out.
 
-**Then decide:** if large beats base by clearly more than the seed spread, use large (and train it
-with 2 more seeds if time allows); otherwise keep base. Report the mean and spread over seeds,
-the per-platform numbers (Rokomari is the weakest), and the Gemini yardstick.
+Optional, only if time is left: `--rokomari-weight 2` (Rokomari counted twice in the loss), one seed,
+added to whichever variant won.
 
+### Round 2 (Colab T4, Mastura, about 1 hour): does the large model help?
+
+`train_transformer_colab.ipynb`, part A: A2 if round 1 kept the product name, otherwise A1.
+
+**Decision:** large wins if its MAE is lower than the base model's 3-seed mean by more than twice the
+base spread. If it wins and time allows, run 1 or 2 more seeds of large (part B, about 1 hour each,
+can be on different days). If it does not win, the final model is the base model from round 1.
+
+### Round 3: the final model
+
+- Report: mean and spread over seeds, overall and by platform and language (`05_seeds.py` output),
+  next to the baseline and the Gemini yardstick, and say why Rokomari is the hardest platform.
+- Keep the saved model of seed 299 of the winner (`models_noreadmore/<name>/`) and share it through
+  Google Drive (about 1 GB for base, 2 GB for large); it is too large for git.
+- The app (`review_coach`) then gets the trained model as its score judge.
+
+### Options in `03_train_transformer.py`
+
+| Option | What it does |
+|---|---|
+| `--seed N` | other random start and train/validation split; seeds other than 299 write their own files (`..._seedN_...`) |
+| `--with-product` | product name given with the review; `--product-dropout` (default 0.3) hides it in that share of training examples |
+| `--rokomari-weight W` | Rokomari training reviews count W times in the loss |
+| `--grad-accum N`, `--grad-ckpt`, `--warmup` | for xlm-roberta-large on a 16 GB GPU |
+| `--no-save` | do not save the model (use for extra seeds) |
+
+`05_seeds.py --model <name>` summarises the seeds of one variant (`xlm-roberta-base`,
+`xlm-roberta-base_product`, `xlm-roberta-large`, ...): each seed, the mean and spread, and the
+average of the seeds' predictions.

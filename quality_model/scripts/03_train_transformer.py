@@ -27,6 +27,10 @@ Writes, with <name> = the model name without slashes:
   Bigger model on a 16 GB GPU (Colab T4), same effective batch of 16:
   python scripts/03_train_transformer.py --model xlm-roberta-large --lr 1e-5 --batch 8 --grad-accum 2 --grad-ckpt --warmup 0.1
 
+  Product name with the review (Gemini saw it too), and Rokomari counted twice in the loss:
+  python scripts/03_train_transformer.py --model xlm-roberta-base --with-product --no-save
+  python scripts/03_train_transformer.py --model xlm-roberta-base --rokomari-weight 2 --no-save
+
   Other seeds (each also gets its own train/validation split), then summarise with 05_seeds.py:
   python scripts/03_train_transformer.py --model xlm-roberta-base --seed 1 --no-save
 
@@ -55,12 +59,23 @@ ap.add_argument("--grad-accum", type=int, default=1,
 ap.add_argument("--grad-ckpt", action="store_true",
                 help="gradient checkpointing: much less GPU memory, about 30 percent slower (for large models)")
 ap.add_argument("--warmup", type=float, default=0.06, help="share of the updates with a rising learning rate")
+ap.add_argument("--with-product", action="store_true",
+                help="give the model the product name with the review (as Gemini had); hidden in 30%% of training examples "
+                     "so the model also works when the product name is left empty")
+ap.add_argument("--product-dropout", type=float, default=0.3, help="share of training examples shown without the product name")
+ap.add_argument("--rokomari-weight", type=float, default=1.0,
+                help="count Rokomari training reviews this many times in the loss (e.g. 2)")
 ap.add_argument("--no-save", action="store_true", help="do not save the fine-tuned model")
 ap.add_argument("--test-run", action="store_true")
 a = ap.parse_args()
 
-NAME = ("test_run" if a.test_run else a.model.replace("/", "_")) + ("" if a.seed == 299 else f"_seed{a.seed}")
-LABEL = a.model + ("" if a.seed == 299 else f" (seed {a.seed})")          # row name in model_comparison.csv
+if a.with_product and a.head_tail:
+    raise SystemExit("--with-product and --head-tail cannot be combined")
+VARIANT = ("_product" if a.with_product else "") + (f"_rokw{a.rokomari_weight:g}" if a.rokomari_weight != 1 else "")
+NAME = ("test_run" if a.test_run else a.model.replace("/", "_")) + VARIANT + ("" if a.seed == 299 else f"_seed{a.seed}")
+LABEL = (a.model + (" + product name" if a.with_product else "")
+         + (f" + Rokomari x{a.rokomari_weight:g}" if a.rokomari_weight != 1 else "")
+         + ("" if a.seed == 299 else f" (seed {a.seed})"))                 # row name in model_comparison.csv
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 
@@ -98,17 +113,32 @@ def head_tail(ids, max_len):
     return ids[:head] + ids[len(ids) - (max_len - head):]
 
 
-def batches(tok, texts, labels, batch, shuffle, max_len):
+DROP = np.random.default_rng(a.seed + 1)
+
+
+def batches(tok, df, labels, batch, train=False, product="keep"):
+    """Batches of (review, label, weight). With --with-product the input is the pair
+    (product name, review); product="keep" shows the name, "blank" hides it, and training
+    hides it in --product-dropout of the examples."""
+    weights = np.where(df["platform"] == "Rokomari", a.rokomari_weight, 1.0) if train else np.ones(len(df))
+    # product names are capped at 120 characters (some Daraz names are very long)
+    rows = list(zip(df["product_name"].fillna("").astype(str).str[:120], df["text_original"], labels, weights))
+
     def collate(rows):
-        if a.head_tail:
-            ids = tok([r[0] for r in rows])["input_ids"]
-            enc = tok.pad({"input_ids": [head_tail(i, max_len) for i in ids]}, return_tensors="pt")
+        texts = [r[1] for r in rows]
+        if a.with_product:
+            names = [("" if (train and DROP.random() < a.product_dropout) or product == "blank" else r[0]) for r in rows]
+            enc = tok(names, texts, truncation="longest_first", max_length=a.max_len, padding=True, return_tensors="pt")
+        elif a.head_tail:
+            ids = tok(texts)["input_ids"]
+            enc = tok.pad({"input_ids": [head_tail(i, a.max_len) for i in ids]}, return_tensors="pt")
         else:
-            enc = tok([r[0] for r in rows], truncation=True, max_length=max_len, padding=True, return_tensors="pt")
+            enc = tok(texts, truncation=True, max_length=a.max_len, padding=True, return_tensors="pt")
         enc.pop("token_type_ids", None)
-        enc["labels"] = torch.tensor([r[1] for r in rows], dtype=torch.float)
+        enc["labels"] = torch.tensor([r[2] for r in rows], dtype=torch.float)
+        enc["weights"] = torch.tensor([r[3] for r in rows], dtype=torch.float)
         return enc
-    return DataLoader(list(zip(texts, labels)), batch_size=batch, shuffle=shuffle, collate_fn=collate)
+    return DataLoader(rows, batch_size=batch, shuffle=train, collate_fn=collate)
 
 
 @torch.no_grad()
@@ -116,7 +146,7 @@ def predict(model, loader, mean, std):
     model.eval()
     out = []
     for b in loader:
-        b.pop("labels")
+        b.pop("labels"); b.pop("weights")
         b = {k: v.to(DEVICE) for k, v in b.items()}
         with torch.autocast(DEVICE, enabled=DEVICE == "cuda"):
             out.append(model(**b).logits.float().squeeze(-1).cpu())
@@ -148,9 +178,9 @@ def main():
     # the model learns the score in standard units (mean 0, spread 1); predictions are converted back
     mean, std = float(train["score"].mean()), float(train["score"].std())
     z = lambda s: ((s - mean) / std).tolist()
-    tr = batches(tok, train["text_original"].tolist(), z(train["score"]), a.batch, True, a.max_len)
-    va = batches(tok, val["text_original"].tolist(), z(val["score"]), a.batch * 2, False, a.max_len)
-    te = batches(tok, test["text_original"].tolist(), z(test["score"]), a.batch * 2, False, a.max_len)
+    tr = batches(tok, train, z(train["score"]), a.batch, train=True)
+    va = batches(tok, val, z(val["score"]), a.batch * 2)
+    te = batches(tok, test, z(test["score"]), a.batch * 2)
 
     from transformers import get_linear_schedule_with_warmup
     opt = torch.optim.AdamW(model.parameters(), lr=a.lr, weight_decay=0.01)
@@ -158,7 +188,6 @@ def main():
     steps = -(-len(tr) // a.grad_accum) * a.epochs                        # optimizer updates
     sched = get_linear_schedule_with_warmup(opt, int(a.warmup * steps), steps)
     scaler = torch.amp.GradScaler(enabled=DEVICE == "cuda")
-    loss_fn = torch.nn.MSELoss()
 
     best, best_state, log, t0 = None, None, [], time.time()
     for epoch in range(1, a.epochs + 1):
@@ -166,9 +195,10 @@ def main():
         total = 0.0
         for i, b in enumerate(tr, 1):
             b = {k: v.to(DEVICE) for k, v in b.items()}
-            labels = b.pop("labels")
+            labels, w = b.pop("labels"), b.pop("weights")
             with torch.autocast(DEVICE, enabled=DEVICE == "cuda"):
-                loss = loss_fn(model(**b).logits.float().squeeze(-1), labels)
+                err = (model(**b).logits.float().squeeze(-1) - labels) ** 2
+                loss = (err * w).sum() / w.sum()                 # mean squared error, Rokomari weighted if asked
             scaler.scale(loss / a.grad_accum).backward()
             if i % a.grad_accum == 0 or i == len(tr):          # one update per grad-accum batches
                 scaler.unscale_(opt)
@@ -196,11 +226,21 @@ def main():
              + (f" x {a.grad_accum} accumulated" if a.grad_accum > 1 else "") + (", gradient checkpointing" if a.grad_ckpt else "")
              + f", warmup {a.warmup}, max {a.max_len} tokens{' (head+tail)' if a.head_tail else ''}, seed {a.seed}, "
              f"device {DEVICE}, {time.time() - t0:.0f}s", "", "TRAINING"] + log + [
-             f"  kept: epoch {best[0]} (lowest validation MAE)", "",
+             f"  kept: epoch {best[0]} (lowest validation MAE)"]
+    if a.with_product or a.rokomari_weight != 1:
+        parts = ([f"product name with the review (hidden in {a.product_dropout:.0%} of training examples)"] if a.with_product else []) \
+            + ([f"Rokomari counted x{a.rokomari_weight:g} in the loss"] if a.rokomari_weight != 1 else [])
+        lines.insert(2, "variant: " + "; ".join(parts))
+    lines += ["",
              "TEST: THE 400 MAIN-RUN REVIEWS", f"  {NAME[:24]:24s} {fmt(tm)}"]
     base_file = os.path.join(RESULTS, "baseline_predictions.csv")
     out = test[["review_id", "platform", "language", "n_words", "score"]].copy()
     out["predicted"] = pred.round(2)
+    if a.with_product:
+        # the same model when the user leaves the product name empty, as in the app
+        blank = predict(model, batches(tok, test, z(test["score"]), a.batch * 2, product="blank"), mean, std)
+        out["predicted_no_product"] = blank.round(2)
+        lines.append(f"  {'same, product name empty':24s} {fmt(metrics(test['score'], blank))}")
     if os.path.exists(base_file):
         base = pd.read_csv(base_file, dtype={"review_id": str})[["review_id", "predicted"]]
         out = out.merge(base.rename(columns={"predicted": "baseline"}), on="review_id", how="left")
@@ -232,7 +272,7 @@ def main():
             dst = os.path.join(MODELS, NAME)
             model.save_pretrained(dst); tok.save_pretrained(dst)
             json.dump({"mean": mean, "std": std, "max_len": a.max_len, "head_tail": a.head_tail, "base_model": a.model,
-                       "seed": a.seed, "strip_read_more": os.environ.get("RUN_TAG", "").startswith("noreadmore"),
+                       "seed": a.seed, "with_product": a.with_product, "strip_read_more": os.environ.get("RUN_TAG", "").startswith("noreadmore"),
                        "test": {k: float(v) for k, v in tm.items()}}, open(os.path.join(dst, "score_scale.json"), "w"))
             print(f"model saved to {dst}")
 
