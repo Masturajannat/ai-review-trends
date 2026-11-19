@@ -24,6 +24,12 @@ Writes, with <name> = the model name without slashes:
   results/model_comparison.csv                  one row per model trained so far (plus the baseline)
   models/<name>/                                the fine-tuned model (large; not committed to git)
 
+  Bigger model on a 16 GB GPU (Colab T4), same effective batch of 16:
+  python scripts/03_train_transformer.py --model xlm-roberta-large --lr 1e-5 --batch 8 --grad-accum 2 --grad-ckpt --warmup 0.1
+
+  Other seeds (each also gets its own train/validation split), then summarise with 05_seeds.py:
+  python scripts/03_train_transformer.py --model xlm-roberta-base --seed 1 --no-save
+
   --test-run   trains a tiny untrained model for one epoch to check that everything works
                (no download, no GPU; the numbers mean nothing)
 """
@@ -42,12 +48,19 @@ ap.add_argument("--lr", type=float, default=2e-5)
 ap.add_argument("--batch", type=int, default=16)
 ap.add_argument("--max-len", type=int, default=256, help="tokens kept per review; longer reviews are cut")
 ap.add_argument("--head-tail", action="store_true", help="long reviews: keep the start and the end, drop the middle")
-ap.add_argument("--seed", type=int, default=299)
+ap.add_argument("--seed", type=int, default=299,
+                help="also changes the 90/10 train/validation split; seeds other than 299 get their own result files")
+ap.add_argument("--grad-accum", type=int, default=1,
+                help="add up the gradients of this many batches before each update: effective batch = batch x grad-accum")
+ap.add_argument("--grad-ckpt", action="store_true",
+                help="gradient checkpointing: much less GPU memory, about 30 percent slower (for large models)")
+ap.add_argument("--warmup", type=float, default=0.06, help="share of the updates with a rising learning rate")
 ap.add_argument("--no-save", action="store_true", help="do not save the fine-tuned model")
 ap.add_argument("--test-run", action="store_true")
 a = ap.parse_args()
 
-NAME = "test_run" if a.test_run else a.model.replace("/", "_")
+NAME = ("test_run" if a.test_run else a.model.replace("/", "_")) + ("" if a.seed == 299 else f"_seed{a.seed}")
+LABEL = a.model + ("" if a.seed == 299 else f" (seed {a.seed})")          # row name in model_comparison.csv
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 
@@ -129,6 +142,8 @@ def main():
         tok = AutoTokenizer.from_pretrained(a.model)
         model = AutoModelForSequenceClassification.from_pretrained(a.model, num_labels=1)
     model.to(DEVICE)
+    if a.grad_ckpt:
+        model.gradient_checkpointing_enable()
 
     # the model learns the score in standard units (mean 0, spread 1); predictions are converted back
     mean, std = float(train["score"].mean()), float(train["score"].std())
@@ -139,8 +154,9 @@ def main():
 
     from transformers import get_linear_schedule_with_warmup
     opt = torch.optim.AdamW(model.parameters(), lr=a.lr, weight_decay=0.01)
-    steps = len(tr) * a.epochs
-    sched = get_linear_schedule_with_warmup(opt, int(0.06 * steps), steps)
+    opt.zero_grad()
+    steps = -(-len(tr) // a.grad_accum) * a.epochs                        # optimizer updates
+    sched = get_linear_schedule_with_warmup(opt, int(a.warmup * steps), steps)
     scaler = torch.amp.GradScaler(enabled=DEVICE == "cuda")
     loss_fn = torch.nn.MSELoss()
 
@@ -153,11 +169,12 @@ def main():
             labels = b.pop("labels")
             with torch.autocast(DEVICE, enabled=DEVICE == "cuda"):
                 loss = loss_fn(model(**b).logits.float().squeeze(-1), labels)
-            opt.zero_grad()
-            scaler.scale(loss).backward()
-            scaler.unscale_(opt)
-            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-            scaler.step(opt); scaler.update(); sched.step()
+            scaler.scale(loss / a.grad_accum).backward()
+            if i % a.grad_accum == 0 or i == len(tr):          # one update per grad-accum batches
+                scaler.unscale_(opt)
+                torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+                scaler.step(opt); scaler.update(); sched.step()
+                opt.zero_grad()
             total += loss.item()
             if i % 100 == 0:
                 print(f"  epoch {epoch} step {i}/{len(tr)}  loss {total / i:.3f}", flush=True)
@@ -175,7 +192,9 @@ def main():
     gm = metrics(g["run2"], g["run1"])
     lines = [f"TRANSFORMER FOR THE REVIEW-QUALITY SCORE: {a.model if not a.test_run else 'TEST RUN (numbers mean nothing)'}",
              f"train {len(train)}, validation {len(val)} (from full + pilot), test {len(test)} (main run, never trained on)",
-             f"epochs {a.epochs}, learning rate {a.lr}, batch {a.batch}, max {a.max_len} tokens{' (head+tail)' if a.head_tail else ''}, seed {a.seed}, "
+             f"epochs {a.epochs}, learning rate {a.lr}, batch {a.batch}"
+             + (f" x {a.grad_accum} accumulated" if a.grad_accum > 1 else "") + (", gradient checkpointing" if a.grad_ckpt else "")
+             + f", warmup {a.warmup}, max {a.max_len} tokens{' (head+tail)' if a.head_tail else ''}, seed {a.seed}, "
              f"device {DEVICE}, {time.time() - t0:.0f}s", "", "TRAINING"] + log + [
              f"  kept: epoch {best[0]} (lowest validation MAE)", "",
              "TEST: THE 400 MAIN-RUN REVIEWS", f"  {NAME[:24]:24s} {fmt(tm)}"]
@@ -201,18 +220,19 @@ def main():
         # one table of all models trained so far
         table = os.path.join(RESULTS, "model_comparison.csv")
         rows = pd.read_csv(table) if os.path.exists(table) else pd.DataFrame()
-        add = [dict(model=a.model, **{k: round(v, 3) for k, v in tm.items()}, best_epoch=best[0], seed=a.seed)]
+        add = [dict(model=LABEL, **{k: round(v, 3) for k, v in tm.items()}, best_epoch=best[0], seed=a.seed)]
         if "baseline" in out and not (len(rows) and (rows["model"] == "baseline (TF-IDF + ridge)").any()):
             add.append(dict(model="baseline (TF-IDF + ridge)",
                             **{k: round(v, 3) for k, v in metrics(out["score"], out["baseline"]).items()}))
             add.append(dict(model="Gemini run 1 vs run 2", **{k: round(v, 3) for k, v in gm.items()}))
-        rows = pd.concat([rows[rows["model"] != a.model] if len(rows) else rows, pd.DataFrame(add)], ignore_index=True)
+        rows = pd.concat([rows[rows["model"] != LABEL] if len(rows) else rows, pd.DataFrame(add)], ignore_index=True)
         rows.to_csv(table, index=False)
         print("\nALL MODELS SO FAR\n" + rows[["model", "MAE", "within 1", "Spearman"]].to_string(index=False))
         if not a.no_save:
             dst = os.path.join(MODELS, NAME)
             model.save_pretrained(dst); tok.save_pretrained(dst)
             json.dump({"mean": mean, "std": std, "max_len": a.max_len, "head_tail": a.head_tail, "base_model": a.model,
+                       "seed": a.seed, "strip_read_more": os.environ.get("RUN_TAG", "").startswith("noreadmore"),
                        "test": {k: float(v) for k, v in tm.items()}}, open(os.path.join(dst, "score_scale.json"), "w"))
             print(f"model saved to {dst}")
 

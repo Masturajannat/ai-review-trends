@@ -103,3 +103,44 @@ Results of each run go to `results/transformer_<name>_results.txt` and `results/
 Two follow-up runs on xlm-roberta-base, from the Rokomari investigation. Neither improved the
 model clearly; the plain stripped model (`RUN_TAG=noreadmore`) is the one to use. Exact commands,
 code changes, a comparison table and the decision are in [`noreadmore_headtail.md`](noreadmore_headtail.md).
+
+## Step 5: finishing the model (from 19 Nov 2026)
+
+What the runs so far show (`comparison.md`, `rokomari_check/rokomari.md`, `noreadmore_headtail.md`):
+xlm-roberta-base is the best model so far (test MAE 0.65 to 0.68, 75 to 78% within 1 point,
+rank correlation 0.86 to 0.87), BanglaBERT is level with it, and the same model trained twice
+differs by up to 0.03 MAE. The chosen setting is "Read More" stripped, first 256 tokens.
+
+Two things are still open before the numbers are final:
+
+1. **Is the result stable?** Every model was trained with one seed. Train xlm-roberta-base with
+   two more seeds and report the mean and spread; averaging the seeds' predictions may also help a little.
+2. **Does a bigger model help?** `xlm-roberta-large` (three times bigger) is the most likely real
+   improvement. It needs about 12 GB of GPU memory, so it runs on Colab, not on an 8 GB laptop.
+
+New options in `03_train_transformer.py`: `--grad-accum N` (add up N batches per update),
+`--grad-ckpt` (gradient checkpointing, much less memory), `--warmup`. A seed other than 299 also
+changes the train/validation split and writes its own files (`..._seed1_...`), so runs do not
+overwrite each other. `05_seeds.py` summarises the seeds of a model.
+
+**Laptop GPU (seeds of the base model, about 7 minutes each):**
+
+```powershell
+$env:RUN_TAG = "noreadmore"
+python scripts\03_train_transformer.py --model xlm-roberta-base --seed 1 --no-save
+python scripts\03_train_transformer.py --model xlm-roberta-base --seed 2 --no-save
+python scripts\05_seeds.py --model xlm-roberta-base
+```
+
+**Colab (xlm-roberta-large, about 1 hour on a T4):** open
+[`train_transformer_colab.ipynb`](https://colab.research.google.com/github/Masturajannat/ai-review-trends/blob/Mastura/quality_model/train_transformer_colab.ipynb)
+and run part A. The command it runs:
+
+```
+python scripts/03_train_transformer.py --model xlm-roberta-large --lr 1e-5 --batch 8 --grad-accum 2 --grad-ckpt --warmup 0.1
+```
+
+**Then decide:** if large beats base by clearly more than the seed spread, use large (and train it
+with 2 more seeds if time allows); otherwise keep base. Report the mean and spread over seeds,
+the per-platform numbers (Rokomari is the weakest), and the Gemini yardstick.
+
