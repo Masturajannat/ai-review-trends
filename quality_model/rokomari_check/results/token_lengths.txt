@@ -1,0 +1,20 @@
+TRAIN: share of reviews longer than 256 tokens
+  Daraz     n= 3339  cut  0.0%  median tokens 22
+  Rokomari  n= 1528  cut 20.1%  median tokens 53
+  Shajgoj   n= 2055  cut  0.4%  median tokens 26
+
+TEST (400 main-run reviews): share of reviews longer than 256 tokens
+  Daraz     n=  132  cut  1.5%  median tokens 32
+  Rokomari  n=  130  cut  7.7%  median tokens 34
+  Shajgoj   n=  138  cut  0.7%  median tokens 36
+
+results_local: xlm-roberta test MAE, reviews kept whole vs cut
+  Rokomari  whole n=120 MAE 0.73   |   cut   n= 10 MAE 1.44
+  Daraz     whole n=130 MAE 0.55   |   cut   n=  2 MAE 0.71
+  Shajgoj   whole n=137 MAE 0.62   |   cut   n=  1 MAE 0.15
+
+results_colab: xlm-roberta test MAE, reviews kept whole vs cut
+  Rokomari  whole n=120 MAE 0.77   |   cut   n= 10 MAE 1.43
+  Daraz     whole n=130 MAE 0.56   |   cut   n=  2 MAE 1.23
+  Shajgoj   whole n=137 MAE 0.67   |   cut   n=  1 MAE 0.21
+

@@ -41,6 +41,7 @@ ap.add_argument("--epochs", type=int, default=5)
 ap.add_argument("--lr", type=float, default=2e-5)
 ap.add_argument("--batch", type=int, default=16)
 ap.add_argument("--max-len", type=int, default=256, help="tokens kept per review; longer reviews are cut")
+ap.add_argument("--head-tail", action="store_true", help="long reviews: keep the start and the end, drop the middle")
 ap.add_argument("--seed", type=int, default=299)
 ap.add_argument("--no-save", action="store_true", help="do not save the fine-tuned model")
 ap.add_argument("--test-run", action="store_true")
@@ -75,9 +76,22 @@ def tiny_model(texts):
     return fast, BertForSequenceClassification(cfg)
 
 
+def head_tail(ids, max_len):
+    """A long review cut to max_len tokens: half from the start, half from the end.
+    The first and last ids are the model's start and end tokens, so they stay."""
+    if len(ids) <= max_len:
+        return ids
+    head = max_len // 2
+    return ids[:head] + ids[len(ids) - (max_len - head):]
+
+
 def batches(tok, texts, labels, batch, shuffle, max_len):
     def collate(rows):
-        enc = tok([r[0] for r in rows], truncation=True, max_length=max_len, padding=True, return_tensors="pt")
+        if a.head_tail:
+            ids = tok([r[0] for r in rows])["input_ids"]
+            enc = tok.pad({"input_ids": [head_tail(i, max_len) for i in ids]}, return_tensors="pt")
+        else:
+            enc = tok([r[0] for r in rows], truncation=True, max_length=max_len, padding=True, return_tensors="pt")
         enc.pop("token_type_ids", None)
         enc["labels"] = torch.tensor([r[1] for r in rows], dtype=torch.float)
         return enc
@@ -161,7 +175,7 @@ def main():
     gm = metrics(g["run2"], g["run1"])
     lines = [f"TRANSFORMER FOR THE REVIEW-QUALITY SCORE: {a.model if not a.test_run else 'TEST RUN (numbers mean nothing)'}",
              f"train {len(train)}, validation {len(val)} (from full + pilot), test {len(test)} (main run, never trained on)",
-             f"epochs {a.epochs}, learning rate {a.lr}, batch {a.batch}, max {a.max_len} tokens, seed {a.seed}, "
+             f"epochs {a.epochs}, learning rate {a.lr}, batch {a.batch}, max {a.max_len} tokens{' (head+tail)' if a.head_tail else ''}, seed {a.seed}, "
              f"device {DEVICE}, {time.time() - t0:.0f}s", "", "TRAINING"] + log + [
              f"  kept: epoch {best[0]} (lowest validation MAE)", "",
              "TEST: THE 400 MAIN-RUN REVIEWS", f"  {NAME[:24]:24s} {fmt(tm)}"]
@@ -198,7 +212,7 @@ def main():
         if not a.no_save:
             dst = os.path.join(MODELS, NAME)
             model.save_pretrained(dst); tok.save_pretrained(dst)
-            json.dump({"mean": mean, "std": std, "max_len": a.max_len, "base_model": a.model,
+            json.dump({"mean": mean, "std": std, "max_len": a.max_len, "head_tail": a.head_tail, "base_model": a.model,
                        "test": {k: float(v) for k, v in tm.items()}}, open(os.path.join(dst, "score_scale.json"), "w"))
             print(f"model saved to {dst}")
 

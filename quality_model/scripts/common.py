@@ -8,8 +8,11 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)                                   # quality_model/
 QE = os.path.join(os.path.dirname(ROOT), "quality_eval")
 DATA = os.path.join(QE, "all_scores_feedback.csv")             # one row per scored review
-RESULTS = os.path.join(ROOT, "results")
-MODELS = os.path.join(ROOT, "models")
+# a run tag (PowerShell: $env:RUN_TAG="noreadmore") sends results and models to their own folders;
+# tags starting with "noreadmore" also strip the Rokomari "Read More" leftover from the text
+TAG = os.environ.get("RUN_TAG", "")
+RESULTS = os.path.join(ROOT, "results" + ("_" + TAG if TAG else ""))
+MODELS = os.path.join(ROOT, "models" + ("_" + TAG if TAG else ""))
 
 
 def load():
@@ -20,6 +23,9 @@ def load():
     earlier results were made on."""
     d = pd.read_csv(DATA, dtype={"review_id": str})
     d["text_original"] = d["text_original"].fillna("").astype(str)
+    if TAG.startswith("noreadmore"):
+        # Rokomari previews end with "Read More" (scraping leftover); users never type it
+        d["text_original"] = d["text_original"].str.replace(r"(?i)\s*read more\s*$", "", regex=True)
     return (d[d["stage"] != "main"].reset_index(drop=True),
             d[d["stage"] == "main"].reset_index(drop=True))
 
