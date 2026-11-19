@@ -8,7 +8,7 @@ import html, os
 import streamlit as st
 
 import db
-from evaluator import evaluate, suggest
+from evaluator import evaluate, suggest, model_available, load_model
 
 st.set_page_config(page_title="Review Coach", layout="wide")
 
@@ -118,14 +118,22 @@ with st.sidebar:
     st.header("Settings")
     st.toggle("Dark theme", key="dark")
     has_key = bool(os.environ.get("GEMINI_API_KEY"))
-    judge = st.radio("Judge", ["gemini", "mock"], index=0 if has_key else 1,
-                     format_func=lambda j: {"gemini": "Gemini (real score and suggestions)",
-                                            "mock": "Mock (no API, for testing)"}[j])
+    has_model = model_available()
+    scorers = ["model", "gemini", "mock"]
+    judge = st.radio("Score from", scorers, index=0 if has_model else (1 if has_key else 2),
+                     format_func=lambda j: {"model": "Our trained model (on this computer)",
+                                            "gemini": "Gemini (API)", "mock": "Mock (for testing)"}[j])
+    if judge == "model" and not has_model:
+        st.warning("The trained model is not in quality_model/models_noreadmore/xlm-roberta-large. "
+                   "Download it from Google Drive into that folder.")
     if judge == "gemini" and not has_key:
         st.warning("GEMINI_API_KEY is not set in the terminal that started the app.")
+    helper = st.radio("Suggestions from", ["gemini", "mock"], index=0 if has_key else 1,
+                      format_func=lambda j: {"gemini": "Gemini (API)", "mock": "Mock (for testing)"}[j])
     st.button("Start a new review", on_click=new_review)
-    st.caption("Your review text is sent to Google's Gemini model when the Gemini judge is on. "
-               "Nothing is posted anywhere. No names or emails are stored.")
+    st.caption("With our trained model, rating stays on this computer. Suggestions (and the Gemini score) "
+               "send the review text to Google's Gemini model. Nothing is posted anywhere. No names or emails "
+               "are stored.")
 
 st.markdown("<h1 style='margin-bottom:0'>Review Coach</h1>"
             "<p class='rc-muted'>Write your review your own way, in Bangla, Banglish or English. "
@@ -151,6 +159,9 @@ with left:
         key = db.cache_key("score", judge, product, review)
         hit = db.cached_score(con, key)
         try:
+            if judge == "model" and model_available():
+                with st.spinner("Loading the trained model (first time only, up to a minute)..."):
+                    load_model()
             with st.spinner("Rating your review..."):
                 r = hit or evaluate(product, review, judge=judge)
             db.save_score(con, sid, review, r, key, from_cache=hit is not None)
@@ -161,11 +172,11 @@ with left:
             st.error(str(e))
     elif ask:
         sid = session(product)
-        key = db.cache_key("suggest", judge, product, review)
+        key = db.cache_key("suggest", helper, product, review)
         hit = db.cached_suggestions(con, key)
         try:
             with st.spinner("Thinking about what a buyer would ask..."):
-                s = hit or suggest(product, review, judge=judge)
+                s = hit or suggest(product, review, judge=helper)
             ss.sug_id = db.save_suggestions(con, sid, review, s, key, from_cache=hit is not None)
             ss.sug, ss.sug_text = s, review
         except Exception as e:
@@ -177,7 +188,7 @@ with right:
     if r is None and s is None:
         st.markdown("<div class='rc-card'><div class='rc-title'>How it works</div>"
                     "<p><b>Rate my review</b> gives your review a score from 1 to 10 for how useful it is to "
-                    "someone deciding whether to buy, with the reasons for it.</p>"
+                    "someone deciding whether to buy, and what that score means.</p>"
                     "<p style='margin-bottom:0'><b>Suggest improvements</b> reads your review and points at "
                     "places where a buyer would want to know a little more. It never changes your opinion and "
                     "never writes the review for you.</p></div>", unsafe_allow_html=True)
@@ -186,19 +197,22 @@ with right:
         color = T["ok"] if r["score"] >= 7 else T["miss"]
         bar = "".join(f"<span style='background:{color if i < r['score'] else T['line']}'></span>"
                       for i in range(10))
+        hint = ("" if s is not None or r["explanation"] else
+                "<div class='rc-muted' style='margin-top:6px'>Want to know what would raise it? Press "
+                "<b>Suggest improvements</b>.</div>")
         st.markdown(f"""
 <div class='rc-card rc-score'>
-  <div><span class='rc-big' style='color:{color}'>{r['score']}</span><span class='rc-muted'> /10</span></div>
+  <div><span class='rc-big' style='color:{color}'>{r['score']:g}</span><span class='rc-muted'> /10</span></div>
   <div style='flex:1 1 260px; min-width:0'>
     <div class='rc-bar'>{bar}</div>
     <div style='font-weight:600'>{esc(r['level_meaning'][:1].upper() + r['level_meaning'][1:])}</div>
+    {hint}
   </div>
 </div>""", unsafe_allow_html=True)
-        st.markdown(f"<div class='rc-card'><div class='rc-title'>Why this score</div>"
-                    f"<p style='margin:0; line-height:1.6'>{esc(r['explanation'])}</p></div>",
-                    unsafe_allow_html=True)
-        if s is None:
-            st.caption("Want ideas for making it more helpful? Press Suggest improvements.")
+        if r["explanation"]:                       # only the Gemini judge writes one
+            st.markdown(f"<div class='rc-card'><div class='rc-title'>Why this score</div>"
+                        f"<p style='margin:0; line-height:1.6'>{esc(r['explanation'])}</p></div>",
+                        unsafe_allow_html=True)
 
     if s is not None:
         items = s["suggestions"]
@@ -230,8 +244,8 @@ with right:
     hist = db.history(con, ss.sid) if ss.sid else []
     if len(hist) > 1:
         pills = " <span class='rc-muted'>→</span> ".join(
-            f"<span class='rc-pill'>Draft {h['draft_no']}: <b>{h['score']}</b></span>" for h in hist)
-        change = hist[-1]["score"] - hist[0]["score"]
+            f"<span class='rc-pill'>Draft {h['draft_no']}: <b>{h['score']:g}</b></span>" for h in hist)
+        change = round(hist[-1]["score"] - hist[0]["score"], 1)
         st.markdown(f"<div class='rc-card'><div class='rc-title'>Your drafts "
-                    f"({'+' if change >= 0 else ''}{change} since the first)</div>"
+                    f"({'+' if change >= 0 else ''}{change:g} since the first)</div>"
                     f"<div class='rc-hist'>{pills}</div></div>", unsafe_allow_html=True)

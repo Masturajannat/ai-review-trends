@@ -105,3 +105,58 @@ def test_database_round_trip():
     sug_id = db.save_suggestions(con, sid, text, s, skey)
     assert db.cached_suggestions(con, skey)["suggestions"] == s["suggestions"] and skey != key
     db.rate(con, sug_id, 1)
+
+
+def _tiny_trained_model(path):
+    """A small untrained model saved like 03_train_transformer.py saves the real one."""
+    import json
+    from tokenizers import Tokenizer, models, trainers, pre_tokenizers
+    from transformers import PreTrainedTokenizerFast, BertConfig, BertForSequenceClassification
+    tok = Tokenizer(models.WordPiece(unk_token="[UNK]"))
+    tok.pre_tokenizer = pre_tokenizers.Whitespace()
+    tok.train_from_iterator(["good product fast delivery", "battery lasts five hours", "বইটি ভালো"],
+                            trainers.WordPieceTrainer(vocab_size=200, special_tokens=["[PAD]", "[UNK]", "[CLS]", "[SEP]"]))
+    fast = PreTrainedTokenizerFast(tokenizer_object=tok, pad_token="[PAD]", unk_token="[UNK]",
+                                   cls_token="[CLS]", sep_token="[SEP]")
+    cfg = BertConfig(vocab_size=fast.vocab_size, hidden_size=32, num_hidden_layers=1, num_attention_heads=2,
+                     intermediate_size=64, max_position_embeddings=64, num_labels=1)
+    BertForSequenceClassification(cfg).save_pretrained(path)
+    fast.save_pretrained(path)
+    json.dump({"mean": 4.3, "std": 1.9, "max_len": 64, "base_model": "tiny-test-model"},
+              open(os.path.join(path, "score_scale.json"), "w"))
+
+
+def test_trained_model_judge():
+    import pytest
+    pytest.importorskip("torch"); pytest.importorskip("transformers")
+    import evaluator
+    path = tempfile.mkdtemp()
+    assert not evaluator.model_available(path)
+    _tiny_trained_model(path)
+    assert evaluator.model_available(path)
+    old = evaluator.MODEL_DIR
+    evaluator.MODEL_DIR = path
+    try:
+        r = evaluate("", "Battery lasts five hours. Read More", judge="model")
+        assert set(r) == SCORE_KEYS | {"raw_score"} and r["judge"] == "model" and r["model"] == "tiny-test-model"
+        assert 1 <= r["score"] <= 10 and r["score"] * 2 == int(r["score"] * 2)       # half points
+        assert r["explanation"] == "" and r["level_meaning"]                          # no API, no paragraph
+        # "Read More" at the end is ignored, as in training
+        assert evaluator.model_score("Battery lasts five hours. Read More", path) == \
+            evaluator.model_score("Battery lasts five hours.", path)
+    finally:
+        evaluator.MODEL_DIR = old
+
+
+def test_missing_model_message():
+    import evaluator
+    old = evaluator.MODEL_DIR
+    evaluator.MODEL_DIR = tempfile.mkdtemp()
+    try:
+        evaluate("", "Good sound.", judge="model")
+        assert False
+    except RuntimeError as e:
+        assert "Google Drive" in str(e)
+    finally:
+        evaluator.MODEL_DIR = old
+

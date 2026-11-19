@@ -2,3 +2,6 @@ streamlit
 google-genai
 pandas
 pytest
+torch
+transformers
+sentencepiece

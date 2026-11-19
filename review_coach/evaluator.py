@@ -10,10 +10,12 @@ The app only calls these two functions, and each always returns the same keys, s
 behind them can be swapped.
 
 evaluate(): the score
-  "gemini"  the scoring instructions of the dataset (prompt_v2) and the same model; after the score
-            it also explains the score in a short paragraph; needs GEMINI_API_KEY
+  "model"   our own model: XLM-RoBERTa large fine-tuned on the 7,322 reviews Gemini scored
+            (quality_model/). Runs on this computer, no API, no internet. The score is given in
+            half points, like the training labels, with what its level means.
+  "gemini"  the scoring instructions of the dataset (prompt_v2) and the same Gemini model; after
+            the score it also explains it in a short paragraph; needs GEMINI_API_KEY
   "mock"    simple rules, no API calls; for building and testing the page only
-  Later, our own model trained on the dataset is added here as a third judge.
 
 suggest(): the suggestions, only when the user asks for them
   A separate prompt (prompts/suggest_v1.txt) that reads this one review and returns at most
@@ -32,7 +34,10 @@ SCORE_VERSION = "prompt_v2"
 SUGGEST_PROMPT = os.path.join(HERE, "prompts", "suggest_v1.txt")
 SUGGEST_VERSION = "suggest_v1"
 GEMINI_MODEL = "gemini-3.5-flash-lite"
-JUDGES = ["gemini", "mock"]
+# the trained model: a folder made by quality_model/scripts/03_train_transformer.py
+MODEL_DIR = os.environ.get("REVIEW_COACH_MODEL", os.path.join(
+    os.path.dirname(HERE), "quality_model", "models_noreadmore", "xlm-roberta-large"))
+JUDGES = ["model", "gemini", "mock"]
 MAX_SUGGESTIONS = 3
 
 _templates, _llm = {}, {}
@@ -103,6 +108,50 @@ def count_words(text):
     return len(re.findall(r"\w+", text))
 
 
+# ---------------------------------------------------------------- our own model
+_own = {}
+
+
+def model_available(path=None):
+    path = path or MODEL_DIR
+    return all(os.path.exists(os.path.join(path, f)) for f in ("config.json", "score_scale.json"))
+
+
+def load_model(path=None):
+    """Load the trained model once (a large model takes 10 to 30 seconds the first time)."""
+    path = path or MODEL_DIR
+    if path not in _own:
+        if not model_available(path):
+            raise RuntimeError(f"The trained model was not found in {path}. Download it from Google Drive "
+                               "(review_quality_model/xlm-roberta-large) into that folder, or choose another judge.")
+        import torch
+        from transformers import AutoTokenizer, AutoModelForSequenceClassification
+        tok = AutoTokenizer.from_pretrained(path)
+        model = AutoModelForSequenceClassification.from_pretrained(path).eval()
+        scale = json.load(open(os.path.join(path, "score_scale.json"), encoding="utf-8"))
+        _own[path] = (tok, model, scale, torch)
+    return _own[path]
+
+
+def model_score(review, path=None):
+    """The trained model's score, 1 to 10 (not rounded)."""
+    tok, model, scale, torch = load_model(path)
+    text = re.sub(r"(?i)\s*read more\s*$", "", review)          # as in training ("Read More" stripped)
+    enc = tok(text, truncation=True, max_length=int(scale.get("max_len", 256)), return_tensors="pt")
+    enc.pop("token_type_ids", None)
+    with torch.no_grad():
+        z = model(**enc).logits.float().squeeze().item()
+    return float(min(10, max(1, z * scale["std"] + scale["mean"])))
+
+
+def model_name(path=None):
+    path = path or MODEL_DIR
+    try:
+        return json.load(open(os.path.join(path, "score_scale.json"), encoding="utf-8")).get("base_model", "own model")
+    except OSError:
+        return "own model"
+
+
 # ---------------------------------------------------------------- score
 def _score_result(score, reason, explanation, judge, model, version, t0):
     lvl, meaning = explain_level(score)
@@ -146,14 +195,16 @@ def evaluate(product, review, judge="gemini"):
     if not review:
         raise ValueError("Write a review first.")
     t0 = time.time()
-    if judge == "gemini":
+    if judge == "model":
+        raw = model_score(review)
+        r = _score_result(round(raw * 2) / 2, "", "", "model", model_name(), "trained model", t0)
+        r["raw_score"] = round(raw, 3)
+    elif judge == "gemini":
         score, reason, why = _ask_gemini(_fill(SCORE_PROMPT, product, review), _parse_score)
         r = _score_result(score, reason, why or reason, "gemini", GEMINI_MODEL, SCORE_VERSION, t0)
     else:
-        score = _mock_score(review)
-        r = _score_result(score, "Mock judge: rough rules for testing the app, not a real score.",
-                          "(Mock) A short explanation of the score would be written here: what your review "
-                          "tells a buyer, and what keeps the score from being higher.", "mock", "rules", "mock", t0)
+        r = _score_result(_mock_score(review), "Mock judge: rough rules for testing the app, not a real score.",
+                          "", "mock", "rules", "mock", t0)
     r["language"] = detect_language(review)
     r["word_count"] = count_words(review)
     return r

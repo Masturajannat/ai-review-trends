@@ -18,39 +18,62 @@ The product name is optional.
 
 ## How the two parts are produced
 
-| Part | Now | Later |
+| Part | Made by | API? |
 |---|---|---|
-| Score | Gemini with the dataset's scoring prompt (`quality_eval/prompts/prompt_v2.txt`, `gemini-3.5-flash-lite`) | our own model trained on the scored dataset, no API |
-| Suggestions | Gemini with `prompts/suggest_v1.txt`, a separate prompt that has nothing to do with scoring | stays an API call, because suggestions must be written for each review |
+| Score | **our trained model**: XLM-RoBERTa large fine-tuned on the 7,322 Gemini-scored reviews (`quality_model/`; test MAE 0.64, 80% within 1 point of Gemini). Shown in half points with what its level means. | no, runs on this computer |
+| Suggestions | Gemini with `prompts/suggest_v1.txt`, a separate prompt, only when the button is pressed | yes |
+
+For comparison the score can also come from Gemini itself (the dataset's scoring prompt, with a
+short "Why this score" paragraph) or from a mock judge for testing. With our model there is no
+paragraph: the card shows what the level means and points to **Suggest improvements**, which
+explains, for this review, what would make it more useful.
 
 ## Run it (VS Code terminal, PowerShell, from the repository folder `ai-review-trends`)
 
+Once:
+
+1. Download the trained model from Google Drive (`review_quality_model/xlm-roberta-large`, about
+   2.2 GB) and put the folder at `quality_model\models_noreadmore\xlm-roberta-large`, so that
+   `quality_model\models_noreadmore\xlm-roberta-large\config.json` exists. It is not committed to git.
+2. Install the packages (PyTorch for the CPU is enough):
+
 ```powershell
 .\.venv\Scripts\Activate.ps1
+python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
 python -m pip install -r review_coach\requirements.txt
+```
+
+Every time:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
 cd review_coach
-$env:GEMINI_API_KEY = "<your key>"       # skip this to use only the mock judge
+$env:GEMINI_API_KEY = "<your key>"       # only needed for suggestions (or the Gemini score)
 python -m streamlit run app.py --server.headless true
 ```
 
-Open http://localhost:8501. Stop the app with Ctrl+C in the terminal.
+Open http://localhost:8501. The first rating loads the model (up to a minute); after that each
+rating takes a second or two. Stop the app with Ctrl+C. To use a model in another folder, set
+`$env:REVIEW_COACH_MODEL` to that folder before starting.
 
 ## Settings (left sidebar)
 
 | Setting | What it does |
 |---|---|
 | Dark theme | switches the page colours |
-| Judge: Gemini | real score and real suggestions; one API call per button press |
-| Judge: Mock | rough rules and a placeholder suggestion, no API calls; only for testing the page |
+| Score from: our trained model | the default when the model folder is found; no API |
+| Score from: Gemini | the dataset's scoring prompt, with a "Why this score" paragraph; one API call |
+| Score from: Mock | rough rules, for testing the page only |
+| Suggestions from: Gemini / Mock | real suggestions (one API call per press) or a placeholder for testing |
 
-Pressing a button again for exactly the same text reuses the earlier answer (no new API call).
+Pressing a button again for exactly the same text reuses the earlier answer.
 
 ## Files
 
 | File | Purpose |
 |---|---|
 | `app.py` | the Streamlit page |
-| `evaluator.py` | `evaluate(product, review, judge)` for the score and `suggest(product, review, judge)` for the suggestions; the page calls only these |
+| `evaluator.py` | `evaluate(product, review, judge)` for the score (judge `model`, `gemini` or `mock`) and `suggest(product, review, judge)` for the suggestions; the page calls only these |
 | `prompts/suggest_v1.txt` | the suggestion prompt |
 | `db.py` | SQLite database `review_coach.db` (created automatically, not committed) |
 | `tests/test_evaluator.py` | checks that need no API key: `python -m pytest tests` (from `review_coach`) |
