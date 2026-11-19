@@ -1,0 +1,26 @@
+SEEDS: xlm-roberta-base_product   (3 runs, folder results_noreadmore)
+
+EACH SEED (test set, 400 reviews)
+  seed 1     n= 400  MAE 0.67  RMSE 0.95  within 1 point 78%  within 0.5 54%  rank corr. 0.87
+  seed 2     n= 400  MAE 0.72  RMSE 0.99  within 1 point 74%  within 0.5 49%  rank corr. 0.85
+  seed 299   n= 400  MAE 0.66  RMSE 0.94  within 1 point 76%  within 0.5 52%  rank corr. 0.86
+
+MEAN AND SPREAD OVER SEEDS (report these)
+  MAE        0.683 +- 0.032   (min 0.661, max 0.719)
+  RMSE       0.959 +- 0.024   (min 0.942, max 0.987)
+  within 1   76.2% +- 2.3%   (min 74.0%, max 78.5%)
+  within 0.5 51.8% +- 2.6%   (min 49.0%, max 54.0%)
+  Spearman   0.859 +- 0.011   (min 0.846, max 0.866)
+
+AVERAGE OF THE 3 SEEDS' PREDICTIONS (seed ensemble)
+  all          n= 400  MAE 0.66  RMSE 0.92  within 1 point 79%  within 0.5 53%  rank corr. 0.87
+  Daraz        n= 132  MAE 0.56  RMSE 0.76  within 1 point 84%  within 0.5 58%  rank corr. 0.89
+  Rokomari     n= 130  MAE 0.79  RMSE 1.04  within 1 point 68%  within 0.5 45%  rank corr. 0.73
+  Shajgoj      n= 138  MAE 0.62  RMSE 0.94  within 1 point 84%  within 0.5 57%  rank corr. 0.91
+  bangla       n= 140  MAE 0.70  RMSE 1.02  within 1 point 80%  within 0.5 49%  rank corr. 0.85
+  banglish     n= 124  MAE 0.59  RMSE 0.81  within 1 point 83%  within 0.5 57%  rank corr. 0.89
+  english      n= 136  MAE 0.68  RMSE 0.92  within 1 point 74%  within 0.5 54%  rank corr. 0.87
+  label 1-3    n= 149  MAE 0.60  RMSE 0.97  within 1 point 83%  within 0.5 62%  rank corr. 0.40   mean error +0.43
+  label 3.5-5  n= 108  MAE 0.75  RMSE 0.94  within 1 point 70%  within 0.5 40%  rank corr. 0.43   mean error +0.16
+  label 5.5-7  n= 111  MAE 0.63  RMSE 0.83  within 1 point 80%  within 0.5 54%  rank corr. 0.57   mean error -0.35
+  label 7.5-10 n=  32  MAE 0.67  RMSE 0.95  within 1 point 81%  within 0.5 53%  rank corr. 0.50   mean error -0.65

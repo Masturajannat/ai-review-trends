@@ -2,3 +2,8 @@ model,n,MAE,RMSE,within 1,within 0.5,Spearman,best_epoch,seed
 xlm-roberta-base,400,0.668,0.963,0.775,0.528,0.862,5.0,299.0
 baseline (TF-IDF + ridge),400,0.843,1.132,0.66,0.418,0.804,,
 Gemini run 1 vs run 2,400,0.225,0.49,0.992,0.782,0.965,,
+xlm-roberta-base (seed 1),400,0.713,0.989,0.74,0.48,0.849,5.0,1.0
+xlm-roberta-base (seed 2),400,0.697,0.964,0.76,0.502,0.857,5.0,2.0
+xlm-roberta-base + product name,400,0.661,0.943,0.758,0.522,0.864,5.0,299.0
+xlm-roberta-base + product name (seed 1),400,0.667,0.949,0.785,0.54,0.866,5.0,1.0
+xlm-roberta-base + product name (seed 2),400,0.719,0.987,0.74,0.485,0.846,4.0,2.0

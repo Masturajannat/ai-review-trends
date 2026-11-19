@@ -1,0 +1,30 @@
+TRANSFORMER FOR THE REVIEW-QUALITY SCORE: xlm-roberta-base
+train 6230, validation 692 (from full + pilot), test 400 (main run, never trained on)
+variant: product name with the review (hidden in 30% of training examples)
+epochs 5, learning rate 2e-05, batch 16, warmup 0.06, max 256 tokens, seed 299, device cuda, 425s
+
+TRAINING
+  epoch 1: train loss 0.639   validation n= 692  MAE 0.71  RMSE 0.93  within 1 point 74%  within 0.5 48%  rank corr. 0.83
+  epoch 2: train loss 0.322   validation n= 692  MAE 0.63  RMSE 0.85  within 1 point 79%  within 0.5 51%  rank corr. 0.85
+  epoch 3: train loss 0.224   validation n= 692  MAE 0.57  RMSE 0.79  within 1 point 85%  within 0.5 56%  rank corr. 0.87
+  epoch 4: train loss 0.157   validation n= 692  MAE 0.57  RMSE 0.79  within 1 point 84%  within 0.5 56%  rank corr. 0.87
+  epoch 5: train loss 0.121   validation n= 692  MAE 0.56  RMSE 0.78  within 1 point 83%  within 0.5 56%  rank corr. 0.88
+  kept: epoch 5 (lowest validation MAE)
+
+TEST: THE 400 MAIN-RUN REVIEWS
+  xlm-roberta-base_product n= 400  MAE 0.66  RMSE 0.94  within 1 point 76%  within 0.5 52%  rank corr. 0.86
+  same, product name empty n= 400  MAE 0.65  RMSE 0.94  within 1 point 78%  within 0.5 54%  rank corr. 0.87
+  baseline (TF-IDF + ridge) n= 400  MAE 0.84  RMSE 1.13  within 1 point 66%  within 0.5 42%  rank corr. 0.80
+  Gemini run 1 vs run 2    n= 400  MAE 0.23  RMSE 0.49  within 1 point 99%  within 0.5 78%  rank corr. 0.96   (yardstick)
+
+BY LANGUAGE, PLATFORM AND SCORE BAND (test set)
+  bangla        n= 140  MAE 0.72  RMSE 1.06  within 1 point 74%  within 0.5 51%  rank corr. 0.84   mean error +0.20
+  banglish      n= 124  MAE 0.57  RMSE 0.80  within 1 point 81%  within 0.5 57%  rank corr. 0.89   mean error +0.08
+  english       n= 136  MAE 0.68  RMSE 0.94  within 1 point 74%  within 0.5 50%  rank corr. 0.86   mean error +0.09
+  Daraz         n= 132  MAE 0.54  RMSE 0.75  within 1 point 83%  within 0.5 61%  rank corr. 0.90   mean error -0.04
+  Rokomari      n= 130  MAE 0.83  RMSE 1.09  within 1 point 62%  within 0.5 39%  rank corr. 0.74   mean error +0.25
+  Shajgoj       n= 138  MAE 0.62  RMSE 0.96  within 1 point 83%  within 0.5 57%  rank corr. 0.91   mean error +0.17
+  label 1-3     n= 149  MAE 0.64  RMSE 1.04  within 1 point 79%  within 0.5 60%  rank corr. 0.40   mean error +0.50
+  label 3.5-5   n= 108  MAE 0.79  RMSE 0.98  within 1 point 68%  within 0.5 37%  rank corr. 0.41   mean error +0.22
+  label 5.5-7   n= 111  MAE 0.56  RMSE 0.76  within 1 point 78%  within 0.5 57%  rank corr. 0.58   mean error -0.25
+  label 7.5-10  n=  32  MAE 0.66  RMSE 0.93  within 1 point 81%  within 0.5 56%  rank corr. 0.50   mean error -0.62
