@@ -373,7 +373,16 @@ def check_language(text, lang):
         raise ValueError(f"suggestions came back in {got}, the review is in {lang}")
 
 
-def _mock_suggest(review):
+AVOID_BLOCK = """
+EARLIER SUGGESTIONS
+The reviewer was already shown the suggestions below and said they were not helpful. Give new ones
+that are clearly different: point at other phrases of the review where you can, or ask about other
+things a buyer would want to know. Do not repeat or reword any of these.
+{earlier}
+"""
+
+
+def _mock_suggest(review, attempt=0):
     lang = detect_language(review)
     first = re.split(r"(?<=[.!?।])\s+|\n", review.strip())[0][:60]
     text = {
@@ -382,11 +391,15 @@ def _mock_suggest(review):
                      "Ami ___ dhore use korchi"),
     }.get(lang, ("(Mock suggestion, for testing only)", "Say a little more here: what exactly was good or bad?",
                  "I have used it for ___"))
+    if attempt:
+        return text[0] + f" ({attempt + 1})", [{"quote": "", "suggestion": text[1] + f" ({attempt + 1})",
+                                                 "example": text[2]}]
     return text[0], [{"quote": first, "suggestion": text[1], "example": text[2]}]
 
 
-def suggest(product, review, judge="gemini"):
-    """At most three suggestions for this review, each tied to a phrase the reviewer wrote."""
+def suggest(product, review, judge="gemini", avoid=None):
+    """At most three suggestions for this review, each tied to a phrase the reviewer wrote.
+    `avoid`: suggestions already shown that the reviewer did not find helpful; new ones must differ."""
     product, review = (product or "").strip(), (review or "").strip()
     if not review:
         raise ValueError("Write a review first.")
@@ -394,15 +407,21 @@ def suggest(product, review, judge="gemini"):
     if judge == "gemini":
         lang = detect_language(review)
         prompt = _fill(SUGGEST_PROMPT, product, review).replace("{language_rule}", LANGUAGE_RULE[lang])
+        if avoid:
+            earlier = "\n".join(f"- {a}" for a in avoid)
+            i = prompt.index("\nOUTPUT")
+            prompt = prompt[:i] + AVOID_BLOCK.replace("{earlier}", earlier) + prompt[i:]
 
         def parse(j):
             summary, items = clean_suggestions(j, review)
             check_language(" ".join([summary] + [i["suggestion"] + " " + i["example"] for i in items]), lang)
+            if avoid and items and all(i["suggestion"] in avoid for i in items):
+                raise ValueError("the same suggestions came back")
             return summary, items
         summary, items = _ask_gemini(prompt, parse)
         model = GEMINI_MODEL
     else:
-        summary, items = _mock_suggest(review)
+        summary, items = _mock_suggest(review, attempt=len(avoid or []))
         model = "rules"
     return {"summary": summary, "suggestions": items, "judge": judge, "model": model,
             "prompt_version": SUGGEST_VERSION if judge == "gemini" else "mock",

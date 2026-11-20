@@ -23,7 +23,8 @@ THEMES = {
 }
 
 ss = st.session_state
-for k, v in dict(sid=None, result=None, sug=None, sug_id=None, sug_text="", rated=set(), dark=False).items():
+for k, v in dict(sid=None, result=None, sug=None, sug_id=None, sug_text="", product_text="", sug_seen=[], rated=set(),
+                 dark=False).items():
     ss.setdefault(k, v)
 T = THEMES["dark" if ss.dark else "light"]
 
@@ -93,6 +94,7 @@ esc = html.escape
 
 def new_review():
     ss.sid = ss.result = ss.sug = ss.sug_id = None
+    ss.sug_seen = []
     ss.sug_text = ""
 
 
@@ -237,7 +239,8 @@ with left:
             with st.spinner("Thinking about what a buyer would ask..."):
                 s = hit or suggest(product, review, judge=helper)
             ss.sug_id = db.save_suggestions(con, sid, review, s, key, from_cache=hit is not None)
-            ss.sug, ss.sug_text = s, review
+            ss.sug, ss.sug_text, ss.product_text = s, review, product
+            ss.sug_seen = [i["suggestion"] for i in s["suggestions"]]
         except Exception as e:
             st.error(str(e))
 
@@ -264,7 +267,6 @@ with right:
   <div><span class='rc-big' style='color:{color}'>{r['score']:g}</span><span class='rc-muted'> /10</span></div>
   <div style='flex:1 1 260px; min-width:0'>
     <div class='rc-bar'>{bar}</div>
-    <div style='font-weight:600'>{esc(r['level_meaning'][:1].upper() + r['level_meaning'][1:])}</div>
     {hint}
   </div>
 </div>""", unsafe_allow_html=True)
@@ -294,11 +296,22 @@ with right:
         st.markdown(f"<div class='rc-card'>{body}</div>", unsafe_allow_html=True)
 
         if ss.sug_id not in ss.rated:
-            a, b, _ = st.columns([2, 2, 1])
-            if a.button("Suggestions helped"):
+            a, b = st.columns(2)
+            if a.button("Suggestions helped", use_container_width=True):
                 db.rate(con, ss.sug_id, 1); ss.rated.add(ss.sug_id); st.rerun()
-            if b.button("Not helpful"):
-                db.rate(con, ss.sug_id, 0); ss.rated.add(ss.sug_id); st.rerun()
+            if b.button("Not helpful: show different ones", use_container_width=True):
+                db.rate(con, ss.sug_id, 0); ss.rated.add(ss.sug_id)
+                # ask again, telling Gemini which suggestions were not helpful so the new ones differ
+                try:
+                    with st.spinner("Finding different suggestions..."):
+                        new = suggest(ss.product_text, ss.sug_text, judge=helper, avoid=ss.sug_seen)
+                    key = db.cache_key(f"suggest_v2_retry{len(ss.sug_seen)}", helper, ss.product_text, ss.sug_text)
+                    ss.sug_id = db.save_suggestions(con, ss.sid, ss.sug_text, new, key)
+                    ss.sug = new
+                    ss.sug_seen = ss.sug_seen + [i["suggestion"] for i in new["suggestions"]]
+                    st.rerun()
+                except Exception as e:
+                    st.error(str(e))
         else:
             st.caption("Thanks for the feedback.")
 

@@ -75,7 +75,9 @@ rating takes a second or two. Stop the app with Ctrl+C. To use a model in anothe
 | Score from: Mock | rough rules, for testing the page only |
 | Suggestions from: Gemini / Mock | real suggestions (one API call per press) or a placeholder for testing |
 
-Pressing a button again for exactly the same text reuses the earlier answer.
+Pressing a button again for exactly the same text reuses the earlier answer. Under the suggestions, **Not helpful: show different
+ones** records the rating and asks Gemini again, naming the suggestions already shown so the new
+ones are different; it can be pressed again for a third set.
 
 ## Files
 

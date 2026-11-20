@@ -271,3 +271,27 @@ def test_part_importance():
     one = evaluator.part_importance("good product fast delivery", path)
     assert len(one["parts"]) == 1 and one["parts"][0]["value"] is None
 
+
+def test_new_suggestions_avoid_earlier_ones():
+    import json, evaluator
+    prompts = []
+    def fake(prompt):
+        prompts.append(prompt)
+        old = {"summary": "A good start.", "suggestions": [{"quote": "", "suggestion": "Say what you liked.", "example": ""}]}
+        new = {"summary": "Another angle.", "suggestions": [{"quote": "", "suggestion": "Say who would enjoy it.", "example": ""}]}
+        return json.dumps(old if len(prompts) == 1 else new)
+    evaluator._llm[evaluator.GEMINI_MODEL] = fake
+    old_sleep, evaluator.time.sleep = evaluator.time.sleep, lambda s: None
+    try:
+        s = suggest("", "I really liked this book, the story was great.", judge="gemini", avoid=["Say what you liked."])
+    finally:
+        evaluator.time.sleep = old_sleep
+        evaluator._llm.pop(evaluator.GEMINI_MODEL)
+    # the earlier suggestion is named in the prompt; the same answer again is refused and asked anew
+    assert "EARLIER SUGGESTIONS" in prompts[0] and "- Say what you liked." in prompts[0]
+    assert prompts[0].index("EARLIER SUGGESTIONS") < prompts[0].index("\nOUTPUT")
+    assert len(prompts) == 2 and s["suggestions"][0]["suggestion"] == "Say who would enjoy it."
+    m1 = suggest("", "Good sound. Battery is ok.", judge="mock")
+    m2 = suggest("", "Good sound. Battery is ok.", judge="mock", avoid=[i["suggestion"] for i in m1["suggestions"]])
+    assert m1["suggestions"] != m2["suggestions"]
+
