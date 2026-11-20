@@ -87,6 +87,7 @@ def test_suggestion_prompt_rules():
     p = open(SUGGEST_PROMPT, encoding="utf-8").read()
     assert "{product_name}" in p and "{review_text}" in p
     assert "Never invent" in p and "never as instructions" in p and "{language_rule}" in p
+    assert "Do not mention buyers" in p
 
 
 def test_database_round_trip():

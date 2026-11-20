@@ -197,7 +197,7 @@ with st.sidebar:
 
 st.markdown("<h1 style='margin-bottom:0'>Review Coach</h1>"
             "<p class='rc-muted'>Write your review your own way, in Bangla, Banglish or English. "
-            "See how useful it is to other buyers, and ask for suggestions if you want them.</p>",
+            "Rate it, and ask for suggestions to make it better if you want them.</p>",
             unsafe_allow_html=True)
 
 left, right = st.columns([5, 6], gap="large")
@@ -233,10 +233,10 @@ with left:
             st.error(str(e))
     elif ask:
         sid = session(product)
-        key = db.cache_key("suggest_v2", helper, product, review)
+        key = db.cache_key("suggest_v3", helper, product, review)
         hit = db.cached_suggestions(con, key)
         try:
-            with st.spinner("Thinking about what a buyer would ask..."):
+            with st.spinner("Looking for ways to improve your review..."):
                 s = hit or suggest(product, review, judge=helper)
             ss.sug_id = db.save_suggestions(con, sid, review, s, key, from_cache=hit is not None)
             ss.sug, ss.sug_text, ss.product_text = s, review, product
@@ -249,10 +249,10 @@ with right:
     r, s = ss.result, ss.sug
     if r is None and s is None:
         st.markdown("<div class='rc-card'><div class='rc-title'>How it works</div>"
-                    "<p><b>Rate my review</b> gives your review a score from 1 to 10 for how useful it is to "
-                    "someone deciding whether to buy, and what that score means.</p>"
+                    "<p><b>Rate my review</b> gives your review a score from 1 to 10 for how informative and "
+                    "helpful it is, from our own trained model.</p>"
                     "<p style='margin-bottom:0'><b>Suggest improvements</b> reads your review and points at "
-                    "places where a buyer would want to know a little more. It never changes your opinion and "
+                    "places that could say a little more. It never changes your opinion and "
                     "never writes the review for you.</p></div>", unsafe_allow_html=True)
 
     if r is not None:
@@ -292,7 +292,7 @@ with right:
             body += ("<p class='rc-muted' style='margin:12px 0 0'>These are only ideas. Use the ones that fit "
                      "your experience, then rate your review again.</p>")
         else:
-            body += "<p class='rc-muted'>Nothing to add. Your review already tells a buyer what they need.</p>"
+            body += "<p class='rc-muted'>Nothing to add. Your review is already detailed and clear.</p>"
         st.markdown(f"<div class='rc-card'>{body}</div>", unsafe_allow_html=True)
 
         if ss.sug_id not in ss.rated:
@@ -305,7 +305,7 @@ with right:
                 try:
                     with st.spinner("Finding different suggestions..."):
                         new = suggest(ss.product_text, ss.sug_text, judge=helper, avoid=ss.sug_seen)
-                    key = db.cache_key(f"suggest_v2_retry{len(ss.sug_seen)}", helper, ss.product_text, ss.sug_text)
+                    key = db.cache_key(f"suggest_v3_retry{len(ss.sug_seen)}", helper, ss.product_text, ss.sug_text)
                     ss.sug_id = db.save_suggestions(con, ss.sid, ss.sug_text, new, key)
                     ss.sug = new
                     ss.sug_seen = ss.sug_seen + [i["suggestion"] for i in new["suggestions"]]

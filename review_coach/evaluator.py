@@ -31,8 +31,8 @@ from common import LEVELS, LLM  # noqa: E402
 
 SCORE_PROMPT = os.path.join(QE, "prompts", "prompt_v2.txt")
 SCORE_VERSION = "prompt_v2"
-SUGGEST_PROMPT = os.path.join(HERE, "prompts", "suggest_v2.txt")
-SUGGEST_VERSION = "suggest_v2"
+SUGGEST_PROMPT = os.path.join(HERE, "prompts", "suggest_v3.txt")
+SUGGEST_VERSION = "suggest_v3"
 # the review's language is detected here and named in the prompt, and the answer is checked:
 # Gemini does not reliably pick the right language by itself
 LANGUAGE_RULE = {

@@ -1,16 +1,15 @@
 # Review Coach
 
-A small web app that helps a buyer write a more useful product review, in Bangla, Banglish or
-English. The reviewer writes freely; the app does two things, each only when asked:
+A small web app that rates a product review and suggests how to make it better, in Bangla,
+Banglish or English. The reviewer writes freely; the app does two things, each only when asked:
 
-- **Rate my review**: a score from 1 to 10 for how useful the review is to someone deciding
-  whether to buy, with what the level means and a short paragraph explaining the score:
-  what the review tells a buyer and what keeps the score from being higher, written about this
-  review in its own language.
+- **Rate my review**: a score from 1 to 10 from our own trained model, with the parts of the
+  review that raised or lowered it.
 - **Suggest improvements**: reads this one review and gives at most three suggestions. Each
-  points at a phrase the reviewer wrote, asks what a buyer would still want to know there, and
+  points at a phrase the reviewer wrote, says what could be added or made clearer there, and
   offers a sentence starter with blanks (`Battery ___ ghonta chole`). It never changes the
-  reviewer's opinion, never invents facts, and answers in the review's own language.
+  reviewer's opinion, never invents facts, and answers in the review's own language
+  (`prompts/suggest_v3.txt`). **Not helpful: show different ones** asks for a new set.
 
 There is no checklist and no product type to choose: a review does not have to follow a fixed
 list of points to be useful, and the app works out what kind of product it is from the text.
