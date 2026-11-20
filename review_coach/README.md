@@ -25,9 +25,12 @@ The product name is optional.
 
 For comparison the score can also come from Gemini itself (the dataset's scoring prompt, with a
 short "Why this score" paragraph) or from a mock judge for testing. With our model there is no
-paragraph. Instead the card **"What the score is based on"** shows the review with the words that
-raised the score shaded blue and those that held it back shaded red (integrated gradients over the
-model's input, added up per word; no API). It shows what the model paid attention to, not a rule.
+paragraph. Instead the card **"What the score is based on"** shows the review cut into its parts
+(sentences, and long sentences at commas and words like "but" / "kintu" / "তবে"), each shaded by
+how much it moves the model's score: the score of the whole review minus the score with that part
+left out. Blue parts raised it, red parts pulled it down, with the change in points (no API).
+`evaluator.word_importance` gives the same per word (integrated gradients), but single words such
+as "but", "a" or a full stop are hard for a reviewer to read, so the page shows parts.
 **Suggest improvements** then says, for this review, what would make it more useful.
 
 Suggestions are written in the review's own language: the app detects Bangla, Banglish or English

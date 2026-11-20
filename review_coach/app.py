@@ -53,6 +53,7 @@ CSS = f"""
 .rc-imp {{ background:{T['soft']}; border-radius:10px; padding:12px 14px; line-height:2.0; white-space:pre-wrap; }}
 .rc-imp span.w {{ border-radius:4px; padding:2px 1px; }}
 .rc-imp span.u {{ color:{T['muted']}; }}
+.rc-imp sup.pts {{ font-weight:700; font-size:12px; margin:0 3px 0 2px; }}
 .rc-key {{ display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:-1px; margin:0 4px 0 0; }}
 </style>"""
 DARK_CSS = f"""
@@ -108,45 +109,52 @@ def rgba(hex_color, alpha):
     return f"rgba({int(h[0:2], 16)}, {int(h[2:4], 16)}, {int(h[4:6], 16)}, {alpha:.2f})"
 
 
-def importance_html(imp, show_from=0.2):
-    """The review with each word shaded by how much it raised (blue) or lowered (red) the score.
-    Words below `show_from` of the strongest word stay plain, so only clear signals are marked."""
-    text, words = imp["text"], imp["words"]
-    top = max([abs(w["value"]) for w in words if w["read"]] or [0]) or 1.0
+def importance_html(imp, min_points=0.1):
+    """The review with each part shaded by how much it raised (blue) or lowered (red) the score,
+    with the change in points. Parts that move the score by less than `min_points` stay plain."""
+    text, parts = imp["text"], imp["parts"]
+    vals = [abs(p["value"]) for p in parts if p["value"] is not None]
+    top = max(vals or [0]) or 1.0
     out, pos, unread = [], 0, False
-    for w in words:
-        out.append(esc(text[pos:w["start"]]))
-        word = esc(text[w["start"]:w["end"]])
-        share = abs(w["value"]) / top
-        if not w["read"]:
-            out.append(f"<span class='u'>{word}</span>"); unread = True
-        elif share >= show_from:
-            color = T["ok"] if w["value"] > 0 else T["miss"]
-            sign = "raised" if w["value"] > 0 else "lowered"
-            out.append(f"<span class='w' style='background:{rgba(color, 0.15 + 0.55 * share)}' "
-                       f"title='{sign} the score by about {abs(w['value']):.2f}'>{word}</span>")
+    for p in parts:
+        out.append(esc(text[pos:p["start"]]))
+        seg = esc(text[p["start"]:p["end"]])
+        v = p["value"]
+        if not p["read"]:
+            out.append(f"<span class='u'>{seg}</span>"); unread = True
+        elif v is not None and abs(v) >= min_points:
+            color = T["ok"] if v > 0 else T["miss"]
+            out.append(f"<span class='w' style='background:{rgba(color, 0.18 + 0.45 * abs(v) / top)}'>{seg}</span>"
+                       f"<sup class='pts' style='color:{color}'>{v:+.1f}</sup>")
         else:
-            out.append(word)
-        pos = w["end"]
+            out.append(seg)
+        pos = p["end"]
     out.append(esc(text[pos:]))
-    ups = [w for w in sorted(words, key=lambda w: -w["value"]) if w["read"] and w["value"] > 0 and abs(w["value"]) / top >= show_from][:3]
-    downs = [w for w in sorted(words, key=lambda w: w["value"]) if w["read"] and w["value"] < 0 and abs(w["value"]) / top >= show_from][:3]
-    name = lambda w: "“" + esc(text[w["start"]:w["end"]].strip(".,!?;:।")) + "”"
+    scored = [p for p in parts if p["value"] is not None]
+    quote = lambda p: "\u201c" + esc(text[p["start"]:p["end"]].strip(" .,!?;:\u0964")) + "\u201d"
     lines = []
-    if ups:
-        lines.append(f"<span class='rc-key' style='background:{rgba(T['ok'], 0.6)}'></span>Raised it most: "
-                     + ", ".join(map(name, ups)))
-    if downs:
-        lines.append(f"<span class='rc-key' style='background:{rgba(T['miss'], 0.6)}'></span>Held it back most: "
-                     + ", ".join(map(name, downs)))
+    if not scored:
+        lines.append("Your review is one short part, so there is nothing to compare it with. Write a little more "
+                     "and the app can show which parts helped.")
+    else:
+        best = max(scored, key=lambda p: p["value"])
+        worst = min(scored, key=lambda p: p["value"])
+        if best["value"] >= min_points:
+            lines.append(f"<span class='rc-key' style='background:{rgba(T['ok'], 0.6)}'></span>"
+                         f"Helped most: {quote(best)} ({best['value']:+.1f})")
+        if worst["value"] <= -min_points:
+            lines.append(f"<span class='rc-key' style='background:{rgba(T['miss'], 0.6)}'></span>"
+                         f"Pulled the score down: {quote(worst)} ({worst['value']:+.1f})")
+        if not lines:
+            lines.append("No single part stands out: the parts of your review count about the same.")
     note = ("<br>The grey part at the end was not read: the model reads about the first 250 words."
             if unread else "")
     return (f"<div class='rc-card'><div class='rc-title'>What the score is based on</div>"
             f"<div class='rc-imp'>{''.join(out)}</div>"
             f"<p style='margin:10px 0 0; line-height:1.7'>{'<br>'.join(lines)}</p>"
-            f"<p class='rc-muted' style='margin:8px 0 0'>Shaded words are the ones our model leaned on most: the "
-            f"darker, the stronger. It shows what the model paid attention to, not a rule you have to follow."
-            f"{note}</p></div>")
+            f"<p class='rc-muted' style='margin:8px 0 0'>Each number is how much the score would drop if that "
+            f"part were left out (a minus means the score would rise). It shows what our model counted, "
+            f"not a rule you have to follow.{note}</p></div>")
 
 
 def highlight(text, quotes):
@@ -212,7 +220,7 @@ with left:
             if judge == "model" and model_available():
                 with st.spinner("Loading the trained model (first time only, up to a minute)..."):
                     load_model()
-            with st.spinner("Rating your review and finding the words that mattered..."
+            with st.spinner("Rating your review and checking which parts mattered..."
                             if judge == "model" else "Rating your review..."):
                 r = hit or evaluate(product, review, judge=judge)
             db.save_score(con, sid, review, r, key, from_cache=hit is not None)

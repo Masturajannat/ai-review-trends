@@ -196,7 +196,7 @@ def test_model_judge_returns_importance_and_caches_it():
     old, evaluator.MODEL_DIR = evaluator.MODEL_DIR, path
     try:
         r = evaluate("", "battery lasts five hours", judge="model")
-        assert r["importance"]["words"] and "importance" not in evaluate("", "battery lasts", judge="model", explain=False)
+        assert r["importance"]["parts"] and "importance" not in evaluate("", "battery lasts", judge="model", explain=False)
         con = db.connect()
         sid = db.new_session(con, "")
         key = db.cache_key("score", "model", "", "battery lasts five hours")
@@ -238,3 +238,36 @@ def test_suggestion_language_is_named_and_checked():
         evaluator.time.sleep = old_sleep
         evaluator._llm.pop(evaluator.GEMINI_MODEL)
     assert len(calls) == 2 and s["summary"] == "A good start." and "English only" in calls[0]
+
+
+def test_split_parts():
+    import evaluator
+    t = "This book has my heart . It might seem a bit slow but the emotions are injected that way ."
+    parts = [t[a:b] for a, b in evaluator.split_parts(t)]
+    assert parts == ["This book has my heart .", "It might seem a bit slow but the emotions are injected that way ."]
+    long = "The battery lasts about five hours with my daily use, but the noise cancelling is weak on the bus"
+    assert [long[a:b] for a, b in evaluator.split_parts(long)] == [
+        "The battery lasts about five hours with my daily use,", "but the noise cancelling is weak on the bus"]
+    bn = "বইটা ভালো লেগেছে। সবাই পড়তে পারেন।"
+    assert [bn[a:b] for a, b in evaluator.split_parts(bn)] == ["বইটা ভালো লেগেছে।", "সবাই পড়তে পারেন।"]
+    assert len(evaluator.split_parts("Very good product, recommended.")) == 1        # short parts are joined
+
+
+def test_part_importance():
+    import pytest
+    pytest.importorskip("torch"); pytest.importorskip("transformers")
+    import evaluator
+    path = tempfile.mkdtemp()
+    _tiny_trained_model(path)
+    text = "good product fast delivery. battery lasts five hours. Read More"
+    imp = evaluator.part_importance(text, path)
+    assert imp["text"] == "good product fast delivery. battery lasts five hours."
+    assert [imp["text"][p["start"]:p["end"]] for p in imp["parts"]] == ["good product fast delivery.",
+                                                                     "battery lasts five hours."]
+    # each value is (score of the whole review) - (score without that part)
+    full = evaluator.model_score(imp["text"], path)
+    without = evaluator.model_score("battery lasts five hours.", path)
+    assert abs(imp["parts"][0]["value"] - (full - without)) < 1e-3
+    one = evaluator.part_importance("good product fast delivery", path)
+    assert len(one["parts"]) == 1 and one["parts"][0]["value"] is None
+

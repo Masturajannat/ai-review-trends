@@ -214,6 +214,68 @@ def word_importance(review, path=None, steps=8, chunk=2):
                                     for (a, b), v in zip(spans, values)]}
 
 
+_SENT_END = re.compile(r"[.!?\u0964]+|\n+")                                  # . ! ? and the Bangla danda
+_CLAUSE = re.compile(r"[,;:]\s+|\s+(?=(?:but|however|though|although|kintu|tobe|karon|because)\b)|"
+                     r"\s+(?=(?:\u09a4\u09ac\u09c7|\u0995\u09bf\u09a8\u09cd\u09a4\u09c1|\u0995\u09be\u09b0\u09a3)\s)",
+                     re.IGNORECASE)                                                 # , ; : and "but", "kintu", তবে, কিন্তু, কারণ
+
+
+def split_parts(text, long_part=14, min_words=3):
+    """Cut a review into parts a reader would recognise: sentences, and long sentences into
+    clauses at commas and words like "but" / "kintu" / "তবে". Parts of fewer than `min_words`
+    words are joined to their neighbour. Returns (start, end) character spans covering the words."""
+    def spans(a, b, pattern):
+        out, pos = [], a
+        for m in pattern.finditer(text, a, b):
+            out.append((pos, m.end())); pos = m.end()
+        out.append((pos, b))
+        return [(x, y) for x, y in out if text[x:y].strip()]
+
+    nwords = lambda sp: len(text[sp[0]:sp[1]].split())
+    parts = []
+    for sp in spans(0, len(text), _SENT_END):
+        parts += spans(*sp, _CLAUSE) if nwords(sp) > long_part else [sp]
+    merged = []
+    for sp in parts:
+        if merged and (nwords(sp) < min_words or nwords(merged[-1]) < min_words):
+            merged[-1] = (merged[-1][0], sp[1])
+        else:
+            merged.append(sp)
+    # trim surrounding spaces so the highlight covers only the words
+    out = []
+    for a, b in merged:
+        seg = text[a:b]
+        out.append((a + len(seg) - len(seg.lstrip()), b - (len(seg) - len(seg.rstrip()))))
+    return out
+
+
+def part_importance(review, path=None):
+    """How much each part of the review moves the trained model's score.
+
+    Each part's value is the score of the whole review minus the score of the review with that
+    part left out (in score points): positive = that part raised the score. One extra pass of the
+    model per part, all in one batch; no API. With a single part there is nothing to compare,
+    so values are None."""
+    tok, model, scale, torch = load_model(path)
+    text = strip_read_more(review)
+    spans = split_parts(text)
+    max_len = int(scale.get("max_len", 256))
+    enc = tok(text, truncation=True, max_length=max_len, return_offsets_mapping=True)
+    read_until = max([b for a, b in enc["offset_mapping"] if b > a] or [0])
+    parts = [{"start": a, "end": b, "value": None, "read": a < read_until} for a, b in spans]
+    if len(spans) < 2:
+        return {"text": text, "parts": parts}
+    variants = [text] + [" ".join((text[:a] + " " + text[b:]).split()) for a, b in spans]
+    enc = tok(variants, truncation=True, max_length=max_len, padding=True, return_tensors="pt")
+    enc.pop("token_type_ids", None)
+    with torch.no_grad():
+        z = model(**enc).logits.float().squeeze(-1)
+    scores = (z * float(scale["std"])).tolist()                 # the mean cancels in the differences
+    for p, without in zip(parts, scores[1:]):
+        p["value"] = round(scores[0] - without, 3) if p["read"] else None
+    return {"text": text, "parts": parts}
+
+
 def model_name(path=None):
     path = path or MODEL_DIR
     try:
@@ -261,7 +323,9 @@ def _mock_score(review):
 
 def evaluate(product, review, judge="gemini", explain=True):
     """Score a review 1-10 for how useful it is to a buyer. With the trained model and explain=True
-    the result also has "importance": which words raised or lowered the score (word_importance)."""
+    the result also has "importance": which parts of the review raised or lowered the score
+    (part_importance). word_importance gives the same per word, but single words ("but", "a", a full
+    stop) are hard for a reviewer to read, so the app shows parts."""
     product, review = (product or "").strip(), (review or "").strip()
     if not review:
         raise ValueError("Write a review first.")
@@ -271,7 +335,7 @@ def evaluate(product, review, judge="gemini", explain=True):
         r = _score_result(round(raw * 2) / 2, "", "", "model", model_name(), "trained model", t0)
         r["raw_score"] = round(raw, 3)
         if explain:
-            r["importance"] = word_importance(review)
+            r["importance"] = part_importance(review)
             r["latency_ms"] = int((time.time() - t0) * 1000)
     elif judge == "gemini":
         score, reason, why = _ask_gemini(_fill(SCORE_PROMPT, product, review), _parse_score)
