@@ -25,8 +25,14 @@ The product name is optional.
 
 For comparison the score can also come from Gemini itself (the dataset's scoring prompt, with a
 short "Why this score" paragraph) or from a mock judge for testing. With our model there is no
-paragraph: the card shows what the level means and points to **Suggest improvements**, which
-explains, for this review, what would make it more useful.
+paragraph. Instead the card **"What the score is based on"** shows the review with the words that
+raised the score shaded blue and those that held it back shaded red (integrated gradients over the
+model's input, added up per word; no API). It shows what the model paid attention to, not a rule.
+**Suggest improvements** then says, for this review, what would make it more useful.
+
+Suggestions are written in the review's own language: the app detects Bangla, Banglish or English
+itself, names it in the prompt (`prompts/suggest_v2.txt`) and asks Gemini again if the answer comes
+back in another language.
 
 ## Run it (VS Code terminal, PowerShell, from the repository folder `ai-review-trends`)
 

@@ -42,6 +42,7 @@ def connect(path=DB_PATH):
         level          INTEGER,
         reason         TEXT,
         explanation    TEXT,
+        importance     TEXT,
         judge          TEXT,
         model          TEXT,
         prompt_version TEXT,
@@ -76,7 +77,7 @@ def connect(path=DB_PATH):
     );
     """)
     have = {r[1] for r in con.execute("PRAGMA table_info(evaluations)")}
-    for col in ("explanation",):                        # a database made by an earlier version
+    for col in ("explanation", "importance"):                        # a database made by an earlier version
         if col not in have:
             con.execute(f"ALTER TABLE evaluations ADD COLUMN {col} TEXT")
     con.commit()
@@ -118,6 +119,7 @@ def cached_score(con, key):
         return None
     return {"score": row["score"], "level": lvl, "level_meaning": meaning, "reason": row["reason"],
             "explanation": row["explanation"],
+            **({"importance": json.loads(row["importance"])} if row["importance"] else {}),
             "judge": row["judge"], "model": row["model"], "prompt_version": row["prompt_version"],
             "latency_ms": 0, "language": row["language"], "word_count": row["word_count"]}
 
@@ -127,7 +129,8 @@ def save_score(con, sid, review, r, key, from_cache=False):
     eid = _insert(con, "evaluations", dict(
         session_id=sid, draft_no=n, review_text=review, language=r["language"], word_count=r["word_count"],
         score=r["score"], level=r["level"], reason=r["reason"],
-        explanation=r["explanation"], judge=r["judge"], model=r["model"],
+        explanation=r["explanation"],
+        importance=json.dumps(r["importance"], ensure_ascii=False) if r.get("importance") else None, judge=r["judge"], model=r["model"],
         prompt_version=r["prompt_version"], latency_ms=0 if from_cache else r["latency_ms"],
         cache_key=key, from_cache=int(from_cache), created_at=now()))
     return eid, n

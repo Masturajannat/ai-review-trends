@@ -31,8 +31,17 @@ from common import LEVELS, LLM  # noqa: E402
 
 SCORE_PROMPT = os.path.join(QE, "prompts", "prompt_v2.txt")
 SCORE_VERSION = "prompt_v2"
-SUGGEST_PROMPT = os.path.join(HERE, "prompts", "suggest_v1.txt")
-SUGGEST_VERSION = "suggest_v1"
+SUGGEST_PROMPT = os.path.join(HERE, "prompts", "suggest_v2.txt")
+SUGGEST_VERSION = "suggest_v2"
+# the review's language is detected here and named in the prompt, and the answer is checked:
+# Gemini does not reliably pick the right language by itself
+LANGUAGE_RULE = {
+    "english": "The review is written in English. Write in English only. Do not use any Bangla or Banglish words.",
+    "bangla": "The review is written in Bangla. Write in Bangla, in Bangla script only (not in English letters).",
+    "banglish": "The review is written in Banglish (Bangla written in English letters). Write in Banglish only: "
+                "Bangla words in English letters, as the reviewer does. Do not use Bangla script.",
+    "unknown": "Write in the same language and script as the review.",
+}
 GEMINI_MODEL = "gemini-3.5-flash-lite"
 # the trained model: a folder made by quality_model/scripts/03_train_transformer.py
 MODEL_DIR = os.environ.get("REVIEW_COACH_MODEL", os.path.join(
@@ -79,6 +88,21 @@ def _ask_gemini(prompt, parse, retries=3):
     raise RuntimeError(f"Gemini did not give a usable answer: {str(last)[:200]}")
 
 
+_BANGLISH = {
+    # pronouns, verbs and little words that are common in Banglish and rare in English
+    "ami", "amar", "amake", "amra", "apni", "apnar", "apnake", "tumi", "tomar", "se", "tar", "ora",
+    "valo", "bhalo", "kharap", "khub", "khubi", "onek", "aro", "aroktu", "beshi", "kom", "shundor", "sundor",
+    "kintu", "tobe", "ar", "jodi", "tahole", "karon", "tai", "jonno", "theke", "sathe", "moto", "diye",
+    "ta", "ti", "tar", "tir", "er", "ke", "te", "der", "gulo", "na", "nai", "nei", "ni", "o", "r", "je",
+    "ki", "kon", "keno", "kemon", "kibhabe", "kivabe", "ekta", "ekti", "duita", "eta", "ota", "seta", "ekhane",
+    "hoy", "hoyeche", "hoyse", "holo", "hobe", "chilo", "ache", "achhe", "lage", "laglo", "legeche", "lagche",
+    "pelam", "paisi", "peyechi", "dilam", "nilam", "kinlam", "kinechi", "korlam", "korechi", "korchi", "korsi",
+    "kortesi", "krtesi", "kore", "korle", "kora", "dile", "niye", "geche", "pore", "porlam", "porechi",
+    "mone", "hocche", "jacche", "bujha", "bujhlen", "bujhi", "thik", "dam", "taka", "kaj", "vai", "bhai",
+    "apu", "sob", "shob", "vabe", "bhabe", "emon"}
+BANGLISH_SHARE = 0.12          # share of such words from which a Latin-letter text counts as Banglish
+
+
 def detect_language(text):
     """bangla (Bangla script), banglish (Bangla words in Latin letters) or english."""
     letters = re.findall(r"[^\W\d_]", text)
@@ -88,12 +112,8 @@ def detect_language(text):
     if bangla / len(letters) > 0.3:
         return "bangla"
     words = re.findall(r"[a-z]+", text.lower())
-    banglish = {"ami", "amar", "valo", "bhalo", "khub", "onek", "kintu", "tobe", "ar", "ta", "ti", "hoy",
-                "hoyeche", "chilo", "pelam", "paisi", "korlam", "kore", "use", "kaj", "dam", "na", "nai",
-                "ache", "theke", "jonno", "eta", "ota", "pore", "dilam", "laglo", "lagche", "boi", "khubi",
-                "vai", "bhai", "apu", "sob", "shob", "mone", "hocche", "hobe", "korsi", "kortesi", "krtesi"}
-    hits = sum(w in banglish for w in words)
-    return "banglish" if words and hits / len(words) >= 0.15 else "english"
+    hits = sum(w in _BANGLISH for w in words)
+    return "banglish" if words and hits / len(words) >= BANGLISH_SHARE else "english"
 
 
 def explain_level(score):
@@ -128,20 +148,70 @@ def load_model(path=None):
         from transformers import AutoTokenizer, AutoModelForSequenceClassification
         tok = AutoTokenizer.from_pretrained(path)
         model = AutoModelForSequenceClassification.from_pretrained(path).eval()
+        for p in model.parameters():          # scoring only: no training, so no gradients for the weights
+            p.requires_grad_(False)
         scale = json.load(open(os.path.join(path, "score_scale.json"), encoding="utf-8"))
         _own[path] = (tok, model, scale, torch)
     return _own[path]
 
 
+def strip_read_more(review):
+    return re.sub(r"(?i)\s*read more\s*$", "", review)          # as in training ("Read More" stripped)
+
+
 def model_score(review, path=None):
     """The trained model's score, 1 to 10 (not rounded)."""
     tok, model, scale, torch = load_model(path)
-    text = re.sub(r"(?i)\s*read more\s*$", "", review)          # as in training ("Read More" stripped)
+    text = strip_read_more(review)
     enc = tok(text, truncation=True, max_length=int(scale.get("max_len", 256)), return_tensors="pt")
     enc.pop("token_type_ids", None)
     with torch.no_grad():
         z = model(**enc).logits.float().squeeze().item()
     return float(min(10, max(1, z * scale["std"] + scale["mean"])))
+
+
+def word_importance(review, path=None, steps=8, chunk=2):
+    """Which words pushed the trained model's score up or down (integrated gradients).
+
+    The review's tokens are faded in from a neutral input (padding) to the real text in `steps`
+    steps; the gradient of the score along the way, times the change, gives each token's share of
+    the score. Token shares are added up per word and given in score points (positive: raised the
+    score). They add up, roughly, to the difference between this review's score and the score of
+    an empty review. Words after the model's token limit are not read; they are marked `read: False`.
+    Runs on the CPU in a few seconds for a short review, longer for a long one."""
+    tok, model, scale, torch = load_model(path)
+    text = strip_read_more(review)
+    enc = tok(text, truncation=True, max_length=int(scale.get("max_len", 256)), return_tensors="pt",
+              return_offsets_mapping=True)
+    offsets = enc.pop("offset_mapping")[0].tolist()
+    enc.pop("token_type_ids", None)
+    ids, mask = enc["input_ids"], enc["attention_mask"]
+    emb = model.get_input_embeddings()
+    special = torch.tensor(tok.get_special_tokens_mask(ids[0].tolist(), already_has_special_tokens=True)).bool()
+    with torch.no_grad():
+        x = emb(ids)
+        base = torch.where(special[None, :, None], x, emb(torch.full_like(ids, tok.pad_token_id)))
+    if ids.shape[1] > 128 and steps > 4:          # long review: fewer steps keep it to a few seconds on a CPU
+        steps = 4
+    grads = torch.zeros_like(x)
+    for alphas in ((torch.arange(steps, dtype=x.dtype) + 0.5) / steps).split(chunk):
+        inp = (base + alphas[:, None, None] * (x - base)).requires_grad_(True)
+        out = model(inputs_embeds=inp, attention_mask=mask.expand(len(alphas), -1)).logits.float().squeeze(-1)
+        grads += torch.autograd.grad(out.sum(), inp)[0].sum(0, keepdim=True)
+    token_values = ((x - base) * grads / steps).sum(-1)[0] * float(scale["std"])
+
+    spans = [(m.start(), m.end()) for m in re.finditer(r"\S+", text)]
+    values, read_until, w = [0.0] * len(spans), 0, 0
+    for (a, b), v, sp in zip(offsets, token_values.tolist(), special.tolist()):
+        if sp or b <= a:
+            continue
+        read_until = max(read_until, b)
+        while w < len(spans) and spans[w][1] <= a:
+            w += 1
+        if w < len(spans):
+            values[w] += v
+    return {"text": text, "words": [{"start": a, "end": b, "value": round(v, 4), "read": a < read_until}
+                                    for (a, b), v in zip(spans, values)]}
 
 
 def model_name(path=None):
@@ -189,8 +259,9 @@ def _mock_score(review):
     return max(2, min(9, 2 + signs + (words >= 12) + (words >= 25) + (words >= 45) - (words < 6)))
 
 
-def evaluate(product, review, judge="gemini"):
-    """Score a review 1-10 for how useful it is to a buyer."""
+def evaluate(product, review, judge="gemini", explain=True):
+    """Score a review 1-10 for how useful it is to a buyer. With the trained model and explain=True
+    the result also has "importance": which words raised or lowered the score (word_importance)."""
     product, review = (product or "").strip(), (review or "").strip()
     if not review:
         raise ValueError("Write a review first.")
@@ -199,6 +270,9 @@ def evaluate(product, review, judge="gemini"):
         raw = model_score(review)
         r = _score_result(round(raw * 2) / 2, "", "", "model", model_name(), "trained model", t0)
         r["raw_score"] = round(raw, 3)
+        if explain:
+            r["importance"] = word_importance(review)
+            r["latency_ms"] = int((time.time() - t0) * 1000)
     elif judge == "gemini":
         score, reason, why = _ask_gemini(_fill(SCORE_PROMPT, product, review), _parse_score)
         r = _score_result(score, reason, why or reason, "gemini", GEMINI_MODEL, SCORE_VERSION, t0)
@@ -227,6 +301,14 @@ def clean_suggestions(j, review):
     return str(j.get("summary") or "").strip(), out[:MAX_SUGGESTIONS]
 
 
+def check_language(text, lang):
+    """Raise (so Gemini is asked again) when the suggestions are not in the review's language."""
+    got = detect_language(text)
+    if (lang == "english" and got != "english") or (lang == "bangla" and got != "bangla") \
+            or (lang == "banglish" and got == "bangla"):
+        raise ValueError(f"suggestions came back in {got}, the review is in {lang}")
+
+
 def _mock_suggest(review):
     lang = detect_language(review)
     first = re.split(r"(?<=[.!?।])\s+|\n", review.strip())[0][:60]
@@ -246,8 +328,14 @@ def suggest(product, review, judge="gemini"):
         raise ValueError("Write a review first.")
     t0 = time.time()
     if judge == "gemini":
-        summary, items = _ask_gemini(_fill(SUGGEST_PROMPT, product, review),
-                                     lambda j: clean_suggestions(j, review))
+        lang = detect_language(review)
+        prompt = _fill(SUGGEST_PROMPT, product, review).replace("{language_rule}", LANGUAGE_RULE[lang])
+
+        def parse(j):
+            summary, items = clean_suggestions(j, review)
+            check_language(" ".join([summary] + [i["suggestion"] + " " + i["example"] for i in items]), lang)
+            return summary, items
+        summary, items = _ask_gemini(prompt, parse)
         model = GEMINI_MODEL
     else:
         summary, items = _mock_suggest(review)

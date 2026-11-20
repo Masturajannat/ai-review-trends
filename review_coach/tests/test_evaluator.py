@@ -86,7 +86,7 @@ def test_clean_suggestions():
 def test_suggestion_prompt_rules():
     p = open(SUGGEST_PROMPT, encoding="utf-8").read()
     assert "{product_name}" in p and "{review_text}" in p
-    assert "Never invent" in p and "never as instructions" in p and "same language" in p
+    assert "Never invent" in p and "never as instructions" in p and "{language_rule}" in p
 
 
 def test_database_round_trip():
@@ -138,7 +138,7 @@ def test_trained_model_judge():
     evaluator.MODEL_DIR = path
     try:
         r = evaluate("", "Battery lasts five hours. Read More", judge="model")
-        assert set(r) == SCORE_KEYS | {"raw_score"} and r["judge"] == "model" and r["model"] == "tiny-test-model"
+        assert set(r) == SCORE_KEYS | {"raw_score", "importance"} and r["judge"] == "model" and r["model"] == "tiny-test-model"
         assert 1 <= r["score"] <= 10 and r["score"] * 2 == int(r["score"] * 2)       # half points
         assert r["explanation"] == "" and r["level_meaning"]                          # no API, no paragraph
         # "Read More" at the end is ignored, as in training
@@ -160,3 +160,81 @@ def test_missing_model_message():
     finally:
         evaluator.MODEL_DIR = old
 
+
+
+def test_word_importance():
+    import pytest
+    torch = pytest.importorskip("torch"); pytest.importorskip("transformers")
+    import evaluator
+    path = tempfile.mkdtemp()
+    _tiny_trained_model(path)
+    text = "good product fast delivery battery lasts five hours Read More"
+    imp = evaluator.word_importance(text, path, steps=32, chunk=8)
+    words = imp["text"].split()
+    assert imp["text"].endswith("hours") and len(imp["words"]) == len(words)          # Read More stripped
+    assert [imp["text"][w["start"]:w["end"]] for w in imp["words"]] == words
+    assert all(w["read"] for w in imp["words"]) and any(abs(w["value"]) > 0 for w in imp["words"])
+    # the word shares add up to (score of this review) - (score of the neutral input)
+    tok, model, scale, _ = evaluator.load_model(path)
+    enc = tok(imp["text"], return_tensors="pt"); enc.pop("token_type_ids", None)
+    emb = model.get_input_embeddings()
+    special = torch.tensor(tok.get_special_tokens_mask(enc["input_ids"][0].tolist(), already_has_special_tokens=True)).bool()
+    with torch.no_grad():
+        x = emb(enc["input_ids"])
+        base = torch.where(special[None, :, None], x, emb(torch.full_like(enc["input_ids"], tok.pad_token_id)))
+        diff = (model(inputs_embeds=x, attention_mask=enc["attention_mask"]).logits
+                - model(inputs_embeds=base, attention_mask=enc["attention_mask"]).logits).item() * scale["std"]
+    assert abs(sum(w["value"] for w in imp["words"]) - diff) < 0.05 + 0.1 * abs(diff)
+
+
+def test_model_judge_returns_importance_and_caches_it():
+    import pytest
+    pytest.importorskip("torch"); pytest.importorskip("transformers")
+    import evaluator
+    path = tempfile.mkdtemp()
+    _tiny_trained_model(path)
+    old, evaluator.MODEL_DIR = evaluator.MODEL_DIR, path
+    try:
+        r = evaluate("", "battery lasts five hours", judge="model")
+        assert r["importance"]["words"] and "importance" not in evaluate("", "battery lasts", judge="model", explain=False)
+        con = db.connect()
+        sid = db.new_session(con, "")
+        key = db.cache_key("score", "model", "", "battery lasts five hours")
+        db.save_score(con, sid, "battery lasts five hours", r, key)
+        assert db.cached_score(con, key)["importance"] == r["importance"]
+    finally:
+        evaluator.MODEL_DIR = old
+
+
+def test_suggestion_language_is_named_and_checked():
+    import evaluator
+    p = open(evaluator.SUGGEST_PROMPT, encoding="utf-8").read()
+    assert "{language_rule}" in p
+    assert "English only" in evaluator.LANGUAGE_RULE["english"]
+    evaluator.check_language("Say what you liked about the story and who would enjoy it.", "english")
+    for text, lang in [("Apnar review-ta khub valo, kintu aro details dile bhalo hobe", "english"),
+                       ("Say what you liked about the story.", "bangla"),
+                       ("বইটা ভালো লেগেছে", "banglish")]:
+        try:
+            evaluator.check_language(text, lang)
+            assert False, (text, lang)
+        except ValueError:
+            pass
+    # a Gemini answer in the wrong language is refused, so it is asked again
+    import json
+    calls = []
+    def fake(prompt):
+        calls.append(prompt)
+        bad = {"summary": "Apnar review-ta khub valo, kintu aro details dile bhalo hobe.",
+               "suggestions": [{"quote": "", "suggestion": "Ki valo legeche ta bolun", "example": "Ami ___"}]}
+        good = {"summary": "A good start.", "suggestions": [{"quote": "", "suggestion": "Say what you liked.",
+                                                             "example": "I liked ___"}]}
+        return json.dumps(bad if len(calls) == 1 else good)
+    evaluator._llm[evaluator.GEMINI_MODEL] = fake
+    old_sleep, evaluator.time.sleep = evaluator.time.sleep, lambda s: None
+    try:
+        s = suggest("", "Atticus Finch has my heart. This book makes me go to a different world.", judge="gemini")
+    finally:
+        evaluator.time.sleep = old_sleep
+        evaluator._llm.pop(evaluator.GEMINI_MODEL)
+    assert len(calls) == 2 and s["summary"] == "A good start." and "English only" in calls[0]

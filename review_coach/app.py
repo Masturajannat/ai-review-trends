@@ -50,6 +50,10 @@ CSS = f"""
           border:1px dashed {T['line']}; font-size:14px; }}
 .rc-hist {{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }}
 .rc-pill {{ padding:6px 12px; border-radius:999px; background:{T['pill']}; font-size:14px; }}
+.rc-imp {{ background:{T['soft']}; border-radius:10px; padding:12px 14px; line-height:2.0; white-space:pre-wrap; }}
+.rc-imp span.w {{ border-radius:4px; padding:2px 1px; }}
+.rc-imp span.u {{ color:{T['muted']}; }}
+.rc-key {{ display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:-1px; margin:0 4px 0 0; }}
 </style>"""
 DARK_CSS = f"""
 <style>
@@ -97,6 +101,52 @@ def session(product):
     else:
         db.update_session(con, ss.sid, product)
     return ss.sid
+
+
+def rgba(hex_color, alpha):
+    h = hex_color.lstrip("#")
+    return f"rgba({int(h[0:2], 16)}, {int(h[2:4], 16)}, {int(h[4:6], 16)}, {alpha:.2f})"
+
+
+def importance_html(imp, show_from=0.2):
+    """The review with each word shaded by how much it raised (blue) or lowered (red) the score.
+    Words below `show_from` of the strongest word stay plain, so only clear signals are marked."""
+    text, words = imp["text"], imp["words"]
+    top = max([abs(w["value"]) for w in words if w["read"]] or [0]) or 1.0
+    out, pos, unread = [], 0, False
+    for w in words:
+        out.append(esc(text[pos:w["start"]]))
+        word = esc(text[w["start"]:w["end"]])
+        share = abs(w["value"]) / top
+        if not w["read"]:
+            out.append(f"<span class='u'>{word}</span>"); unread = True
+        elif share >= show_from:
+            color = T["ok"] if w["value"] > 0 else T["miss"]
+            sign = "raised" if w["value"] > 0 else "lowered"
+            out.append(f"<span class='w' style='background:{rgba(color, 0.15 + 0.55 * share)}' "
+                       f"title='{sign} the score by about {abs(w['value']):.2f}'>{word}</span>")
+        else:
+            out.append(word)
+        pos = w["end"]
+    out.append(esc(text[pos:]))
+    ups = [w for w in sorted(words, key=lambda w: -w["value"]) if w["read"] and w["value"] > 0 and abs(w["value"]) / top >= show_from][:3]
+    downs = [w for w in sorted(words, key=lambda w: w["value"]) if w["read"] and w["value"] < 0 and abs(w["value"]) / top >= show_from][:3]
+    name = lambda w: "“" + esc(text[w["start"]:w["end"]].strip(".,!?;:।")) + "”"
+    lines = []
+    if ups:
+        lines.append(f"<span class='rc-key' style='background:{rgba(T['ok'], 0.6)}'></span>Raised it most: "
+                     + ", ".join(map(name, ups)))
+    if downs:
+        lines.append(f"<span class='rc-key' style='background:{rgba(T['miss'], 0.6)}'></span>Held it back most: "
+                     + ", ".join(map(name, downs)))
+    note = ("<br>The grey part at the end was not read: the model reads about the first 250 words."
+            if unread else "")
+    return (f"<div class='rc-card'><div class='rc-title'>What the score is based on</div>"
+            f"<div class='rc-imp'>{''.join(out)}</div>"
+            f"<p style='margin:10px 0 0; line-height:1.7'>{'<br>'.join(lines)}</p>"
+            f"<p class='rc-muted' style='margin:8px 0 0'>Shaded words are the ones our model leaned on most: the "
+            f"darker, the stronger. It shows what the model paid attention to, not a rule you have to follow."
+            f"{note}</p></div>")
 
 
 def highlight(text, quotes):
@@ -162,7 +212,8 @@ with left:
             if judge == "model" and model_available():
                 with st.spinner("Loading the trained model (first time only, up to a minute)..."):
                     load_model()
-            with st.spinner("Rating your review..."):
+            with st.spinner("Rating your review and finding the words that mattered..."
+                            if judge == "model" else "Rating your review..."):
                 r = hit or evaluate(product, review, judge=judge)
             db.save_score(con, sid, review, r, key, from_cache=hit is not None)
             ss.result = r
@@ -172,7 +223,7 @@ with left:
             st.error(str(e))
     elif ask:
         sid = session(product)
-        key = db.cache_key("suggest", helper, product, review)
+        key = db.cache_key("suggest_v2", helper, product, review)
         hit = db.cached_suggestions(con, key)
         try:
             with st.spinner("Thinking about what a buyer would ask..."):
@@ -209,6 +260,8 @@ with right:
     {hint}
   </div>
 </div>""", unsafe_allow_html=True)
+        if r.get("importance"):                    # only our trained model: which words mattered
+            st.markdown(importance_html(r["importance"]), unsafe_allow_html=True)
         if r["explanation"]:                       # only the Gemini judge writes one
             st.markdown(f"<div class='rc-card'><div class='rc-title'>Why this score</div>"
                         f"<p style='margin:0; line-height:1.6'>{esc(r['explanation'])}</p></div>",
