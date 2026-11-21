@@ -94,18 +94,72 @@ def test_database_round_trip():
     con = db.connect()
     sid = db.new_session(con, "Earbuds")
     text = "Good sound but battery is weak."
+    did, n = db.draft(con, sid, "Earbuds", text)
+    assert n == 1 and db.draft(con, sid, "Earbuds", text) == (did, 1)          # same text: same draft
     r = evaluate("Earbuds", text, judge="mock")
-    key = db.cache_key("score", "mock", "Earbuds", text)
-    _, n = db.save_score(con, sid, text, r, key)
-    assert n == 1 and db.cached_score(con, key)["score"] == r["score"]
-    assert db.cached_score(con, key)["explanation"] == r["explanation"]
-    _, n2 = db.save_score(con, sid, text, db.cached_score(con, key), key, from_cache=True)
+    db.save_score(con, did, r)
+    hit = db.cached_score(con, "Earbuds", text, "mock")
+    assert hit["score"] == r["score"] and hit["explanation"] == r["explanation"]
+    assert db.cached_score(con, "Earbuds", text, "gemini") is None              # other judge: not cached
+    db.save_score(con, did, hit, from_cache=True)
+    did2, n2 = db.draft(con, sid, "Earbuds", text + " It lasts 3 hours.")
+    db.save_score(con, did2, evaluate("Earbuds", text + " It lasts 3 hours.", judge="mock"))
     assert n2 == 2 and [h["draft_no"] for h in db.history(con, sid)] == [1, 2]
     s = suggest("Earbuds", text, judge="mock")
-    skey = db.cache_key("suggest", "mock", "Earbuds", text)
-    sug_id = db.save_suggestions(con, sid, text, s, skey)
-    assert db.cached_suggestions(con, skey)["suggestions"] == s["suggestions"] and skey != key
-    db.rate(con, sug_id, 1)
+    set_id = db.save_suggestions(con, did, s)
+    assert db.cached_suggestions(con, "Earbuds", text, "mock", s["prompt_version"])["suggestions"] == s["suggestions"]
+    db.feedback(con, set_id, 0)
+    db.feedback(con, db.save_suggestions(con, did, s, attempt=2), 1)
+    row = dict(con.execute("SELECT * FROM session_summary WHERE session_id=?", (sid,)).fetchone())
+    assert row["drafts"] == 2 and row["suggestion_sets"] == 2 and row["helpful_votes"] == 1
+    assert row["score_change"] == round(db.history(con, sid)[1]["score"] - db.history(con, sid)[0]["score"], 1)
+    import sqlite3, pytest
+    with pytest.raises(sqlite3.IntegrityError):                                # foreign keys are on
+        db.save_score(con, 999999, r)
+
+
+def test_database_export(tmp_path):
+    con = db.connect()
+    paths = db.export_csv(con, str(tmp_path))
+    assert {os.path.basename(p) for p in paths} == {f"{t}.csv" for t in db.TABLES + ["session_summary"]}
+    assert db.summary(con)["sessions"] >= 1
+
+
+def test_old_database_is_migrated(tmp_path):
+    import json, sqlite3
+    path = str(tmp_path / "old.db")
+    old = sqlite3.connect(path)
+    old.executescript("""
+    CREATE TABLE sessions (session_id TEXT PRIMARY KEY, product_name TEXT, created_at TEXT, finished INTEGER DEFAULT 0);
+    CREATE TABLE evaluations (eval_id INTEGER PRIMARY KEY AUTOINCREMENT, session_id TEXT, draft_no INTEGER,
+        review_text TEXT, language TEXT, word_count INTEGER, score INTEGER, level INTEGER, reason TEXT,
+        explanation TEXT, importance TEXT, judge TEXT, model TEXT, prompt_version TEXT, latency_ms INTEGER,
+        cache_key TEXT, from_cache INTEGER DEFAULT 0, created_at TEXT);
+    CREATE TABLE suggestions (suggestion_id INTEGER PRIMARY KEY AUTOINCREMENT, session_id TEXT, review_text TEXT,
+        summary TEXT, suggestions TEXT, n_suggestions INTEGER, judge TEXT, model TEXT, prompt_version TEXT,
+        latency_ms INTEGER, cache_key TEXT, from_cache INTEGER DEFAULT 0, created_at TEXT);
+    CREATE TABLE ratings (eval_id INTEGER, helpful INTEGER, comment TEXT, created_at TEXT);
+    INSERT INTO sessions VALUES ('s1', 'Earbuds', '2026-11-20T10:00:00+00:00', 0);
+    """)
+    ev = "INSERT INTO evaluations (session_id, draft_no, review_text, language, word_count, score, explanation, judge, model, latency_ms, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)"
+    old.execute(ev, ("s1", 1, "Good.", "english", 1, 3, "", "model", "xlm-roberta-large", 900, "2026-11-20T10:01:00+00:00"))
+    old.execute(ev, ("s1", 2, "Good.", "english", 1, 3, "", "model", "xlm-roberta-large", 0, "2026-11-20T10:02:00+00:00"))
+    old.execute(ev, ("s1", 3, "Good. Battery lasts 5 hours.", "english", 5, 5, "", "model", "xlm-roberta-large", 800, "2026-11-20T10:05:00+00:00"))
+    old.execute("INSERT INTO suggestions (session_id, review_text, summary, suggestions, judge, model, prompt_version, latency_ms, created_at) VALUES (?,?,?,?,?,?,?,?,?)",
+                ("s1", "Good.", "Short.", json.dumps([{"quote": "Good.", "suggestion": "Say what is good.", "example": ""}]),
+                 "gemini", "g", "suggest_v3", 1200, "2026-11-20T10:03:00+00:00"))
+    old.execute("INSERT INTO ratings VALUES (1, 1, 'suggestions', '2026-11-20T10:04:00+00:00')")
+    old.commit(); old.close()
+    con = db.connect(path)
+    assert [d["draft_no"] for d in con.execute("SELECT * FROM drafts ORDER BY draft_no")] == [1, 2]
+    assert con.execute("SELECT COUNT(*) FROM scores").fetchone()[0] == 3
+    assert db.items(con, 1)[0]["suggestion"] == "Say what is good."
+    assert con.execute("SELECT helpful FROM feedback").fetchone()[0] == 1
+    assert "legacy_evaluations" in {r[0] for r in con.execute("SELECT name FROM sqlite_master")}
+    row = con.execute("SELECT first_score, last_score, score_change FROM session_summary").fetchone()
+    assert tuple(row) == (3, 5, 2)
+    con.close()
+    db.connect(path).close()                                                    # opening again changes nothing
 
 
 def _tiny_trained_model(path):
@@ -188,7 +242,7 @@ def test_word_importance():
     assert abs(sum(w["value"] for w in imp["words"]) - diff) < 0.05 + 0.1 * abs(diff)
 
 
-def test_model_judge_returns_importance_and_caches_it():
+def test_model_judge_returns_importance_and_score_is_cached():
     import pytest
     pytest.importorskip("torch"); pytest.importorskip("transformers")
     import evaluator
@@ -199,10 +253,9 @@ def test_model_judge_returns_importance_and_caches_it():
         r = evaluate("", "battery lasts five hours", judge="model")
         assert r["importance"]["parts"] and "importance" not in evaluate("", "battery lasts", judge="model", explain=False)
         con = db.connect()
-        sid = db.new_session(con, "")
-        key = db.cache_key("score", "model", "", "battery lasts five hours")
-        db.save_score(con, sid, "battery lasts five hours", r, key)
-        assert db.cached_score(con, key)["importance"] == r["importance"]
+        did, _ = db.draft(con, db.new_session(con, ""), "", "battery lasts five hours")
+        db.save_score(con, did, r)
+        assert db.cached_score(con, "", "battery lasts five hours", "model")["score"] == r["score"]
     finally:
         evaluator.MODEL_DIR = old
 

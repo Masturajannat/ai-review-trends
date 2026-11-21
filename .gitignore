@@ -14,3 +14,4 @@ raw_daraz/
 
 # Review Coach local database
 review_coach/*.db
+review_coach/db_export/

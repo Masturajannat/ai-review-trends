@@ -4,11 +4,11 @@
     $env:GEMINI_API_KEY = "<your key>"      # optional; without it, use the mock judge
     python -m streamlit run app.py --server.headless true
 """
-import html, os
+import html, io, os, tempfile, zipfile
 import streamlit as st
 
 import db
-from evaluator import evaluate, suggest, model_available, load_model
+from evaluator import evaluate, suggest, model_available, load_model, SUGGEST_VERSION
 
 st.set_page_config(page_title="Review Coach", layout="wide")
 
@@ -23,7 +23,8 @@ THEMES = {
 }
 
 ss = st.session_state
-for k, v in dict(sid=None, result=None, sug=None, sug_id=None, sug_text="", product_text="", sug_seen=[], rated=set(),
+for k, v in dict(sid=None, result=None, sug=None, sug_id=None, sug_draft=None, attempt=1, sug_text="", product_text="",
+                 sug_seen=[], rated=set(),
                  dark=False).items():
     ss.setdefault(k, v)
 T = THEMES["dark" if ss.dark else "light"]
@@ -32,10 +33,10 @@ CSS = f"""
 <style>
 .rc-card {{ background:{T['card']}; border:1px solid {T['line']}; border-radius:14px; padding:20px 22px; margin-bottom:14px; color:{T['ink']}; }}
 .rc-title {{ font-weight:600; margin-bottom:10px; }}
-.rc-score {{ display:flex; flex-wrap:wrap; gap:22px; align-items:center; }}
-.rc-big {{ font-size:60px; font-weight:700; line-height:1; }}
-.rc-bar {{ display:grid; grid-template-columns:repeat(10,minmax(0,1fr)); gap:4px; margin-bottom:8px; }}
-.rc-bar span {{ height:8px; border-radius:4px; background:{T['line']}; }}
+.rc-score {{ text-align:center; }}
+.rc-ring {{ width:150px; height:150px; border-radius:50%; margin:6px auto 10px; display:flex; align-items:center; justify-content:center; }}
+.rc-ring > div {{ width:116px; height:116px; border-radius:50%; background:{T['card']}; display:flex; align-items:center;
+                 justify-content:center; font-size:42px; font-weight:800; }}
 .rc-muted {{ color:{T['muted']}; font-size:13px; }}
 .rc-dot {{ width:14px; height:14px; border-radius:50%; flex:none; box-sizing:border-box; margin-top:5px; }}
 .rc-why {{ display:flex; gap:10px; align-items:flex-start; margin:8px 0; line-height:1.5; }}
@@ -88,7 +89,8 @@ esc = html.escape
 
 
 def new_review():
-    ss.sid = ss.result = ss.sug = ss.sug_id = None
+    ss.sid = ss.result = ss.sug = ss.sug_id = ss.sug_draft = None
+    ss.attempt = 1
     ss.sug_seen = []
     ss.sug_text = ""
 
@@ -99,6 +101,15 @@ def session(product):
     else:
         db.update_session(con, ss.sid, product)
     return ss.sid
+
+
+def export_zip():
+    with tempfile.TemporaryDirectory() as d:
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
+            for p in db.export_csv(con, d):
+                z.write(p, os.path.basename(p))
+    return buf.getvalue()
 
 
 def highlight(text, quotes):
@@ -133,6 +144,8 @@ with st.sidebar:
     helper = st.radio("Suggestions from", ["gemini", "mock"], index=0 if has_key else 1,
                       format_func=lambda j: {"gemini": "Gemini (API)", "mock": "Mock (for testing)"}[j])
     st.button("Start a new review", on_click=new_review)
+    st.download_button("Download the database (CSV)", data=export_zip(), file_name="review_coach_data.zip",
+                       mime="application/zip", help="Every table as a CSV file, for the report")
     st.caption("With our trained model, rating stays on this computer. Suggestions (and the Gemini score) "
                "send the review text to Google's Gemini model. Nothing is posted anywhere. No names or emails "
                "are stored.")
@@ -157,30 +170,28 @@ with left:
     if (go or ask) and not review.strip():
         st.error("Write a review first.")
     elif go:
-        sid = session(product)
-        key = db.cache_key("score", judge, product, review)
-        hit = db.cached_score(con, key)
+        did, _ = db.draft(con, session(product), product, review)
+        hit = db.cached_score(con, product, review, judge)
         try:
             if judge == "model" and model_available():
                 with st.spinner("Loading the trained model (first time only, up to a minute)..."):
                     load_model()
             with st.spinner("Rating your review..."):
                 r = hit or evaluate(product, review, judge=judge, explain=False)
-            db.save_score(con, sid, review, r, key, from_cache=hit is not None)
+            db.save_score(con, did, r, from_cache=hit is not None)
             ss.result = r
             if ss.sug_text != review:          # suggestions for an older draft: hide them
                 ss.sug = ss.sug_id = None
         except Exception as e:
             st.error(str(e))
     elif ask:
-        sid = session(product)
-        key = db.cache_key("suggest_v3", helper, product, review)
-        hit = db.cached_suggestions(con, key)
+        did, _ = db.draft(con, session(product), product, review)
+        hit = db.cached_suggestions(con, product, review, helper, SUGGEST_VERSION if helper == "gemini" else "mock")
         try:
             with st.spinner("Looking for ways to improve your review..."):
                 s = hit or suggest(product, review, judge=helper)
-            ss.sug_id = db.save_suggestions(con, sid, review, s, key, from_cache=hit is not None)
-            ss.sug, ss.sug_text, ss.product_text = s, review, product
+            ss.sug_id = db.save_suggestions(con, did, s, attempt=1, from_cache=hit is not None)
+            ss.sug, ss.sug_text, ss.product_text, ss.sug_draft, ss.attempt = s, review, product, did, 1
             ss.sug_seen = [i["suggestion"] for i in s["suggestions"]]
         except Exception as e:
             st.error(str(e))
@@ -198,18 +209,22 @@ with right:
 
     if r is not None:
         color = T["ok"] if r["score"] >= 7 else T["miss"]
-        bar = "".join(f"<span style='background:{color if i < r['score'] else T['line']}'></span>"
-                      for i in range(10))
+        pct = max(0.0, min(1.0, r["score"] / 10)) * 100
+        hist = db.history(con, ss.sid) if ss.sid else []
+        change = round(hist[-1]["score"] - hist[0]["score"], 1) if len(hist) > 1 else None
+        note = ("out of 10" if change is None else
+                "out of 10 · same as your first draft" if change == 0 else
+                f"out of 10 · {'up' if change > 0 else 'down'} {abs(change):g} from your first draft")
         hint = ("" if s is not None or r["explanation"] else
-                "<div class='rc-muted' style='margin-top:6px'>Want to know what would raise it? Press "
+                "<div class='rc-muted' style='margin-top:8px'>Want to know what would raise it? Press "
                 "<b>Suggest improvements</b>.</div>")
         st.markdown(f"""
 <div class='rc-card rc-score'>
-  <div><span class='rc-big' style='color:{color}'>{r['score']:g}</span><span class='rc-muted'> /10</span></div>
-  <div style='flex:1 1 260px; min-width:0'>
-    <div class='rc-bar'>{bar}</div>
-    {hint}
-  </div>
+  <div class='rc-title' style='text-align:left'>Your score</div>
+  <div class='rc-ring' style='background:conic-gradient({color} 0 {pct:.1f}%, {T['line']} {pct:.1f}% 100%)'>
+    <div style='color:{color}'>{r['score']:g}</div></div>
+  <div class='rc-muted'>{note}</div>
+  {hint}
 </div>""", unsafe_allow_html=True)
         if r["explanation"]:                       # only the Gemini judge writes one
             st.markdown(f"<div class='rc-card'><div class='rc-title'>Why this score</div>"
@@ -237,15 +252,15 @@ with right:
         if ss.sug_id not in ss.rated:
             a, b = st.columns(2)
             if a.button("Suggestions helped", use_container_width=True):
-                db.rate(con, ss.sug_id, 1); ss.rated.add(ss.sug_id); st.rerun()
+                db.feedback(con, ss.sug_id, 1); ss.rated.add(ss.sug_id); st.rerun()
             if b.button("Not helpful: show different ones", use_container_width=True):
-                db.rate(con, ss.sug_id, 0); ss.rated.add(ss.sug_id)
+                db.feedback(con, ss.sug_id, 0); ss.rated.add(ss.sug_id)
                 # ask again, telling Gemini which suggestions were not helpful so the new ones differ
                 try:
                     with st.spinner("Finding different suggestions..."):
                         new = suggest(ss.product_text, ss.sug_text, judge=helper, avoid=ss.sug_seen)
-                    key = db.cache_key(f"suggest_v3_retry{len(ss.sug_seen)}", helper, ss.product_text, ss.sug_text)
-                    ss.sug_id = db.save_suggestions(con, ss.sid, ss.sug_text, new, key)
+                    ss.attempt += 1
+                    ss.sug_id = db.save_suggestions(con, ss.sug_draft, new, attempt=ss.attempt)
                     ss.sug = new
                     ss.sug_seen = ss.sug_seen + [i["suggestion"] for i in new["suggestions"]]
                     st.rerun()

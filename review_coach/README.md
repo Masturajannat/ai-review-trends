@@ -82,16 +82,36 @@ ones are different; it can be pressed again for a third set.
 | `evaluator.py` | `evaluate(product, review, judge)` for the score (judge `model`, `gemini` or `mock`) and `suggest(product, review, judge)` for the suggestions; the page calls only these |
 | `prompts/suggest_v1.txt` | the suggestion prompt |
 | `db.py` | SQLite database `review_coach.db` (created automatically, not committed) |
+| `export_db.py` | writes every table to `db_export/*.csv` for the report and prints the headline numbers |
 | `tests/test_evaluator.py` | checks that need no API key: `python -m pytest tests` (from `review_coach`) |
 
 ## Database (`review_coach.db`)
 
+SQLite: one file, no server, Python's built-in `sqlite3`. Foreign keys are on, so a score cannot
+point to a draft that does not exist.
+
 | Table | One row per | Main fields |
 |---|---|---|
-| `sessions` | review being written | product_name, created_at, finished |
-| `evaluations` | click on "Rate my review" | draft_no, review_text, language, word_count, score, level, reason, judge, model, prompt_version, latency_ms |
-| `suggestions` | click on "Suggest improvements" | review_text, summary, suggestions (JSON), n_suggestions, judge, model, prompt_version, latency_ms |
-| `ratings` | "Suggestions helped" / "Not helpful" click | suggestion id, helpful |
+| `sessions` | review a person starts | product_name, created_at, finished |
+| `drafts` | version of the review text (the same text is saved once) | session_id, draft_no, product_name, review_text, text_hash, word_count, language |
+| `scores` | rating of a draft | draft_id, score (shown), raw_score (exact model output), reason, explanation, judge, model, prompt_version, latency_ms, from_cache |
+| `suggestion_sets` | click on "Suggest improvements" (attempt 1) or "Show different ones" (2, 3, ...) | draft_id, attempt, summary, judge, model, prompt_version, latency_ms, from_cache |
+| `suggestion_items` | single suggestion | set_id, position, quote, suggestion, example |
+| `feedback` | "Suggestions helped" (1) / "Not helpful" (0) | set_id, helpful |
+
+The view `session_summary` gives per session: drafts, first and last score, the change, suggestion
+sets and helpful votes. That is the number for the report: does the score go up after suggestions?
+
+A result is reused (`from_cache = 1`) when exactly the same product + review was scored by the same
+judge before (or got suggestions from the same prompt); nothing is sent to the API again.
+
+A database made by the earlier version (tables `evaluations`, `suggestions`, `ratings`) is copied
+into the new tables the first time the app opens it; the old tables are kept as `legacy_*`.
+
+Export for the report: the sidebar button **Download the database (CSV)**, or
+
+    python export_db.py          # writes db_export/<table>.csv and prints: helpful share,
+                                 # mean score change first to last draft, time to score per judge
 
 No names, emails or API keys are stored. With the Gemini judge the review text is sent to Google;
 the page says so in the sidebar.
