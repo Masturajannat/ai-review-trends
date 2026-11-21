@@ -107,7 +107,8 @@ point to a draft that does not exist.
 | `suggestion_items` | single suggestion | set_id, position, quote, suggestion, example |
 | `feedback` | "Suggestions helped" (1) / "Not helpful" (0) | set_id, helpful |
 
-The view `session_summary` gives per session: drafts, first and last score, the change, suggestion
+The view `review_scores` lists every score with its product, review text, language and words (open it in
+VS Code's SQLite Viewer or DB Browser for SQLite). The view `session_summary` gives per session: drafts, first and last score, the change, suggestion
 sets and helpful votes. That is the number for the report: does the score go up after suggestions?
 
 A result is reused (`from_cache = 1`) when exactly the same product + review was scored by the same

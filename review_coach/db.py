@@ -8,7 +8,8 @@ Tables (one row per ...)
   suggestion_items  single suggestion in a set: the quoted words, the advice, an example
   feedback          "Suggestions helped" (1) or "Not helpful" (0) for a set
 
-View
+Views (ready-made tables to look at, e.g. in VS Code's SQLite Viewer)
+  review_scores     every score with its product, review text, language and words
   session_summary   per session: drafts, first and last score, change, suggestion sets, helpful votes
 
 Foreign keys are on, so a score cannot point to a draft that does not exist.
@@ -92,6 +93,12 @@ CREATE TABLE IF NOT EXISTS feedback (
     created_at  TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_feedback_set ON feedback(set_id);
+DROP VIEW IF EXISTS review_scores;
+CREATE VIEW review_scores AS
+SELECT substr(d.session_id, 1, 8) AS session, d.draft_no, d.product_name, d.language, d.word_count AS words,
+       d.review_text, s.score, s.raw_score, s.judge, s.model, s.latency_ms, s.from_cache, s.created_at AS scored_at
+FROM scores s JOIN drafts d ON d.draft_id = s.draft_id
+ORDER BY s.score_id;
 DROP VIEW IF EXISTS session_summary;
 CREATE VIEW session_summary AS
 WITH scored AS (
@@ -295,7 +302,7 @@ def export_csv(con, folder):
     """Every table and the session_summary view as CSV files (UTF-8, opens in Excel). Returns the paths."""
     os.makedirs(folder, exist_ok=True)
     paths = []
-    for name in TABLES + ["session_summary"]:
+    for name in TABLES + ["review_scores", "session_summary"]:
         cur = con.execute(f"SELECT * FROM {name}")
         p = os.path.join(folder, f"{name}.csv")
         with open(p, "w", newline="", encoding="utf-8-sig") as f:

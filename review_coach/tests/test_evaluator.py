@@ -121,7 +121,7 @@ def test_database_round_trip():
 def test_database_export(tmp_path):
     con = db.connect()
     paths = db.export_csv(con, str(tmp_path))
-    assert {os.path.basename(p) for p in paths} == {f"{t}.csv" for t in db.TABLES + ["session_summary"]}
+    assert {os.path.basename(p) for p in paths} == {f"{t}.csv" for t in db.TABLES + ["review_scores", "session_summary"]}
     assert db.summary(con)["sessions"] >= 1
 
 
