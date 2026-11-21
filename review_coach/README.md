@@ -19,17 +19,13 @@ The product name is optional.
 
 | Part | Made by | API? |
 |---|---|---|
-| Score | **our trained model**: XLM-RoBERTa large fine-tuned on the 7,322 Gemini-scored reviews (`quality_model/`; test MAE 0.64, 80% within 1 point of Gemini). Shown in half points with what its level means. | no, runs on this computer |
+| Score | **our trained model**: XLM-RoBERTa large fine-tuned on the 7,322 Gemini-scored reviews (`quality_model/`; test MAE 0.64, 80% within 1 point of Gemini). Shown in half points. | no, runs on this computer |
 | Suggestions | Gemini with `prompts/suggest_v1.txt`, a separate prompt, only when the button is pressed | yes |
 
 For comparison the score can also come from Gemini itself (the dataset's scoring prompt, with a
-short "Why this score" paragraph) or from a mock judge for testing. With our model there is no
-paragraph. Instead the card **"What the score is based on"** shows the review cut into its parts
-(sentences, and long sentences at commas and words like "but" / "kintu" / "তবে"), each shaded by
-how much it moves the model's score: the score of the whole review minus the score with that part
-left out. Blue parts raised it, red parts pulled it down, with the change in points (no API).
-`evaluator.word_importance` gives the same per word (integrated gradients), but single words such
-as "but", "a" or a full stop are hard for a reviewer to read, so the page shows parts.
+short "Why this score" paragraph) or from a mock judge for testing. With our model the page shows
+only the score; the instructor asked us to remove the highlighting of review parts.
+(`evaluator.part_importance` and `evaluator.word_importance` are still in the code for analysis.)
 **Suggest improvements** then says, for this review, what would make it more useful.
 
 Suggestions are written in the review's own language: the app detects Bangla, Banglish or English

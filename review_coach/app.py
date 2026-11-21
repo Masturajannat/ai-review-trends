@@ -51,11 +51,6 @@ CSS = f"""
           border:1px dashed {T['line']}; font-size:14px; }}
 .rc-hist {{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }}
 .rc-pill {{ padding:6px 12px; border-radius:999px; background:{T['pill']}; font-size:14px; }}
-.rc-imp {{ background:{T['soft']}; border-radius:10px; padding:12px 14px; line-height:2.0; white-space:pre-wrap; }}
-.rc-imp span.w {{ border-radius:4px; padding:2px 1px; }}
-.rc-imp span.u {{ color:{T['muted']}; }}
-.rc-imp sup.pts {{ font-weight:700; font-size:12px; margin:0 3px 0 2px; }}
-.rc-key {{ display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:-1px; margin:0 4px 0 0; }}
 </style>"""
 DARK_CSS = f"""
 <style>
@@ -104,59 +99,6 @@ def session(product):
     else:
         db.update_session(con, ss.sid, product)
     return ss.sid
-
-
-def rgba(hex_color, alpha):
-    h = hex_color.lstrip("#")
-    return f"rgba({int(h[0:2], 16)}, {int(h[2:4], 16)}, {int(h[4:6], 16)}, {alpha:.2f})"
-
-
-def importance_html(imp, min_points=0.1):
-    """The review with each part shaded by how much it raised (blue) or lowered (red) the score,
-    with the change in points. Parts that move the score by less than `min_points` stay plain."""
-    text, parts = imp["text"], imp["parts"]
-    vals = [abs(p["value"]) for p in parts if p["value"] is not None]
-    top = max(vals or [0]) or 1.0
-    out, pos, unread = [], 0, False
-    for p in parts:
-        out.append(esc(text[pos:p["start"]]))
-        seg = esc(text[p["start"]:p["end"]])
-        v = p["value"]
-        if not p["read"]:
-            out.append(f"<span class='u'>{seg}</span>"); unread = True
-        elif v is not None and abs(v) >= min_points:
-            color = T["ok"] if v > 0 else T["miss"]
-            out.append(f"<span class='w' style='background:{rgba(color, 0.18 + 0.45 * abs(v) / top)}'>{seg}</span>"
-                       f"<sup class='pts' style='color:{color}'>{v:+.1f}</sup>")
-        else:
-            out.append(seg)
-        pos = p["end"]
-    out.append(esc(text[pos:]))
-    scored = [p for p in parts if p["value"] is not None]
-    quote = lambda p: "\u201c" + esc(text[p["start"]:p["end"]].strip(" .,!?;:\u0964")) + "\u201d"
-    lines = []
-    if not scored:
-        lines.append("Your review is one short part, so there is nothing to compare it with. Write a little more "
-                     "and the app can show which parts helped.")
-    else:
-        best = max(scored, key=lambda p: p["value"])
-        worst = min(scored, key=lambda p: p["value"])
-        if best["value"] >= min_points:
-            lines.append(f"<span class='rc-key' style='background:{rgba(T['ok'], 0.6)}'></span>"
-                         f"Helped most: {quote(best)} ({best['value']:+.1f})")
-        if worst["value"] <= -min_points:
-            lines.append(f"<span class='rc-key' style='background:{rgba(T['miss'], 0.6)}'></span>"
-                         f"Pulled the score down: {quote(worst)} ({worst['value']:+.1f})")
-        if not lines:
-            lines.append("No single part stands out: the parts of your review count about the same.")
-    note = ("<br>The grey part at the end was not read: the model reads about the first 250 words."
-            if unread else "")
-    return (f"<div class='rc-card'><div class='rc-title'>What the score is based on</div>"
-            f"<div class='rc-imp'>{''.join(out)}</div>"
-            f"<p style='margin:10px 0 0; line-height:1.7'>{'<br>'.join(lines)}</p>"
-            f"<p class='rc-muted' style='margin:8px 0 0'>Each number is how much the score would drop if that "
-            f"part were left out (a minus means the score would rise). It shows what our model counted, "
-            f"not a rule you have to follow.{note}</p></div>")
 
 
 def highlight(text, quotes):
@@ -222,9 +164,8 @@ with left:
             if judge == "model" and model_available():
                 with st.spinner("Loading the trained model (first time only, up to a minute)..."):
                     load_model()
-            with st.spinner("Rating your review and checking which parts mattered..."
-                            if judge == "model" else "Rating your review..."):
-                r = hit or evaluate(product, review, judge=judge)
+            with st.spinner("Rating your review..."):
+                r = hit or evaluate(product, review, judge=judge, explain=False)
             db.save_score(con, sid, review, r, key, from_cache=hit is not None)
             ss.result = r
             if ss.sug_text != review:          # suggestions for an older draft: hide them
@@ -270,8 +211,6 @@ with right:
     {hint}
   </div>
 </div>""", unsafe_allow_html=True)
-        if r.get("importance"):                    # only our trained model: which words mattered
-            st.markdown(importance_html(r["importance"]), unsafe_allow_html=True)
         if r["explanation"]:                       # only the Gemini judge writes one
             st.markdown(f"<div class='rc-card'><div class='rc-title'>Why this score</div>"
                         f"<p style='margin:0; line-height:1.6'>{esc(r['explanation'])}</p></div>",
