@@ -10,7 +10,7 @@ import streamlit as st
 import db
 from evaluator import evaluate, suggest, model_available, load_model, SUGGEST_VERSION
 
-st.set_page_config(page_title="Review Coach", layout="wide")
+st.set_page_config(page_title="Review Coach", page_icon="📝", layout="wide", initial_sidebar_state="collapsed")
 
 # colours: navy and coral; a light and a dark version
 THEMES = {
@@ -24,13 +24,32 @@ THEMES = {
 
 ss = st.session_state
 for k, v in dict(sid=None, result=None, sug=None, sug_id=None, sug_draft=None, attempt=1, sug_text="", product_text="",
-                 sug_seen=[], rated=set(),
+                 sug_seen=[], rated=set(), my_sessions=[], product="", review="",
                  dark=False).items():
     ss.setdefault(k, v)
 T = THEMES["dark" if ss.dark else "light"]
 
 CSS = f"""
 <style>
+[data-testid="stSidebar"], [data-testid="stSidebarCollapsedControl"], [data-testid="collapsedControl"],
+[data-testid="stToolbar"], [data-testid="stDecoration"] {{ display:none !important; }}
+[data-testid="stHeader"] {{ background:transparent; height:0; }}
+.block-container {{ padding-top:1.2rem !important; }}
+.st-key-topbar {{ background:{T['card']}; border:1px solid {T['line']}; border-radius:14px; padding:10px 16px; margin-bottom:10px; }}
+.st-key-topbar [data-testid="stHorizontalBlock"] {{ align-items:center; }}
+[data-testid="stPopoverBody"] {{ min-width:360px; }}
+.rc-logo {{ position:relative; top:-7px; display:flex; align-items:center; gap:10px; font-weight:800; font-size:21px; color:{T['ink']}; }}
+.rc-logo i {{ width:34px; height:34px; border-radius:9px; background:{T['ok']}; color:{T['on_ok']}; font-style:normal;
+              display:inline-flex; align-items:center; justify-content:center; font-size:17px; }}
+.stApp .st-key-new_review button {{ background:{T['miss']} !important; border-color:{T['miss']} !important; }}
+.stApp .st-key-new_review button, .stApp .st-key-new_review button * {{ color:#FFFFFF !important; }}
+.st-key-gearbox [data-testid="stIconMaterial"], .st-key-gearbox button svg {{ display:none !important; }}
+.st-key-gearbox button p {{ font-size:18px; }}
+.st-key-topbar [data-testid="stMarkdownContainer"] > div {{ margin:0; }}
+.st-key-topbar .stMarkdown, .st-key-topbar [data-testid="stElementContainer"] {{ margin-bottom:0 !important; }}
+.st-key-inputcard {{ background:{T['card']}; border:1px solid {T['line']}; border-radius:14px; padding:20px 22px; }}
+.rc-rev {{ display:flex; justify-content:space-between; gap:10px; }}
+.rc-chip {{ font-size:12px; font-weight:700; padding:2px 8px; border-radius:20px; background:{T['pill']}; color:{T['ok']}; }}
 .rc-card {{ background:{T['card']}; border:1px solid {T['line']}; border-radius:14px; padding:20px 22px; margin-bottom:14px; color:{T['ink']}; }}
 .rc-title {{ font-weight:600; margin-bottom:10px; }}
 .rc-score {{ text-align:center; }}
@@ -65,10 +84,14 @@ DARK_CSS = f"""
 .stApp input::placeholder, .stApp textarea::placeholder {{ color:{T['muted']}; opacity:1; }}
 div[data-baseweb="input"], div[data-baseweb="base-input"], div[data-baseweb="textarea"] {{
   background:{T['card']} !important; border-color:{T['line']} !important; }}
-.stButton > button {{ background:{T['card']}; color:{T['ink']}; border:1px solid {T['line']}; }}
+.stButton > button, [data-testid="stPopover"] button, .stDownloadButton > button {{
+  background:{T['card']} !important; color:{T['ink']} !important; border:1px solid {T['line']} !important; }}
+[data-testid="stPopover"] button *, .stDownloadButton > button * {{ color:{T['ink']} !important; }}
+[data-testid="stPopoverBody"] {{ background:{T['card']} !important; border:1px solid {T['line']}; }}
 .stButton > button:hover {{ border-color:{T['ok']}; color:{T['ok']}; }}
-.stButton > button[kind="primary"], .stButton > button[kind="primary"] * {{
-  background:{T['ok']}; color:{T['on_ok']}; border-color:{T['ok']}; }}
+.stButton > button[kind="primary"] {{ background:{T['ok']} !important; color:{T['on_ok']} !important;
+  border-color:{T['ok']} !important; }}
+.stButton > button[kind="primary"] * {{ background:transparent !important; color:{T['on_ok']} !important; }}
 .stApp .rc-muted, .stApp .rc-muted * {{ color:{T['muted']}; }}
 .stApp .rc-sug q, .stApp .rc-draft sup {{ color:{T['miss_text']}; }}
 .stApp .rc-num {{ color:{T['on_ok']}; }}
@@ -91,6 +114,7 @@ esc = html.escape
 def new_review():
     ss.sid = ss.result = ss.sug = ss.sug_id = ss.sug_draft = None
     ss.attempt = 1
+    ss.product = ss.review = ""
     ss.sug_seen = []
     ss.sug_text = ""
 
@@ -98,9 +122,25 @@ def new_review():
 def session(product):
     if ss.sid is None:
         ss.sid = db.new_session(con, product)
+        ss.my_sessions = [ss.sid] + ss.my_sessions
+        ss.fresh = True                         # redraw so "My reviews" counts the new one
     else:
         db.update_session(con, ss.sid, product)
     return ss.sid
+
+
+def open_review(sid):
+    """Show an earlier review again: its last draft, and its score if this judge rated it."""
+    last = db.last_drafts(con, [sid])
+    new_review()
+    ss.sid = sid
+    if last:
+        ss.product, ss.review = last[0]["product_name"] or "", last[0]["review_text"]
+        ss.result = db.cached_score(con, ss.product, ss.review, ss.get("judge", "model"))
+
+
+def toggle_dark():
+    ss.dark = not ss.dark
 
 
 def export_zip():
@@ -126,46 +166,57 @@ def highlight(text, quotes):
     return "".join(out) + esc(text[pos:])
 
 
-# ---------------------------------------------------------------- sidebar
-with st.sidebar:
-    st.header("Settings")
-    st.toggle("Dark theme", key="dark")
-    has_key = bool(os.environ.get("GEMINI_API_KEY"))
-    has_model = model_available()
-    scorers = ["model", "gemini", "mock"]
-    judge = st.radio("Score from", scorers, index=0 if has_model else (1 if has_key else 2),
-                     format_func=lambda j: {"model": "Our trained model (on this computer)",
-                                            "gemini": "Gemini (API)", "mock": "Mock (for testing)"}[j])
-    if judge == "model" and not has_model:
-        st.warning("The trained model is not in quality_model/models_noreadmore/xlm-roberta-large. "
-                   "Download it from Google Drive into that folder.")
-    if judge == "gemini" and not has_key:
-        st.warning("GEMINI_API_KEY is not set in the terminal that started the app.")
-    helper = st.radio("Suggestions from", ["gemini", "mock"], index=0 if has_key else 1,
-                      format_func=lambda j: {"gemini": "Gemini (API)", "mock": "Mock (for testing)"}[j])
-    st.button("Start a new review", on_click=new_review)
-    st.download_button("Download the database (CSV)", data=export_zip(), file_name="review_coach_data.zip",
-                       mime="application/zip", help="Every table as a CSV file, for the report")
-    st.caption("With our trained model, rating stays on this computer. Suggestions (and the Gemini score) "
-               "send the review text to Google's Gemini model. Nothing is posted anywhere. No names or emails "
-               "are stored.")
-
-st.markdown("<h1 style='margin-bottom:0'>Review Coach</h1>"
-            "<p class='rc-muted'>Write your review your own way, in Bangla, Banglish or English. "
-            "Rate it, and ask for suggestions to make it better if you want them.</p>",
-            unsafe_allow_html=True)
+# ---------------------------------------------------------------- top bar
+has_key = bool(os.environ.get("GEMINI_API_KEY"))
+has_model = model_available()
+with st.container(key="topbar"):
+    logo, gap, mine, new, dark, gear = st.columns([4, 3, 1.5, 1.4, 0.5, 0.5], gap="small",
+                                                  vertical_alignment="center")
+    logo.markdown("<div class='rc-logo'><i>R</i>Review Coach</div>", unsafe_allow_html=True)
+    with mine.popover(f"My reviews ({len(ss.my_sessions)})", use_container_width=True):
+        rows = db.last_drafts(con, ss.my_sessions)
+        if not rows:
+            st.caption("Reviews you rate or improve here appear in this list.")
+        for r_ in rows:
+            name = r_["product_name"] or " ".join(r_["review_text"].split()[:5]) + "..."
+            score = f"<span class='rc-chip'>{r_['score']:g}</span>" if r_["score"] is not None else ""
+            c_a, c_b = st.columns([3, 1.2], vertical_alignment="center")
+            c_a.markdown(f"<div class='rc-rev'><span>{esc(name)}</span>{score}</div>", unsafe_allow_html=True)
+            c_b.button("Open", key=f"open_{r_['session_id']}", on_click=open_review, args=(r_["session_id"],))
+    new.button("+ New review", key="new_review", on_click=new_review, use_container_width=True)
+    dark.button("☀" if ss.dark else "☾", key="dark_btn", on_click=toggle_dark,
+                use_container_width=True)
+    with gear.container(key="gearbox"), st.popover("⚙", use_container_width=True):
+        st.markdown("**Settings** · for the project team")
+        judge = st.radio("Score from", ["model", "gemini", "mock"], key="judge",
+                         index=0 if has_model else (1 if has_key else 2),
+                         format_func=lambda j: {"model": "Our trained model (on this computer)",
+                                                "gemini": "Gemini (API)", "mock": "Mock (for testing)"}[j])
+        if judge == "model" and not has_model:
+            st.warning("The trained model is not in quality_model/models_noreadmore/xlm-roberta-large.")
+        if judge == "gemini" and not has_key:
+            st.warning("GEMINI_API_KEY is not set in the terminal that started the app.")
+        helper = st.radio("Suggestions from", ["gemini", "mock"], key="helper", index=0 if has_key else 1,
+                          format_func=lambda j: {"gemini": "Gemini (API)", "mock": "Mock (for testing)"}[j])
+        if helper == "gemini" and not has_key:
+            st.warning("GEMINI_API_KEY is not set, so suggestions will fail. Choose Mock to test.")
+        st.download_button("Download data (CSV)", data=export_zip(), file_name="review_coach_data.zip",
+                           mime="application/zip", use_container_width=True)
 
 left, right = st.columns([5, 6], gap="large")
 
 # ---------------------------------------------------------------- input
-with left:
-    st.subheader("Write your review")
-    product = st.text_input("Product (optional)", placeholder="e.g. Foaming Facial Cleanser 236 ml")
-    review = st.text_area("Your review", height=240, placeholder="Share your experience with what you bought.")
+with left, st.container(key="inputcard"):
+    st.markdown("<div class='rc-title' style='font-size:18px;margin-bottom:2px'>Write your review</div>"
+                "<div class='rc-muted'>Your own way, in Bangla, Banglish or English.</div>", unsafe_allow_html=True)
+    product = st.text_input("Product (optional)", key="product", placeholder="e.g. Foaming Facial Cleanser 236 ml")
+    review = st.text_area("Your review", key="review", height=260,
+                          placeholder="Share your experience with what you bought.")
     st.caption(f"{len(review.split())} words")
     c1, c2 = st.columns(2)
-    go = c1.button("Rate my review", type="primary", use_container_width=True)
-    ask = c2.button("Suggest improvements", use_container_width=True)
+    ask = c1.button("Suggest improvements", use_container_width=True)
+    go = c2.button("Rate my review", type="primary", use_container_width=True)
+    st.caption("🔒 No names or emails are saved. Suggestions are written with Google's Gemini.")
 
     if (go or ask) and not review.strip():
         st.error("Write a review first.")
@@ -195,6 +246,9 @@ with left:
             ss.sug_seen = [i["suggestion"] for i in s["suggestions"]]
         except Exception as e:
             st.error(str(e))
+
+if ss.pop("fresh", False):
+    st.rerun()
 
 # ---------------------------------------------------------------- results
 with right:

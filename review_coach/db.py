@@ -227,6 +227,19 @@ def history(con, sid):
         WHERE d.session_id=? ORDER BY d.draft_no""", (sid,))]
 
 
+def last_drafts(con, sids):
+    """For each session (in the order given): its last draft and that draft's latest score (or None)."""
+    out = []
+    for sid in sids:
+        row = con.execute("""
+            SELECT d.session_id, d.product_name, d.review_text, d.draft_no,
+                   (SELECT score FROM scores WHERE draft_id = d.draft_id ORDER BY score_id DESC LIMIT 1) AS score
+            FROM drafts d WHERE d.session_id=? ORDER BY d.draft_no DESC LIMIT 1""", (sid,)).fetchone()
+        if row:
+            out.append(dict(row))
+    return out
+
+
 # ---------------------------------------------------------------- suggestions and feedback
 def cached_suggestions(con, product, review, judge, prompt_version):
     """The first set of suggestions given earlier for exactly this text, judge and prompt."""

@@ -60,11 +60,19 @@ Open http://localhost:8501. The first rating loads the model (up to a minute); a
 rating takes a second or two. Stop the app with Ctrl+C. To use a model in another folder, set
 `$env:REVIEW_COACH_MODEL` to that folder before starting.
 
-## Settings (left sidebar)
+## Top bar
+
+| Button | What it does |
+|---|---|
+| My reviews (n) | the reviews started in this browser tab, each with its last score; **Open** loads one again |
+| + New review | clears the page for a new review |
+| ☾ / ☀ | dark or light theme |
+| ⚙ | settings for the project team (below) and **Download data (CSV)**; users don't need it |
+
+## Settings (⚙, for the project team)
 
 | Setting | What it does |
 |---|---|
-| Dark theme | switches the page colours |
 | Score from: our trained model | the default when the model folder is found; no API |
 | Score from: Gemini | the dataset's scoring prompt, with a "Why this score" paragraph; one API call |
 | Score from: Mock | rough rules, for testing the page only |
@@ -108,10 +116,10 @@ judge before (or got suggestions from the same prompt); nothing is sent to the A
 A database made by the earlier version (tables `evaluations`, `suggestions`, `ratings`) is copied
 into the new tables the first time the app opens it; the old tables are kept as `legacy_*`.
 
-Export for the report: the sidebar button **Download the database (CSV)**, or
+Export for the report: **⚙ → Download data (CSV)**, or
 
     python export_db.py          # writes db_export/<table>.csv and prints: helpful share,
                                  # mean score change first to last draft, time to score per judge
 
 No names, emails or API keys are stored. With the Gemini judge the review text is sent to Google;
-the page says so in the sidebar.
+the page says so under the review box.
