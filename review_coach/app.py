@@ -216,7 +216,6 @@ with left, st.container(key="inputcard"):
     c1, c2 = st.columns(2)
     ask = c1.button("Suggest improvements", use_container_width=True)
     go = c2.button("Rate my review", type="primary", use_container_width=True)
-    st.caption("🔒 No names or emails are saved. Suggestions are written with Google's Gemini.")
 
     if (go or ask) and not review.strip():
         st.error("Write a review first.")

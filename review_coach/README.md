@@ -122,4 +122,4 @@ Export for the report: **⚙ → Download data (CSV)**, or
                                  # mean score change first to last draft, time to score per judge
 
 No names, emails or API keys are stored. With the Gemini judge the review text is sent to Google;
-the page says so under the review box.
+the project team should mention this to anyone testing the app.
