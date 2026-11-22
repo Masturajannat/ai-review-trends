@@ -1,26 +1,37 @@
 # Review Coach
 
 A small web app that rates a product review and suggests how to make it better, in Bangla,
-Banglish or English. The reviewer writes freely; the app does two things, each only when asked:
+Banglish or English. It is the second step of a demo: the reviewer first picks a product in
+**ShopLite**, a very small dummy shop (folder `shop/`), then presses **Write a review** on the
+product page, which opens Review Coach for that product. The reviewer writes freely; the app does
+two things, each only when asked:
 
 - **Rate my review**: a score from 1 to 10 from our own trained model, with the parts of the
   review that raised or lowered it.
 - **Suggest improvements**: reads this one review and gives at most three suggestions. Each
   points at a phrase the reviewer wrote, says what could be added or made clearer there, and
-  offers a sentence starter with blanks (`Battery ___ ghonta chole`). It never changes the
-  reviewer's opinion, never invents facts, and answers in the review's own language
-  (`prompts/suggest_v3.txt`). **Not helpful: show different ones** asks for a new set.
+  gives a complete example sentence for this product ("I used this face wash for 7 weeks before
+  the bumps on my cheeks disappeared."), which the reviewer replaces with their own experience. It never
+  changes the reviewer's opinion, and answers in the review's own language (`prompts/suggest_v5.txt`).
+  If the review is about a different kind of product than the one chosen (a sofa review under a
+  face wash), it gives one suggestion that says so. **Not helpful: show different ones** asks for a
+  new set.
+- **Submit review**: appears in the top bar once the review has a score (and only while the text is
+  the one that was scored). It adds the review to the product's list in ShopLite.
 
-There is no checklist and no product type to choose: a review does not have to follow a fixed
-list of points to be useful, and the app works out what kind of product it is from the text.
-The product name is optional.
+There is no checklist to follow: a review does not have to cover a fixed list of points to be
+useful. The product is not typed: it comes from the shop link (`?product=<id>`), is shown locked,
+and its name and type (for example "body wash") are sent to Gemini with the review. Opened without
+a product, the page asks the reviewer to pick one in the shop first.
+
+The whole review page fits one screen without scrolling; the score is a bar, not a circle.
 
 ## How the two parts are produced
 
 | Part | Made by | API? |
 |---|---|---|
 | Score | **our trained model**: XLM-RoBERTa large fine-tuned on the 7,322 Gemini-scored reviews (`quality_model/`; test MAE 0.64, 80% within 1 point of Gemini). Shown in half points. | no, runs on this computer |
-| Suggestions | Gemini with `prompts/suggest_v1.txt`, a separate prompt, only when the button is pressed | yes |
+| Suggestions | Gemini with `prompts/suggest_v5.txt`, a separate prompt, only when the button is pressed | yes |
 
 For comparison the score can also come from Gemini itself (the dataset's scoring prompt, with a
 short "Why this score" paragraph) or from a mock judge for testing. With our model the page shows
@@ -29,7 +40,7 @@ only the score; the instructor asked us to remove the highlighting of review par
 **Suggest improvements** then says, for this review, what would make it more useful.
 
 Suggestions are written in the review's own language: the app detects Bangla, Banglish or English
-itself, names it in the prompt (`prompts/suggest_v2.txt`) and asks Gemini again if the answer comes
+itself, names it in the prompt and asks Gemini again if the answer comes
 back in another language.
 
 ## Run it (VS Code terminal, PowerShell, from the repository folder `ai-review-trends`)
@@ -47,24 +58,52 @@ python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
 python -m pip install -r review_coach\requirements.txt
 ```
 
-Every time:
+Every time, the shop and the coach together (the first run also makes `shop\shop.db`):
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
-cd review_coach
 $env:GEMINI_API_KEY = "<your key>"       # only needed for suggestions (or the Gemini score)
-python -m streamlit run app.py --server.headless true
+python run_demo.py
 ```
 
-Open http://localhost:8501. The first rating loads the model (up to a minute); after that each
-rating takes a second or two. Stop the app with Ctrl+C. To use a model in another folder, set
-`$env:REVIEW_COACH_MODEL` to that folder before starting.
+The shop opens at http://localhost:8502; the coach runs at http://localhost:8501 and is opened from a
+product page. The first rating loads the model (up to a minute); after that each rating takes a
+second or two. Stop both with Ctrl+C. To use a model in another folder, set `$env:REVIEW_COACH_MODEL`
+to that folder before starting.
+
+To start them by hand, in two terminals: `cd review_coach` then
+`python -m streamlit run app.py --server.port 8501`, and `cd shop` then `python build_shop_db.py`
+(once) and `python -m streamlit run shop_app.py --server.port 8502`. More in `shop\README.md`.
+
+## How to use it (the demo)
+
+1. In ShopLite, open a product (20 of the most reviewed products of the dataset) and read its reviews.
+2. Press **Write a review**. Review Coach opens with that product fixed.
+3. Write the review, press **Rate my review** to see the score, and **Suggest improvements** if wanted.
+   Edit and rate again as often as you like.
+4. After a score is shown, press **Submit review** (top bar). The review is saved in `shop.db`.
+5. Press **Back to the product**: the review is at the top of the list, marked "New".
+   **Write another review** starts again for the same product.
+
+## What changed (22 Nov 2026)
+
+| File | Change |
+|---|---|
+| `review_coach/app.py` | score shown as a bar, not a circle; tighter spacing so the page needs no scrolling; product comes from the shop link and is locked; "Pick a product in the shop first" screen; **Submit review** in the top bar after a score; "Review added" screen; "My reviews" lists only this product; examples shown with "e.g." |
+| `review_coach/evaluator.py` | `suggest()` takes `product_type`; uses `suggest_v5.txt` |
+| `review_coach/prompts/suggest_v5.txt` | new (replaces v3/v4): product-match check, questions that fit the product, complete example sentences instead of blanks, product type in the prompt |
+| `shop/shop_app.py` | new: the dummy shop (product grid, product page, reviews with language filter) |
+| `shop/shop_db.py` | new: reads and writes `shop.db` for the shop and the coach |
+| `shop/build_shop_db.py` | new: makes `shop.db` from `combined_reviews.csv` (20 products, name and type written by hand in the file) |
+| `shop/test_shop_db.py`, `shop/README.md` | new: tests and short notes |
+| `run_demo.py` | new: starts the shop and the coach together |
 
 ## Top bar
 
 | Button | What it does |
 |---|---|
 | My reviews (n) | the reviews started in this browser tab, each with its last score; **Open** loads one again |
+| Submit review | shown only after the review has a score; adds it to the product in the shop |
 | + New review | clears the page for a new review |
 | ☾ / ☀ | dark or light theme |
 | ⚙ | settings for the project team (below) and **Download data (CSV)**; users don't need it |
@@ -88,10 +127,11 @@ ones are different; it can be pressed again for a third set.
 |---|---|
 | `app.py` | the Streamlit page |
 | `evaluator.py` | `evaluate(product, review, judge)` for the score (judge `model`, `gemini` or `mock`) and `suggest(product, review, judge)` for the suggestions; the page calls only these |
-| `prompts/suggest_v1.txt` | the suggestion prompt |
+| `prompts/suggest_v5.txt` | the suggestion prompt |
 | `db.py` | SQLite database `review_coach.db` (created automatically, not committed) |
 | `export_db.py` | writes every table to `db_export/*.csv` for the report and prints the headline numbers |
 | `tests/test_evaluator.py` | checks that need no API key: `python -m pytest tests` (from `review_coach`) |
+| `../shop/` | the dummy shop and its database `shop.db` (made by `build_shop_db.py`, not committed) |
 
 ## Database (`review_coach.db`)
 
@@ -124,3 +164,10 @@ Export for the report: **⚙ → Download data (CSV)**, or
 
 No names, emails or API keys are stored. With the Gemini judge the review text is sent to Google;
 the project team should mention this to anyone testing the app.
+
+## Shop database (`shop/shop.db`)
+
+Separate from `review_coach.db`. Table `products` (product_id, platform, name, type) and table
+`reviews` (product_id, review_text, language, score, written_at, source). `source` is `dataset` for
+the original reviews and `coach` for reviews submitted here; their `score` is the one the reviewer saw.
+Running `build_shop_db.py` again rebuilds it and removes the submitted reviews.

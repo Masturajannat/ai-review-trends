@@ -31,8 +31,8 @@ from common import LEVELS, LLM  # noqa: E402
 
 SCORE_PROMPT = os.path.join(QE, "prompts", "prompt_v2.txt")
 SCORE_VERSION = "prompt_v2"
-SUGGEST_PROMPT = os.path.join(HERE, "prompts", "suggest_v3.txt")
-SUGGEST_VERSION = "suggest_v3"
+SUGGEST_PROMPT = os.path.join(HERE, "prompts", "suggest_v5.txt")
+SUGGEST_VERSION = "suggest_v5"
 # the review's language is detected here and named in the prompt, and the answer is checked:
 # Gemini does not reliably pick the right language by itself
 LANGUAGE_RULE = {
@@ -397,16 +397,18 @@ def _mock_suggest(review, attempt=0):
     return text[0], [{"quote": first, "suggestion": text[1], "example": text[2]}]
 
 
-def suggest(product, review, judge="gemini", avoid=None):
+def suggest(product, review, judge="gemini", avoid=None, product_type=""):
     """At most three suggestions for this review, each tied to a phrase the reviewer wrote.
-    `avoid`: suggestions already shown that the reviewer did not find helpful; new ones must differ."""
+    `avoid`: suggestions already shown that the reviewer did not find helpful; new ones must differ.
+    `product_type`: what kind of product it is, e.g. "body wash"; tells Gemini what the review should be about."""
     product, review = (product or "").strip(), (review or "").strip()
     if not review:
         raise ValueError("Write a review first.")
     t0 = time.time()
     if judge == "gemini":
         lang = detect_language(review)
-        prompt = _fill(SUGGEST_PROMPT, product, review).replace("{language_rule}", LANGUAGE_RULE[lang])
+        prompt = _fill(SUGGEST_PROMPT, product, review).replace("{language_rule}", LANGUAGE_RULE[lang]) \
+            .replace("{product_type}", (product_type or "").strip() or "(not given)")
         if avoid:
             earlier = "\n".join(f"- {a}" for a in avoid)
             i = prompt.index("\nOUTPUT")

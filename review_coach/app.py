@@ -4,10 +4,12 @@
     $env:GEMINI_API_KEY = "<your key>"      # optional; without it, use the mock judge
     python -m streamlit run app.py --server.headless true
 """
-import html, io, os, tempfile, zipfile
+import html, io, os, sys, tempfile, zipfile
 import streamlit as st
 
 import db
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "shop"))
+import shop_db       # the dummy shop's products and reviews
 from evaluator import evaluate, suggest, model_available, load_model, SUGGEST_VERSION
 
 st.set_page_config(page_title="Review Coach", page_icon="📝", layout="wide", initial_sidebar_state="collapsed")
@@ -25,7 +27,7 @@ THEMES = {
 ss = st.session_state
 for k, v in dict(sid=None, result=None, sug=None, sug_id=None, sug_draft=None, attempt=1, sug_text="", product_text="",
                  sug_seen=[], rated=set(), my_sessions=[], product="", review="",
-                 dark=False).items():
+                 dark=False, result_text="", submitted=False).items():
     ss.setdefault(k, v)
 T = THEMES["dark" if ss.dark else "light"]
 
@@ -33,8 +35,9 @@ CSS = f"""
 <style>
 [data-testid="stSidebar"], [data-testid="stSidebarCollapsedControl"], [data-testid="collapsedControl"],
 [data-testid="stToolbar"], [data-testid="stDecoration"] {{ display:none !important; }}
-[data-testid="stHeader"] {{ background:transparent; height:0; }}
-.block-container {{ padding-top:1.2rem !important; }}
+[data-testid="stHeader"] {{ background:transparent; height:0; pointer-events:none; }}
+.block-container {{ padding-top:1.2rem !important; padding-bottom:0.5rem !important; }}
+[data-testid="stVerticalBlock"] {{ gap:0.6rem; }}
 .st-key-topbar {{ background:{T['card']}; border:1px solid {T['line']}; border-radius:14px; padding:10px 16px; margin-bottom:10px; }}
 .st-key-topbar [data-testid="stHorizontalBlock"] {{ align-items:center; }}
 [data-testid="stPopoverBody"] {{ min-width:360px; }}
@@ -50,24 +53,24 @@ CSS = f"""
 .st-key-inputcard {{ background:{T['card']}; border:1px solid {T['line']}; border-radius:14px; padding:20px 22px; }}
 .rc-rev {{ display:flex; justify-content:space-between; gap:10px; }}
 .rc-chip {{ font-size:12px; font-weight:700; padding:2px 8px; border-radius:20px; background:{T['pill']}; color:{T['ok']}; }}
-.rc-card {{ background:{T['card']}; border:1px solid {T['line']}; border-radius:14px; padding:20px 22px; margin-bottom:14px; color:{T['ink']}; }}
+.rc-card {{ background:{T['card']}; border:1px solid {T['line']}; border-radius:14px; padding:14px 18px; margin-bottom:10px; color:{T['ink']}; }}
 .rc-title {{ font-weight:600; margin-bottom:10px; }}
-.rc-score {{ text-align:center; }}
-.rc-ring {{ width:150px; height:150px; border-radius:50%; margin:6px auto 10px; display:flex; align-items:center; justify-content:center; }}
-.rc-ring > div {{ width:116px; height:116px; border-radius:50%; background:{T['card']}; display:flex; align-items:center;
-                 justify-content:center; font-size:42px; font-weight:800; }}
+.rc-scorehead {{ display:flex; align-items:center; gap:14px; }}
+.rc-big {{ font-size:28px; font-weight:800; line-height:1; }}
+.rc-bar {{ flex:1; height:14px; border-radius:999px; background:{T['line']}; overflow:hidden; }}
+.rc-bar > div {{ height:100%; border-radius:999px; }}
 .rc-muted {{ color:{T['muted']}; font-size:13px; }}
 .rc-dot {{ width:14px; height:14px; border-radius:50%; flex:none; box-sizing:border-box; margin-top:5px; }}
 .rc-why {{ display:flex; gap:10px; align-items:flex-start; margin:8px 0; line-height:1.5; }}
-.rc-draft {{ background:{T['soft']}; border-radius:10px; padding:12px 14px; line-height:1.7; white-space:pre-wrap; margin-bottom:6px; }}
+.rc-draft {{ background:{T['soft']}; border-radius:10px; padding:8px 12px; line-height:1.7; white-space:pre-wrap; margin-bottom:6px; }}
 .rc-draft mark {{ background:{T['mark']}; color:{T['ink']}; border-bottom:2px solid {T['miss']}; border-radius:3px; padding:1px 2px; }}
 .rc-draft sup {{ color:{T['miss_text']}; font-weight:700; margin-left:1px; }}
-.rc-sug {{ display:flex; gap:12px; background:{T['tip']}; border-radius:10px; padding:12px 14px; margin:10px 0 0; }}
+.rc-sug {{ display:flex; gap:12px; background:{T['tip']}; border-radius:10px; padding:8px 12px; margin:6px 0 0; }}
 .rc-num {{ flex:none; width:24px; height:24px; border-radius:50%; background:{T['miss']}; color:{T['on_ok']};
            display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; }}
 .rc-sug q {{ color:{T['miss_text']}; font-size:13px; font-weight:600; }}
 .rc-sug p {{ margin:2px 0 0 !important; line-height:1.5; }}
-.rc-eg {{ display:inline-block; margin-top:8px; padding:4px 10px; border-radius:8px; background:{T['card']};
+.rc-eg {{ display:inline-block; margin-top:4px; padding:4px 10px; border-radius:8px; background:{T['card']};
           border:1px dashed {T['line']}; font-size:14px; }}
 .rc-hist {{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }}
 .rc-pill {{ padding:6px 12px; border-radius:999px; background:{T['pill']}; font-size:14px; }}
@@ -110,6 +113,23 @@ def get_db():
 con = get_db()
 esc = html.escape
 
+# the product comes from the shop link (?product=<id>); without it there is nothing to review
+SHOP_URL = os.environ.get("SHOP_URL", "http://localhost:8502")
+try:
+    prod, shop_error = shop_db.product(st.query_params.get("product", "")), ""
+except Exception as e:                       # for example shop.db was not made yet
+    prod, shop_error = None, str(e)
+if prod is None:
+    st.markdown("<div class='rc-card' style='max-width:520px;margin:12vh auto 10px'>"
+                "<div class='rc-title' style='font-size:18px'>Pick a product in the shop first</div>"
+                "<p style='margin:0'>Review Coach opens from a product page: choose a product, then press "
+                "<b>Write a review</b>.</p></div>", unsafe_allow_html=True)
+    if shop_error:
+        st.error(shop_error)
+    st.link_button("Go to the shop", SHOP_URL)
+    st.stop()
+ss.product = prod["name"]                    # fixed: the text box below only shows it
+
 
 def new_review():
     ss.sid = ss.result = ss.sug = ss.sug_id = ss.sug_draft = None
@@ -117,6 +137,7 @@ def new_review():
     ss.product = ss.review = ""
     ss.sug_seen = []
     ss.sug_text = ""
+    ss.result_text, ss.submitted = "", False
 
 
 def session(product):
@@ -137,6 +158,7 @@ def open_review(sid):
     if last:
         ss.product, ss.review = last[0]["product_name"] or "", last[0]["review_text"]
         ss.result = db.cached_score(con, ss.product, ss.review, ss.get("judge", "model"))
+        ss.result_text = ss.review.strip() if ss.result else ""
 
 
 def toggle_dark():
@@ -173,8 +195,9 @@ with st.container(key="topbar"):
     logo, gap, mine, new, dark, gear = st.columns([4, 3, 1.5, 1.4, 0.5, 0.5], gap="small",
                                                   vertical_alignment="center")
     logo.markdown("<div class='rc-logo'><i>R</i>Review Coach</div>", unsafe_allow_html=True)
-    with mine.popover(f"My reviews ({len(ss.my_sessions)})", use_container_width=True):
-        rows = db.last_drafts(con, ss.my_sessions)
+    submit_slot = gap.empty()                # the Submit button appears here once the review has a score
+    rows = [r_ for r_ in db.last_drafts(con, ss.my_sessions) if (r_["product_name"] or "") == prod["name"]]
+    with mine.popover(f"My reviews ({len(rows)})", use_container_width=True):
         if not rows:
             st.caption("Reviews you rate or improve here appear in this list.")
         for r_ in rows:
@@ -203,13 +226,25 @@ with st.container(key="topbar"):
         st.download_button("Download data (CSV)", data=export_zip(), file_name="review_coach_data.zip",
                            mime="application/zip", use_container_width=True)
 
+if ss.submitted:
+    _, mid, _ = st.columns([1, 1.4, 1])
+    with mid:
+        st.markdown(f"<div class='rc-card' style='margin-top:12vh'>"
+                    f"<div class='rc-title' style='font-size:18px'>Your review was added</div>"
+                    f"<p style='margin:0'>It is now on the product page of <b>{esc(prod['name'])}</b>.</p></div>",
+                    unsafe_allow_html=True)
+        back, again = st.columns(2)
+        back.link_button("Back to the product", f"{SHOP_URL}/?p={prod['product_id']}", use_container_width=True)
+        again.button("Write another review", on_click=new_review, use_container_width=True)
+    st.stop()
+
 left, right = st.columns([5, 6], gap="large")
 
 # ---------------------------------------------------------------- input
 with left, st.container(key="inputcard"):
     st.markdown("<div class='rc-title' style='font-size:18px;margin-bottom:2px'>Write your review</div>"
                 "<div class='rc-muted'>Your own way, in Bangla, Banglish or English.</div>", unsafe_allow_html=True)
-    product = st.text_input("Product (optional)", key="product", placeholder="e.g. Foaming Facial Cleanser 236 ml")
+    product = st.text_input("Product", key="product", disabled=True)
     review = st.text_area("Your review", key="review", height=260,
                           placeholder="Share your experience with what you bought.")
     st.caption(f"{len(review.split())} words")
@@ -229,7 +264,7 @@ with left, st.container(key="inputcard"):
             with st.spinner("Rating your review..."):
                 r = hit or evaluate(product, review, judge=judge, explain=False)
             db.save_score(con, did, r, from_cache=hit is not None)
-            ss.result = r
+            ss.result, ss.result_text = r, review.strip()
             if ss.sug_text != review:          # suggestions for an older draft: hide them
                 ss.sug = ss.sug_id = None
         except Exception as e:
@@ -239,7 +274,7 @@ with left, st.container(key="inputcard"):
         hit = db.cached_suggestions(con, product, review, helper, SUGGEST_VERSION if helper == "gemini" else "mock")
         try:
             with st.spinner("Looking for ways to improve your review..."):
-                s = hit or suggest(product, review, judge=helper)
+                s = hit or suggest(product, review, judge=helper, product_type=prod["type"])
             ss.sug_id = db.save_suggestions(con, did, s, attempt=1, from_cache=hit is not None)
             ss.sug, ss.sug_text, ss.product_text, ss.sug_draft, ss.attempt = s, review, product, did, 1
             ss.sug_seen = [i["suggestion"] for i in s["suggestions"]]
@@ -248,6 +283,16 @@ with left, st.container(key="inputcard"):
 
 if ss.pop("fresh", False):
     st.rerun()
+
+# Submit shows only for a review that has been rated, and only while the text is the one that was rated
+if ss.result is not None and ss.result_text == (ss.review or "").strip():
+    if submit_slot.button("Submit review", key="submit_btn", type="primary", use_container_width=True):
+        try:
+            shop_db.add_review(prod["product_id"], ss.result_text, ss.result["score"], ss.result.get("language"))
+            ss.submitted = True
+            st.rerun()
+        except Exception as e:
+            st.error(str(e))
 
 # ---------------------------------------------------------------- results
 with right:
@@ -272,11 +317,11 @@ with right:
                 "<div class='rc-muted' style='margin-top:8px'>Want to know what would raise it? Press "
                 "<b>Suggest improvements</b>.</div>")
         st.markdown(f"""
-<div class='rc-card rc-score'>
-  <div class='rc-title' style='text-align:left'>Your score</div>
-  <div class='rc-ring' style='background:conic-gradient({color} 0 {pct:.1f}%, {T['line']} {pct:.1f}% 100%)'>
-    <div style='color:{color}'>{r['score']:g}</div></div>
-  <div class='rc-muted'>{note}</div>
+<div class='rc-card'>
+  <div class='rc-scorehead'><span class='rc-title' style='margin:0'>Your score</span>
+    <div class='rc-bar'><div style='width:{pct:.1f}%; background:{color}'></div></div>
+    <span class='rc-big' style='color:{color}'>{r['score']:g}</span></div>
+  <div class='rc-muted' style='margin-top:6px'>{note}</div>
   {hint}
 </div>""", unsafe_allow_html=True)
         if r["explanation"]:                       # only the Gemini judge writes one
@@ -293,10 +338,10 @@ with right:
             body += f"<div class='rc-draft'>{highlight(ss.sug_text, [i['quote'] for i in items])}</div>"
             for n, i in enumerate(items, 1):
                 quote = f"<q>{esc(i['quote'])}</q>" if i["quote"] else ""
-                eg = f"<span class='rc-eg'>{esc(i['example'])}</span>" if i["example"] else ""
+                eg = f"<span class='rc-eg'>e.g. {esc(i['example'])}</span>" if i["example"] else ""
                 body += (f"<div class='rc-sug'><div class='rc-num'>{n}</div><div>{quote}"
                          f"<p>{esc(i['suggestion'])}</p>{eg}</div></div>")
-            body += ("<p class='rc-muted' style='margin:12px 0 0'>These are only ideas. Use the ones that fit "
+            body += ("<p class='rc-muted' style='margin:8px 0 0'>These are only ideas. Use the ones that fit "
                      "your experience, then rate your review again.</p>")
         else:
             body += "<p class='rc-muted'>Nothing to add. Your review is already detailed and clear.</p>"
@@ -311,7 +356,7 @@ with right:
                 # ask again, telling Gemini which suggestions were not helpful so the new ones differ
                 try:
                     with st.spinner("Finding different suggestions..."):
-                        new = suggest(ss.product_text, ss.sug_text, judge=helper, avoid=ss.sug_seen)
+                        new = suggest(ss.product_text, ss.sug_text, judge=helper, avoid=ss.sug_seen, product_type=prod["type"])
                     ss.attempt += 1
                     ss.sug_id = db.save_suggestions(con, ss.sug_draft, new, attempt=ss.attempt)
                     ss.sug = new
