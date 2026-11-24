@@ -11,6 +11,7 @@ import db
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "shop"))
 import shop_db       # the dummy shop's products and reviews
 from evaluator import evaluate, suggest, model_available, load_model, SUGGEST_VERSION
+import console_log      # prints each rating and its breakdown in the terminal
 
 st.set_page_config(page_title="Review Coach", page_icon="📝", layout="wide", initial_sidebar_state="collapsed")
 
@@ -265,6 +266,8 @@ with left, st.container(key="inputcard"):
                 r = hit or evaluate(product, review, judge=judge, explain=False)
             db.save_score(con, did, r, from_cache=hit is not None)
             ss.result, ss.result_text = r, review.strip()
+            console_log.log_rating(product, prod["type"], review, r,
+                                   cached=hit is not None, judge=judge, note=(helper == "gemini"))
             if ss.sug_text != review:          # suggestions for an older draft: hide them
                 ss.sug = ss.sug_id = None
         except Exception as e:

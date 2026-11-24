@@ -171,3 +171,15 @@ Separate from `review_coach.db`. Table `products` (product_id, platform, name, t
 `reviews` (product_id, review_text, language, score, written_at, source). `source` is `dataset` for
 the original reviews and `coach` for reviews submitted here; their `score` is the one the reviewer saw.
 Running `build_shop_db.py` again rebuilds it and removes the submitted reviews.
+
+## Console log (terminal)
+
+Each press of **Rate my review** prints a log in the terminal that runs the app (`run_demo.py`); the page
+itself does not change. `console_log.py` prints, in order: the request (product, review, language, words),
+how the score was made (tokens read, model output, rounding, level), what our model reacted to (points each
+sentence added: the score of the whole review minus the score without that sentence), and the response sent to the page. After that, a short Gemini note arrives: Gemini is given the review,
+the model's score and the sentence points, and only explains them (`prompts/console_note_v1.txt`). It does
+not give a score and is not used for the score; the four criteria words in it are optional labels. The note
+needs `GEMINI_API_KEY` and "Suggestions from: Gemini"; without them the console says "note unavailable".
+Set `NOTE_IN_BACKGROUND = False` in `console_log.py` to print the note before the next step instead of when
+it arrives.
